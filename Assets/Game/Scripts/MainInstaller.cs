@@ -4,6 +4,7 @@ using UnityEngine;
 using Zenject;
 using System;
 using Authorization;
+using Web;
 
 public class MainInstaller : MonoInstaller
 {
@@ -16,6 +17,15 @@ public class MainInstaller : MonoInstaller
 	
 	public override void InstallBindings()
 	{
+		#region Web
+		
+		Container
+			.Bind<IHTTPPresenter>()
+			.To<HTTPPresenter>()
+			.AsSingle();
+			
+		#endregion
+		
 		#region Authorization
 		
 		Container
