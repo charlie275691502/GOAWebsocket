@@ -9,9 +9,15 @@ public class MainInstaller : MonoInstaller
 {
 	[SerializeField]
 	private AuthorizationView _authorizationView;
+	[SerializeField]
+	private LoginView _loginView;
+	[SerializeField]
+	private RegisterView _registerView;
 	
 	public override void InstallBindings()
 	{
+		#region Authorization
+		
 		Container
 			.Bind<IAuthorizationPresenter>()
 			.To<AuthorizationPresenter>()
@@ -20,5 +26,23 @@ public class MainInstaller : MonoInstaller
 			.Bind<IAuthorizationView>()
 			.To<AuthorizationView>()
 			.FromInstance(_authorizationView);
+		Container
+			.Bind<ILoginPresneter>()
+			.To<LoginPresenter>()
+			.AsSingle();
+		Container
+			.Bind<ILoginView>()
+			.To<LoginView>()
+			.FromInstance(_loginView);
+		Container
+			.Bind<IRegisterPresenter>()
+			.To<RegisterPresenter>()
+			.AsSingle();
+		Container
+			.Bind<IRegisterView>()
+			.To<RegisterView>()
+			.FromInstance(_registerView);
+			
+		#endregion
 	}
 }

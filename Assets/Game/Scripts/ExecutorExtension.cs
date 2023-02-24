@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Rayark.Mast;
 using UnityEngine;
 
-public class SimpleExecutor : Executor
+public class CommandExecutor : Executor
 {
 	private bool _isStop;
 	public IEnumerator Start()
