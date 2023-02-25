@@ -14,9 +14,9 @@ namespace Authorization
 	
 	public class RegisterPresenter : IRegisterPresenter
 	{
-		private readonly IHTTPPresenter _hTTPPresenter;
-		private readonly IWarningPresenter _warningPresenter;
-		private readonly IRegisterView _registerView;
+		private IHTTPPresenter _hTTPPresenter;
+		private IWarningPresenter _warningPresenter;
+		private IRegisterView _registerView;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
@@ -48,10 +48,29 @@ namespace Authorization
 			_Stop();
 		}
 		
-		private void _OnRegister()
+		private void _OnRegister(string username, string password, string confirmPassword, string email)
 		{
-			Debug.Log("Register");
-			_result = AuthorizationTabResult.Leave;
+			if(_commandExecutor.Empty)
+				_commandExecutor.Add(_Register(username, password, confirmPassword, email));
+		}
+
+		private IEnumerator _Register(string username, string password, string confirmPassword, string email)
+		{
+			if(password != confirmPassword)
+			{
+				yield return _warningPresenter.Run("Input Fail", "Passwrod and Confirm Password are not the same");
+				yield break;
+			}
+			
+			var monad = _hTTPPresenter.Register(username, password, email);
+			yield return monad.Do();
+			if(monad.Error != null)
+			{
+				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.ToString());
+				yield break;
+			}
+			Debug.LogFormat("username: {0}", monad.Result.Username);
+			_result = AuthorizationTabResult.ToLogin;
 			_Stop();
 		}
 	}

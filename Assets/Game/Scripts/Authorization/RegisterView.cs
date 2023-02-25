@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,7 @@ namespace Authorization
 {
 	public interface IRegisterView
 	{
-		void Enter(Action onSwitchToLogin, Action onRegister);
+		void Enter(Action onSwitchToLogin, Action<string, string, string, string> onRegister);
 		void Leave();
 	}
 	
@@ -17,14 +18,22 @@ namespace Authorization
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
+		private InputField _usernameInputField;
+		[SerializeField]
+		private InputField _passwordInputField;
+		[SerializeField]
+		private InputField _confirmPasswordInputField;
+		[SerializeField]
+		private InputField _emailInputField;
+		[SerializeField]
 		private Button _switchToLoginButton;
 		[SerializeField]
 		private Button _registerButton;
 		
 		private Action _onSwitchToLogin;
-		private Action _onRegister;
+		private Action<string, string, string, string> _onRegister;
 		
-		public void Enter(Action onSwitchToLogin, Action onRegister)
+		public void Enter(Action onSwitchToLogin, Action<string, string, string, string> onRegister)
 		{
 			_Register(onSwitchToLogin, onRegister);
 			_panel.SetActive(true);
@@ -36,7 +45,7 @@ namespace Authorization
 			_panel.SetActive(false);
 		}
 		
-		private void _Register(Action onSwitchToLogin, Action onRegister)
+		private void _Register(Action onSwitchToLogin, Action<string, string, string, string> onRegister)
 		{
 			_onSwitchToLogin = onSwitchToLogin;
 			_onRegister = onRegister;
@@ -61,7 +70,7 @@ namespace Authorization
 		
 		private void _OnRegister()
 		{
-			_onRegister?.Invoke();
+			_onRegister?.Invoke(_usernameInputField.text, _passwordInputField.text, _confirmPasswordInputField.text, _emailInputField.text);
 		}
 	}
 }

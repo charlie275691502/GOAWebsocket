@@ -12,4 +12,10 @@ namespace Web
 		[JsonProperty("refresh")]
 		public string RefreshKey;
 	}
+	
+	public class RegisterResult
+	{
+		[JsonProperty("username")]
+		public string Username;
+	}
 }

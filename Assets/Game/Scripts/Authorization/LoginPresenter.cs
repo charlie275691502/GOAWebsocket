@@ -13,9 +13,9 @@ namespace Authorization
 	}
 	public class LoginPresenter : ILoginPresneter
 	{
-		private readonly IHTTPPresenter _hTTPPresenter;
-		private readonly IWarningPresenter _warningPresenter;
-		private readonly ILoginView _loginView;
+		private IHTTPPresenter _hTTPPresenter;
+		private IWarningPresenter _warningPresenter;
+		private ILoginView _loginView;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
@@ -65,6 +65,6 @@ namespace Authorization
 			Debug.LogFormat("access: {0}\n\nrefresh: {1}", monad.Result.AccessKey, monad.Result.RefreshKey);
 			_result = AuthorizationTabResult.Leave;
 			_Stop();
-		}		
+		}
 	}
 }

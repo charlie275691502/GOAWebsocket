@@ -12,7 +12,7 @@ namespace Common
 	
 	public class WarningPresenter : IWarningPresenter
 	{
-		private readonly IWarningView _warningView;
+		private IWarningView _warningView;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private Action _onConfirm;

@@ -25,11 +25,11 @@ namespace Authorization
 			Register,
 		}
 		
-		private readonly IAuthorizationView _authorizationView;
-		private readonly ILoginPresneter _loginPresneter;
-		private readonly ILoginView _loginView;
-		private readonly IRegisterPresenter _registerPresenter;
-		private readonly IRegisterView _registerView;
+		private IAuthorizationView _authorizationView;
+		private ILoginPresneter _loginPresneter;
+		private ILoginView _loginView;
+		private IRegisterPresenter _registerPresenter;
+		private IRegisterView _registerView;
 		
 		public AuthorizationPresenter(
 			ILoginPresneter loginPresneter,

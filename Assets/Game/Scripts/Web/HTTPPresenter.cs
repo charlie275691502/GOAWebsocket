@@ -12,10 +12,11 @@ namespace Web
 	public interface IHTTPPresenter
 	{
 		IMonad<LoginResult> Login(string username, string password);
+		IMonad<RegisterResult> Register(string username, string password, string email);
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
-		private readonly ILoadingView _loadingView;
+		private ILoadingView _loadingView;
 		
 		public HTTPPresenter(ILoadingView loadingView)
 		{
@@ -31,6 +32,19 @@ namespace Web
 				{
 					{"username", username},
 					{"password", password},
+				});
+		}
+		
+		public IMonad<RegisterResult> Register(string username, string password, string email)
+		{
+			return _Send<RegisterResult>(
+				"auth/users/",
+				HTTPMethods.Post,
+				new Dictionary<string, object>()
+				{
+					{"username", username},
+					{"password", password},
+					{"email", email},
 				});
 		}
 		
