@@ -13,6 +13,7 @@ namespace Authorization
 	public class RegisterPresenter : IRegisterPresenter
 	{
 		private IRegisterView _registerView;
+		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
@@ -29,23 +30,23 @@ namespace Authorization
 			ret.Accept(_result);
 		}
 		
+		private void _Stop()
+		{
+			_registerView.Leave();
+			_commandExecutor.Stop();
+		}
+		
 		private void _OnSwitchToLogin()
 		{
 			_result = AuthorizationTabResult.ToLogin;
-			_Leave();
+			_Stop();
 		}
 		
 		private void _OnRegister()
 		{
 			Debug.Log("Register");
 			_result = AuthorizationTabResult.Leave;
-			_Leave();
-		}
-		
-		private void _Leave()
-		{
-			_registerView.Leave();
-			_commandExecutor.Stop();
+			_Stop();
 		}
 	}
 }

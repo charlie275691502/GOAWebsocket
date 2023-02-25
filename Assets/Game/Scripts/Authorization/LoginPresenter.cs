@@ -14,6 +14,7 @@ namespace Authorization
 	{
 		private IHTTPPresenter _hTTPPresenter;
 		private ILoginView _loginView;
+		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
@@ -31,10 +32,16 @@ namespace Authorization
 			ret.Accept(_result);
 		}
 		
+		private void _Stop()
+		{
+			_loginView.Leave();
+			_commandExecutor.Stop();
+		}
+		
 		private void _OnSwitchToRegister()
 		{
 			_result = AuthorizationTabResult.ToRegister;
-			_Leave();
+			_Stop();
 		}
 		
 		private void _OnLogin()
@@ -54,13 +61,7 @@ namespace Authorization
 			}
 			Debug.Log("Request Finished! Text received: " + monad.Result);
 			_result = AuthorizationTabResult.Leave;
-			_Leave();
+			_Stop();
 		}		
-		
-		private void _Leave()
-		{
-			_loginView.Leave();
-			_commandExecutor.Stop();
-		}
 	}
 }
