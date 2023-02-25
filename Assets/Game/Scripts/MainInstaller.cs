@@ -11,6 +11,8 @@ public class MainInstaller : MonoInstaller
 {
 	[SerializeField]
 	private WarningView _warningView;
+	[SerializeField]
+	private LoadingView _loadingView;
 	
 	[SerializeField]
 	private AuthorizationView _authorizationView;
@@ -40,6 +42,14 @@ public class MainInstaller : MonoInstaller
 			.Bind<IWarningView>()
 			.To<WarningView>()
 			.FromInstance(_warningView);
+		Container
+			.Bind<ILoadingPresenter>()
+			.To<LoadingPresenter>()
+			.AsSingle();
+		Container
+			.Bind<ILoadingView>()
+			.To<LoadingView>()
+			.FromInstance(_loadingView);
 			
 		#endregion
 		

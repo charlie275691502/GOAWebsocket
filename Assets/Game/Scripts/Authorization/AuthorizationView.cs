@@ -6,13 +6,10 @@ namespace Authorization
 {
 	public interface IAuthorizationView
 	{
-		void Display();
+		
 	}
 	public class AuthorizationView : MonoBehaviour, IAuthorizationView
 	{
-		public void Display()
-		{
-			Debug.Log("Display");
-		}
+		
 	}
 }

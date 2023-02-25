@@ -47,7 +47,6 @@ namespace Authorization
 		
 		public IEnumerator Run()
 		{
-			_authorizationView.Display();
 			yield return _Run();
 		}
 		
