@@ -47,22 +47,22 @@ namespace Authorization
 			_Stop();
 		}
 		
-		private void _OnLogin()
+		private void _OnLogin(string username, string password)
 		{
 			if(_commandExecutor.Empty)
-				_commandExecutor.Add(_Login());
+				_commandExecutor.Add(_Login(username, password));
 		}
 
-		private IEnumerator _Login()
+		private IEnumerator _Login(string username, string password)
 		{
-			var monad = _hTTPPresenter.Login();
+			var monad = _hTTPPresenter.Login(username, password);
 			yield return monad.Do();
 			if(monad.Error != null)
 			{
 				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.ToString());
 				yield break;
 			}
-			Debug.Log("Request Finished! Text received: " + monad.Result);
+			Debug.LogFormat("access: {0}\n\nrefresh: {1}", monad.Result.AccessKey, monad.Result.RefreshKey);
 			_result = AuthorizationTabResult.Leave;
 			_Stop();
 		}		

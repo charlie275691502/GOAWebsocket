@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BestHTTP;
 using Common;
+using Newtonsoft.Json;
 using Rayark.Mast;
 using UnityEngine;
 
@@ -10,33 +11,38 @@ namespace Web
 {
 	public interface IHTTPPresenter
 	{
-		IMonad<string> Login();
+		IMonad<LoginResult> Login(string username, string password);
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
 		private readonly ILoadingView _loadingView;
-		
-		string accessKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc3MjA3NzgyLCJqdGkiOiI4ODZjZWNjOTI1ZTI0MWMwOWU0ZmVkOGVkMTM3NDVhNyIsInVzZXJfaWQiOjR9.29WT5dPlJbuL9wuyR8xC1zJawyRnkFp4OMRVW1Fk6XY";
 		
 		public HTTPPresenter(ILoadingView loadingView)
 		{
 			_loadingView = loadingView;
 		}
 		
-		public IMonad<string> Login()
+		public IMonad<LoginResult> Login(string username, string password)
 		{
-			return _Send<string>("auth/jwt/create/", HTTPMethods.Post, "{ \"username\": \"player1\", \"password\": \"asd860221\" }");
+			return _Send<LoginResult>(
+				"auth/jwt/create/",
+				HTTPMethods.Post,
+				new Dictionary<string, object>()
+				{
+					{"username", username},
+					{"password", password},
+				});
 		}
 		
-		
-		private IMonad<T> _Send<T>(string path, HTTPMethods method, string json)
+		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body)
 		{
-			return new BlockMonad<string>(r => _SendRequest(path, method, json, r))
-				.Map(r => (T)(object)r);
+			return new BlockMonad<string>(r => _SendRequest(path, method, body, r))
+				.Map(r => JsonConvert.DeserializeObject<T>(r));
 		}
 		
-		private IEnumerator _SendRequest(string path, HTTPMethods method, string json, IReturn<string> ret)
+		private IEnumerator _SendRequest(string path, HTTPMethods method, Dictionary<string, object> body, IReturn<string> ret)
 		{
+			var json = JsonConvert.SerializeObject(body);
 			var isFinished = false;
 			var result = string.Empty;
 			OnRequestFinishedDelegate onRequestFinished = (HTTPRequest request, HTTPResponse response) =>

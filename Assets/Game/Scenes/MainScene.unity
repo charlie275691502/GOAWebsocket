@@ -2858,6 +2858,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _panel: {fileID: 590849078}
+  _usernameInputField: {fileID: 195088531}
+  _passwordInputField: {fileID: 1061677515}
   _switchToRegisterButton: {fileID: 52602314}
   _loginButton: {fileID: 627996643}
 --- !u!1 &1081899784
