@@ -25,24 +25,10 @@ namespace Authorization
 		
 		public IEnumerator Run(IReturn<AuthorizationTabResult> ret)
 		{
-			_Register();
-			_loginView.Enter();
+			_loginView.Enter(_OnSwitchToRegister, _OnLogin);
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
-			_Unregister();
 			ret.Accept(_result);
-		}
-		
-		private void _Register()
-		{
-			_loginView.OnClickSwitchToRegister += _OnSwitchToRegister;
-			_loginView.OnClickLogin += _OnLogin;
-		}
-		
-		private void _Unregister()
-		{
-			_loginView.OnClickSwitchToRegister -= _OnSwitchToRegister;
-			_loginView.OnClickLogin -= _OnLogin;
 		}
 		
 		private void _OnSwitchToRegister()
