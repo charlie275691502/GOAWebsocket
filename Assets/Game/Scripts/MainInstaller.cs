@@ -43,10 +43,6 @@ public class MainInstaller : MonoInstaller
 			.To<WarningView>()
 			.FromInstance(_warningView);
 		Container
-			.Bind<ILoadingPresenter>()
-			.To<LoadingPresenter>()
-			.AsSingle();
-		Container
 			.Bind<ILoadingView>()
 			.To<LoadingView>()
 			.FromInstance(_loadingView);
