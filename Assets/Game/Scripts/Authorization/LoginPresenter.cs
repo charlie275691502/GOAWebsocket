@@ -55,7 +55,7 @@ namespace Authorization
 
 		private IEnumerator _Login()
 		{
-			var monad = _hTTPPresenter.TestSend();
+			var monad = _hTTPPresenter.Login();
 			yield return monad.Do();
 			if(monad.Error != null)
 			{

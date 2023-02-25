@@ -10,7 +10,7 @@ namespace Web
 {
 	public interface IHTTPPresenter
 	{
-		IMonad<string> TestSend();
+		IMonad<string> Login();
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
@@ -23,19 +23,19 @@ namespace Web
 			_loadingView = loadingView;
 		}
 		
-		public IMonad<string> TestSend()
+		public IMonad<string> Login()
 		{
-			return _Send<string>();
+			return _Send<string>("auth/jwt/create/", HTTPMethods.Post, "{ \"username\": \"player1\", \"password\": \"asd860221\" }");
 		}
 		
 		
-		private IMonad<T> _Send<T>()
+		private IMonad<T> _Send<T>(string path, HTTPMethods method, string json)
 		{
-			return new BlockMonad<string>(r => _SendRequest(r))
+			return new BlockMonad<string>(r => _SendRequest(path, method, json, r))
 				.Map(r => (T)(object)r);
 		}
 		
-		private IEnumerator _SendRequest(IReturn<string> ret)
+		private IEnumerator _SendRequest(string path, HTTPMethods method, string json, IReturn<string> ret)
 		{
 			var isFinished = false;
 			var result = string.Empty;
@@ -47,8 +47,10 @@ namespace Web
 			};
 			_loadingView.Enter();
 			
-			HTTPRequest request = new HTTPRequest(new Uri(string.Format("http://{0}/mainpage/players/me/", WebUtility.Address)), onRequestFinished);
-			request.AddHeader("Authorization", "JWT " + accessKey);
+			HTTPRequest request = new HTTPRequest(new Uri(string.Format("http://{0}:{1}/{2}", WebUtility.Host, WebUtility.Port, path)), method, onRequestFinished);
+			request.SetHeader("Content-Type", "application/json; charset=UTF-8");
+			request.RawData = System.Text.Encoding.UTF8.GetBytes(json);
+			// request.AddHeader("Authorization", "JWT " + accessKey);
 			request.Send();
 			
 			while (!isFinished)
