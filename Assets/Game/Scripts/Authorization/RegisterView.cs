@@ -8,7 +8,7 @@ namespace Authorization
 {
 	public interface IRegisterView
 	{
-		void Enter(Action onClickSwitchToLogin, Action onClickRegister);
+		void Enter(Action onSwitchToLogin, Action onRegister);
 		void Leave();
 	}
 	
@@ -21,12 +21,12 @@ namespace Authorization
 		[SerializeField]
 		private Button _registerButton;
 		
-		private Action _onClickSwitchToLogin;
-		private Action _onClickRegister;
+		private Action _onSwitchToLogin;
+		private Action _onRegister;
 		
-		public void Enter(Action onClickSwitchToLogin, Action onClickRegister)
+		public void Enter(Action onSwitchToLogin, Action onRegister)
 		{
-			_Register(onClickSwitchToLogin, onClickRegister);
+			_Register(onSwitchToLogin, onRegister);
 			_panel.SetActive(true);
 		}
 		
@@ -36,32 +36,32 @@ namespace Authorization
 			_panel.SetActive(false);
 		}
 		
-		private void _Register(Action onClickSwitchToLogin, Action onClickRegister)
+		private void _Register(Action onSwitchToLogin, Action onRegister)
 		{
-			_onClickSwitchToLogin = onClickSwitchToLogin;
-			_onClickRegister = onClickRegister;
+			_onSwitchToLogin = onSwitchToLogin;
+			_onRegister = onRegister;
 			
-			_switchToLoginButton.onClick.AddListener(_OnClickSwitchToLogin);
-			_registerButton.onClick.AddListener(_OnClickRegister);
+			_switchToLoginButton.onClick.AddListener(_OnSwitchToLogin);
+			_registerButton.onClick.AddListener(_OnRegister);
 		}
 		
 		private void _Unregister()
 		{
-			_onClickSwitchToLogin = null;
-			_onClickRegister = null;
+			_onSwitchToLogin = null;
+			_onRegister = null;
 			
 			_switchToLoginButton.onClick.RemoveAllListeners();
 			_registerButton.onClick.RemoveAllListeners();
 		}
 		
-		private void _OnClickSwitchToLogin()
+		private void _OnSwitchToLogin()
 		{
-			_onClickSwitchToLogin?.Invoke();
+			_onSwitchToLogin?.Invoke();
 		}
 		
-		private void _OnClickRegister()
+		private void _OnRegister()
 		{
-			_onClickRegister?.Invoke();
+			_onRegister?.Invoke();
 		}
 	}
 }
