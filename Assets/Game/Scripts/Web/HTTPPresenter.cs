@@ -59,11 +59,19 @@ namespace Web
 			var json = JsonConvert.SerializeObject(body);
 			var isFinished = false;
 			var result = string.Empty;
+			Exception error = null;
+			
 			OnRequestFinishedDelegate onRequestFinished = (HTTPRequest request, HTTPResponse response) =>
 			{
-				result = response.DataAsText;
+				if(response.IsSuccess)
+				{
+					result = response.DataAsText;
+				} else 
+				{
+					error = new Exception(string.Format("[{0}] {1}", response.StatusCode, response.Message));
+				}
+				
 				isFinished = true;
-				_loadingView.Leave();
 			};
 			_loadingView.Enter();
 			
@@ -81,15 +89,22 @@ namespace Web
 					request.State == HTTPRequestStates.ConnectionTimedOut ||
 					request.State == HTTPRequestStates.TimedOut)
 				{
-					ret.Fail(new Exception("Request Finished with Error! " + (request.Exception != null ? (request.Exception.Message + "\n" + request.Exception.StackTrace) : "No Exception")));
-					_loadingView.Leave();
-					yield break;
+					error = new Exception("Request Finished with Error! " + (request.Exception != null ? (request.Exception.Message + "\n" + request.Exception.StackTrace) : "No Exception"));
+					isFinished = true;
 				}
 				
 				yield return null;
 			}
 			
-			ret.Accept(result);
+			_loadingView.Leave();
+			
+			if(error != null)
+			{
+				ret.Fail(error);
+			} else 
+			{
+				ret.Accept(result);
+			}
 		}
 	}
 }

@@ -59,7 +59,7 @@ namespace Authorization
 			yield return monad.Do();
 			if(monad.Error != null)
 			{
-				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.ToString());
+				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.Message.ToString());
 				yield break;
 			}
 			Debug.LogFormat("access: {0}\n\nrefresh: {1}", monad.Result.AccessKey, monad.Result.RefreshKey);
