@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using System;
-using Authorization;
 using Web;
+using Common;
+using Authorization;
 
 public class MainInstaller : MonoInstaller
 {
+	[SerializeField]
+	private WarningView _warningView;
+	
 	[SerializeField]
 	private AuthorizationView _authorizationView;
 	[SerializeField]
@@ -23,6 +27,19 @@ public class MainInstaller : MonoInstaller
 			.Bind<IHTTPPresenter>()
 			.To<HTTPPresenter>()
 			.AsSingle();
+			
+		#endregion
+		
+		#region Common
+		
+		Container
+			.Bind<IWarningPresenter>()
+			.To<WarningPresenter>()
+			.AsSingle();
+		Container
+			.Bind<IWarningView>()
+			.To<WarningView>()
+			.FromInstance(_warningView);
 			
 		#endregion
 		

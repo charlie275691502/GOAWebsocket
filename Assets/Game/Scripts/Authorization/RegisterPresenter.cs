@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using Rayark.Mast;
 using UnityEngine;
+using Web;
 
 namespace Authorization
 {
@@ -12,13 +14,17 @@ namespace Authorization
 	
 	public class RegisterPresenter : IRegisterPresenter
 	{
-		private IRegisterView _registerView;
+		private readonly IHTTPPresenter _hTTPPresenter;
+		private readonly IWarningPresenter _warningPresenter;
+		private readonly IRegisterView _registerView;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
-		public RegisterPresenter(IRegisterView registerView)
+		public RegisterPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRegisterView registerView)
 		{
+			_hTTPPresenter = hTTPPresenter;
+			_warningPresenter = warningPresenter;
 			_registerView = registerView;
 		}
 		

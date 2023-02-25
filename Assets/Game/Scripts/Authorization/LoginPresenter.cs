@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using Rayark.Mast;
 using UnityEngine;
 using Web;
@@ -12,15 +13,17 @@ namespace Authorization
 	}
 	public class LoginPresenter : ILoginPresneter
 	{
-		private IHTTPPresenter _hTTPPresenter;
-		private ILoginView _loginView;
+		private readonly IHTTPPresenter _hTTPPresenter;
+		private readonly IWarningPresenter _warningPresenter;
+		private readonly ILoginView _loginView;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
-		public LoginPresenter(IHTTPPresenter hTTPPresenter, ILoginView loginView)
+		public LoginPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ILoginView loginView)
 		{
 			_hTTPPresenter = hTTPPresenter;
+			_warningPresenter = warningPresenter;
 			_loginView = loginView;
 		}
 		
@@ -56,7 +59,7 @@ namespace Authorization
 			yield return monad.Do();
 			if(monad.Error != null)
 			{
-				Debug.LogError(monad.Error);
+				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.ToString());
 				yield break;
 			}
 			Debug.Log("Request Finished! Text received: " + monad.Result);
