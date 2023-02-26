@@ -30,6 +30,10 @@ public class MainInstaller : MonoInstaller
 			.To<HTTPPresenter>()
 			.AsSingle();
 			
+		Container
+			.Bind<BackendPlayerModel>()
+			.AsSingle();
+			
 		#endregion
 		
 		#region Common

@@ -11,50 +11,73 @@ namespace Web
 {
 	public interface IHTTPPresenter
 	{
-		IMonad<LoginResult> Login(string username, string password);
-		IMonad<RegisterResult> Register(string username, string password, string email);
+		IMonad<None> Login(string username, string password);
+		IMonad<None> RegisterThenLogin(string username, string password, string email);
+		IMonad<None> UpdatePlayerProfile(string nickName);
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
 		private ILoadingView _loadingView;
+		private BackendPlayerModel _backendPlayer;
 		
-		public HTTPPresenter(ILoadingView loadingView)
+		public HTTPPresenter(ILoadingView loadingView, BackendPlayerModel backendPlayer)
 		{
 			_loadingView = loadingView;
+			_backendPlayer = backendPlayer;
 		}
 		
-		public IMonad<LoginResult> Login(string username, string password)
+		public IMonad<None> Login(string username, string password)
 		{
-			return _Send<LoginResult>(
-				"auth/jwt/create/",
-				HTTPMethods.Post,
-				new Dictionary<string, object>()
-				{
-					{"username", username},
-					{"password", password},
-				});
+			return 
+				_Send<LoginResult>(
+					"auth/jwt/create/",
+					HTTPMethods.Post,
+					new Dictionary<string, object>()
+					{
+						{"username", username},
+						{"password", password},
+					},
+					false)
+				.Then(result => _backendPlayer.Accept(result));
 		}
 		
-		public IMonad<RegisterResult> Register(string username, string password, string email)
+		public IMonad<None> RegisterThenLogin(string username, string password, string email)
 		{
-			return _Send<RegisterResult>(
-				"auth/users/",
-				HTTPMethods.Post,
-				new Dictionary<string, object>()
-				{
-					{"username", username},
-					{"password", password},
-					{"email", email},
-				});
+			return 
+				_Send<None>(
+					"auth/users/",
+					HTTPMethods.Post,
+					new Dictionary<string, object>()
+					{
+						{"username", username},
+						{"password", password},
+						{"email", email},
+					},
+					false)
+				.Then(r => Login(username, password))
+				.Then(r => UpdatePlayerProfile(username));
 		}
 		
-		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body)
+		public IMonad<None> UpdatePlayerProfile(string nickName)
 		{
-			return new BlockMonad<string>(r => _SendRequest(path, method, body, r))
+			return 
+				_Send<None>(
+					"mainpage/players/me/",
+					HTTPMethods.Put,
+					new Dictionary<string, object>()
+					{
+						{"nick_name", nickName},
+					})
+				.Then(r => _backendPlayer.AcceptNickName(nickName));
+		}
+		
+		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)
+		{
+			return new BlockMonad<string>(r => _SendRequest(path, method, body, needAuthorization, r))
 				.Map(r => JsonConvert.DeserializeObject<T>(r));
 		}
 		
-		private IEnumerator _SendRequest(string path, HTTPMethods method, Dictionary<string, object> body, IReturn<string> ret)
+		private IEnumerator _SendRequest(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization, IReturn<string> ret)
 		{
 			var json = JsonConvert.SerializeObject(body);
 			var isFinished = false;
@@ -68,7 +91,7 @@ namespace Web
 					result = response.DataAsText;
 				} else 
 				{
-					error = new Exception(string.Format("[{0}] {1}", response.StatusCode, response.Message));
+					error = new Exception(string.Format("[{0}] {1}\n\n{2}", response.StatusCode, response.Message, response.DataAsText));
 				}
 				
 				isFinished = true;
@@ -76,9 +99,13 @@ namespace Web
 			_loadingView.Enter();
 			
 			HTTPRequest request = new HTTPRequest(new Uri(string.Format("http://{0}:{1}/{2}", WebUtility.Host, WebUtility.Port, path)), method, onRequestFinished);
-			request.SetHeader("Content-Type", "application/json; charset=UTF-8");
 			request.RawData = System.Text.Encoding.UTF8.GetBytes(json);
-			// request.AddHeader("Authorization", "JWT " + accessKey);
+			request.SetHeader("Content-Type", "application/json; charset=UTF-8");
+			if(needAuthorization)
+			{
+				request.AddHeader("Authorization", string.Format("JWT {0}", _backendPlayer.AccessKey));
+			}
+			
 			request.Send();
 			
 			while (!isFinished)
@@ -100,9 +127,17 @@ namespace Web
 			
 			if(error != null)
 			{
+				if(WebUtility.RequestDebugMode)
+				{
+					Debug.LogError(error);
+				}
 				ret.Fail(error);
 			} else 
 			{
+				if(WebUtility.RequestDebugMode)
+				{
+					Debug.Log(error);
+				}
 				ret.Accept(result);
 			}
 		}

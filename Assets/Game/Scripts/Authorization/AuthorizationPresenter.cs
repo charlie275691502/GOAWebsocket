@@ -9,7 +9,7 @@ namespace Authorization
 	{
 		ToLogin,
 		ToRegister,
-		Leave,
+		LoginSuccess,
 	}
 	
 	public interface IAuthorizationPresenter
@@ -66,7 +66,7 @@ namespace Authorization
 					break;
 				}
 				
-				if (monad.Result == AuthorizationTabResult.Leave)
+				if (monad.Result == AuthorizationTabResult.LoginSuccess)
 				{
 					break;
 				}

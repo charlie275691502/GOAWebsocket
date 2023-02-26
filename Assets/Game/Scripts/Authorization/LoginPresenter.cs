@@ -16,15 +16,17 @@ namespace Authorization
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
 		private ILoginView _loginView;
+		private BackendPlayerModel _backendPlayer;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
-		public LoginPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ILoginView loginView)
+		public LoginPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ILoginView loginView, BackendPlayerModel backendPlayer)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_loginView = loginView;
+			_backendPlayer = backendPlayer;
 		}
 		
 		public IEnumerator Run(IReturn<AuthorizationTabResult> ret)
@@ -62,8 +64,7 @@ namespace Authorization
 				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.Message.ToString());
 				yield break;
 			}
-			Debug.LogFormat("access: {0}\n\nrefresh: {1}", monad.Result.AccessKey, monad.Result.RefreshKey);
-			_result = AuthorizationTabResult.Leave;
+			_result = AuthorizationTabResult.LoginSuccess;
 			_Stop();
 		}
 	}
