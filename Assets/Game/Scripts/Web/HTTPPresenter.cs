@@ -18,12 +18,14 @@ namespace Web
 	public class HTTPPresenter : IHTTPPresenter
 	{
 		private ILoadingView _loadingView;
-		private BackendPlayerModel _backendPlayer;
+		private IBackendPlayerPresenter _backendPlayerPresenter;
+		private BackendPlayerData _backendPlayerData;
 		
-		public HTTPPresenter(ILoadingView loadingView, BackendPlayerModel backendPlayer)
+		public HTTPPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
 		{
 			_loadingView = loadingView;
-			_backendPlayer = backendPlayer;
+			_backendPlayerPresenter = backendPlayerPresenter;
+			_backendPlayerData = backendPlayerData;
 		}
 		
 		public IMonad<None> Login(string username, string password)
@@ -38,7 +40,7 @@ namespace Web
 						{"password", password},
 					},
 					false)
-				.Then(result => _backendPlayer.Accept(result));
+				.Then(result => _backendPlayerPresenter.Accept(result));
 		}
 		
 		public IMonad<None> RegisterThenLogin(string username, string password, string email)
@@ -68,7 +70,7 @@ namespace Web
 					{
 						{"nick_name", nickName},
 					})
-				.Then(r => _backendPlayer.AcceptNickName(nickName));
+				.Then(r => _backendPlayerPresenter.AcceptNickName(nickName));
 		}
 		
 		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)
@@ -103,7 +105,7 @@ namespace Web
 			request.SetHeader("Content-Type", "application/json; charset=UTF-8");
 			if(needAuthorization)
 			{
-				request.AddHeader("Authorization", string.Format("JWT {0}", _backendPlayer.AccessKey));
+				request.AddHeader("Authorization", string.Format("JWT {0}", _backendPlayerData.AccessKey));
 			}
 			
 			request.Send();
@@ -136,7 +138,7 @@ namespace Web
 			{
 				if(WebUtility.RequestDebugMode)
 				{
-					Debug.Log(error);
+					Debug.Log(result);
 				}
 				ret.Accept(result);
 			}

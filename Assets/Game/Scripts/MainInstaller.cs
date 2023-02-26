@@ -6,6 +6,7 @@ using System;
 using Web;
 using Common;
 using Authorization;
+using Metagame;
 
 public class MainInstaller : MonoInstaller
 {
@@ -29,9 +30,13 @@ public class MainInstaller : MonoInstaller
 			.Bind<IHTTPPresenter>()
 			.To<HTTPPresenter>()
 			.AsSingle();
-			
+		
 		Container
-			.Bind<BackendPlayerModel>()
+			.Bind<BackendPlayerData>()
+			.AsSingle();
+		Container
+			.Bind<IBackendPlayerPresenter>()
+			.To<BackendPlayerPresenter>()
 			.AsSingle();
 			
 		#endregion
@@ -79,6 +84,16 @@ public class MainInstaller : MonoInstaller
 			.Bind<IRegisterView>()
 			.To<RegisterView>()
 			.FromInstance(_registerView);
+			
+		#endregion
+		
+		#region Metagame
+		
+		Container
+			.Bind<IBackendPlayerView>()
+			.WithId("TopMenu")
+			.To<TopMenuView>()
+			.AsSingle();
 			
 		#endregion
 	}

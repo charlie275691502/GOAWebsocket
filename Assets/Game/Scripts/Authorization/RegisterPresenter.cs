@@ -16,21 +16,21 @@ namespace Authorization
 	{
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
-		private IRegisterView _registerView;
+		private IRegisterView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private AuthorizationTabResult _result;
 		
-		public RegisterPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRegisterView registerView)
+		public RegisterPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRegisterView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
-			_registerView = registerView;
+			_view = view;
 		}
 		
 		public IEnumerator Run(IReturn<AuthorizationTabResult> ret)
 		{
-			_registerView.Enter(_OnSwitchToLogin, _OnRegister);
+			_view.Enter(_OnSwitchToLogin, _OnRegister);
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
 			ret.Accept(_result);
@@ -38,7 +38,7 @@ namespace Authorization
 		
 		private void _Stop()
 		{
-			_registerView.Leave();
+			_view.Leave();
 			_commandExecutor.Stop();
 		}
 		
