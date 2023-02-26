@@ -2,11 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Common;
 using Web;
 
 namespace Metagame
 {
-	public class TopMenuView : MonoBehaviour, IBackendPlayerView
+	public interface ITopMenuView
+	{
+		void Enter(BackendPlayerData data);
+		void Leave();
+	}
+	
+	public class TopMenuView : MonoBehaviour, IBackendPlayerView, ITopMenuView
 	{
 		[SerializeField]
 		private GameObject _panel;
@@ -17,6 +24,8 @@ namespace Metagame
 		
 		public void Enter(BackendPlayerData data)
 		{
+			_nickNameText.text = data.NickName;
+			_coinText.text = data.Coin.ToString();
 			_panel.SetActive(true);
 		}
 		

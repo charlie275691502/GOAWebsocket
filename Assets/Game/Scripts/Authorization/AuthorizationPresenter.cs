@@ -25,24 +25,15 @@ namespace Authorization
 			Register,
 		}
 		
-		private IAuthorizationView _authorizationView;
 		private ILoginPresneter _loginPresneter;
-		private ILoginView _loginView;
 		private IRegisterPresenter _registerPresenter;
-		private IRegisterView _registerView;
 		
 		public AuthorizationPresenter(
 			ILoginPresneter loginPresneter,
-			ILoginView loginView,
-			IRegisterPresenter registerPresenter,
-			IRegisterView registerView,
-			IAuthorizationView authorizationView)
+			IRegisterPresenter registerPresenter)
 		{
-			_authorizationView = authorizationView;
 			_loginPresneter = loginPresneter;
-			_loginView = loginView;
 			_registerPresenter = registerPresenter;
-			_registerView = registerView;
 		}
 		
 		public IEnumerator Run()

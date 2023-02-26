@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using Zenject;
 using System.Linq;
+using Common;
+using Web;
 
-namespace Web
+namespace Common
 {
 	public interface IBackendPlayerPresenter
 	{

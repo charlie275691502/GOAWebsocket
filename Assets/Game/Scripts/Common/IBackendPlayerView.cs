@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Web
+namespace Common
 {
 	public interface IBackendPlayerView
 	{

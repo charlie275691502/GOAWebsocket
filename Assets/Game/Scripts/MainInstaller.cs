@@ -16,11 +16,15 @@ public class MainInstaller : MonoInstaller
 	private LoadingView _loadingView;
 	
 	[SerializeField]
-	private AuthorizationView _authorizationView;
-	[SerializeField]
 	private LoginView _loginView;
 	[SerializeField]
 	private RegisterView _registerView;
+	[SerializeField]
+	private MainPageView _mainPageView;
+	[SerializeField]
+	private RoomView _roomView;
+	[SerializeField]
+	private TopMenuView _topMenuView;
 	
 	public override void InstallBindings()
 	{
@@ -55,6 +59,11 @@ public class MainInstaller : MonoInstaller
 			.Bind<ILoadingView>()
 			.To<LoadingView>()
 			.FromInstance(_loadingView);
+		Container
+			.Bind<IBackendPlayerView>()
+			.WithId("TopMenu")
+			.To<TopMenuView>()
+			.FromInstance(_topMenuView);
 			
 		#endregion
 		
@@ -64,10 +73,6 @@ public class MainInstaller : MonoInstaller
 			.Bind<IAuthorizationPresenter>()
 			.To<AuthorizationPresenter>()
 			.AsSingle();
-		Container
-			.Bind<IAuthorizationView>()
-			.To<AuthorizationView>()
-			.FromInstance(_authorizationView);
 		Container
 			.Bind<ILoginPresneter>()
 			.To<LoginPresenter>()
@@ -90,11 +95,29 @@ public class MainInstaller : MonoInstaller
 		#region Metagame
 		
 		Container
-			.Bind<IBackendPlayerView>()
-			.WithId("TopMenu")
-			.To<TopMenuView>()
+			.Bind<IMetagamePresenter>()
+			.To<MetagamePresenter>()
 			.AsSingle();
-			
+		Container
+			.Bind<IMainPagePresenter>()
+			.To<MainPagePresenter>()
+			.AsSingle();
+		Container
+			.Bind<IMainPageView>()
+			.To<MainPageView>()
+			.FromInstance(_mainPageView);
+		Container
+			.Bind<IRoomPresenter>()
+			.To<RoomPresenter>()
+			.AsSingle();
+		Container
+			.Bind<IRoomView>()
+			.To<RoomView>()
+			.FromInstance(_roomView);
+		Container
+			.Bind<ITopMenuView>()
+			.To<TopMenuView>()
+			.FromInstance(_topMenuView);
 		#endregion
 	}
 }

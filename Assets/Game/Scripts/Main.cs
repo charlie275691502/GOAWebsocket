@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using Rayark.Mast;
 using UnityEngine;
 using Authorization;
+using Metagame;
 
 public class Main : MonoBehaviour
 {
 	private IAuthorizationPresenter _authorizationPresenter;
+	private IMetagamePresenter _metagamePresenter;
 	
 	private Executor _executor = new Executor();
 	private bool _leave;
 	
 	[Zenject.Inject]
-	public void Zenject(IAuthorizationPresenter authorizationPresenter)
+	public void Zenject(IAuthorizationPresenter authorizationPresenter, IMetagamePresenter metagamePresenter)
 	{
 		_authorizationPresenter = authorizationPresenter;
+		_metagamePresenter = metagamePresenter;
 	}
 
 	void Start()
@@ -30,9 +33,10 @@ public class Main : MonoBehaviour
 	
 	private IEnumerator _Main()
 	{
-		yield return _authorizationPresenter.Run();
 		while(!_leave)
 		{
+			yield return _authorizationPresenter.Run();
+			yield return _metagamePresenter.Run();
 			yield return null;
 		}
 	}

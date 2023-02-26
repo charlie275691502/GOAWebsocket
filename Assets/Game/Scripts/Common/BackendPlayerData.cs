@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Web;
 
-namespace Web
+namespace Common
 {
 	public class BackendPlayerData
 	{
