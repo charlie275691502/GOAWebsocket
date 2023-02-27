@@ -27,20 +27,28 @@ namespace Common
 		
 		public void Enter(string title, string content, Action onConfirm)
 		{
-			_title.text = title;
-			_content.text = content;
-			
+			_Enter(title, content);
 			_Register(onConfirm);
 			_panel.SetActive(true);
 		}
 		
 		public void Leave()
 		{
-			_title.text = string.Empty;
-			_content.text = string.Empty;
-			
 			_Unregister();
 			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter(string title, string content)
+		{
+			_title.text = title;
+			_content.text = content;
+		}
+		
+		private void _Leave()
+		{
+			_title.text = string.Empty;
+			_content.text = string.Empty;
 		}
 		
 		private void _Register(Action onConfirm)

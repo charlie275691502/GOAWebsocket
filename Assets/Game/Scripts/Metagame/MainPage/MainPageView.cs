@@ -27,11 +27,7 @@ namespace Metagame
 		
 		public void Enter(List<RoomViewData> viewDatas, Action<int> switchToRoom)
 		{
-			_viewDatas = viewDatas;
-			
-			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
-			_scrollRect.FillItems(viewDatas.Count);
-			
+			_Enter(viewDatas);
 			_Register(switchToRoom);
 			_panel.SetActive(true);
 		}
@@ -40,6 +36,19 @@ namespace Metagame
 		{
 			_Unregister();
 			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter(List<RoomViewData> viewDatas)
+		{
+			_viewDatas = viewDatas;
+			
+			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
+			_scrollRect.FillItems(viewDatas.Count);
+		}
+		
+		private void _Leave()
+		{
 			_scrollRect.Leave();
 		}
 		

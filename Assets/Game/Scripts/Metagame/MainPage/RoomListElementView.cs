@@ -28,6 +28,20 @@ namespace Metagame
 		
 		public void Enter(RoomViewData viewData, Action switchToRoom)
 		{
+			_Enter(viewData);
+			_Register(switchToRoom);
+			_panel.SetActive(true);
+		}
+		
+		public void Leave()
+		{
+			_Unregister();
+			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter(RoomViewData viewData)
+		{
 			_roomNameText.text = viewData.RoomName;
 			for (int i=0; i < _playerInfoViews.Count; i++)
 			{
@@ -39,16 +53,11 @@ namespace Metagame
 					_playerInfoViews[i].EnterEmpty();
 				}
 			}
-			
-			_Register(switchToRoom);
-			_panel.SetActive(true);
 		}
 		
-		public void Leave()
+		private void _Leave()
 		{
 			_playerInfoViews.ForEach(view => view.Leave());
-			_Unregister();
-			_panel.SetActive(false);
 		}
 		
 		private void _Register(Action switchToRoom)

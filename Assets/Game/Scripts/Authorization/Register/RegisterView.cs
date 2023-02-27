@@ -35,6 +35,7 @@ namespace Authorization
 		
 		public void Enter(Action onSwitchToLogin, Action<string, string, string, string> onRegister)
 		{
+			_Enter();
 			_Register(onSwitchToLogin, onRegister);
 			_panel.SetActive(true);
 		}
@@ -43,6 +44,15 @@ namespace Authorization
 		{
 			_Unregister();
 			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter()
+		{
+		}
+		
+		private void _Leave()
+		{
 		}
 		
 		private void _Register(Action onSwitchToLogin, Action<string, string, string, string> onRegister)

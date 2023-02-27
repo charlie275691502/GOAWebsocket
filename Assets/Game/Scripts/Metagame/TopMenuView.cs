@@ -24,9 +24,36 @@ namespace Metagame
 		
 		public void Enter(BackendPlayerData data)
 		{
+			_Enter(data);
+			_Register();
+			_panel.SetActive(true);
+		}
+		
+		public void Leave()
+		{
+			_Unregister();
+			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter(BackendPlayerData data)
+		{
 			_nickNameText.text = data.PlayerData.NickName;
 			_coinText.text = data.PlayerData.Coin.ToString();
-			_panel.SetActive(true);
+		}
+		
+		private void _Leave()
+		{
+			_nickNameText.text = string.Empty;
+			_coinText.text = string.Empty;
+		}
+		
+		private void _Register()
+		{
+		}
+		
+		private void _Unregister()
+		{
 		}
 		
 		public void UpdateNickName(string nickName)
@@ -37,11 +64,6 @@ namespace Metagame
 		public void UpdateCoin(int coin)
 		{
 			_coinText.text = coin.ToString();
-		}
-		
-		public void Leave()
-		{
-			_panel.SetActive(false);
 		}
 	}
 }

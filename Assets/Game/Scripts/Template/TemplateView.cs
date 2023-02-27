@@ -20,6 +20,7 @@ namespace Template
 		
 		public void Enter()
 		{
+			_Enter();
 			_Register();
 			_panel.SetActive(true);
 		}
@@ -28,6 +29,15 @@ namespace Template
 		{
 			_Unregister();
 			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter()
+		{
+		}
+		
+		private void _Leave()
+		{
 		}
 		
 		private void _Register()

@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using Rayark.Mast;
 using UnityEngine;
 
-public class CommandExecutor : Executor
+namespace Common
 {
-	private bool _isStop;
-	public IEnumerator Start()
+	public class CommandExecutor : Executor
 	{
-		_isStop = false;
-		while(!_isStop)
+		private bool _isStop;
+		public IEnumerator Start()
 		{
-			Resume(Time.deltaTime);
-			yield return null;
+			_isStop = false;
+			while(!_isStop)
+			{
+				Resume(Time.deltaTime);
+				yield return null;
+			}
 		}
-	}
-	
-	public void Stop()
-	{
-		_isStop = true;
+		
+		public void Stop()
+		{
+			_isStop = true;
+		}
 	}
 }

@@ -88,6 +88,8 @@ namespace Metagame
 				
 				nextStatus = monad.Result;
 			}
+			
+			_topMenuView.Leave();
 		}
 	}
 }

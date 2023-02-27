@@ -66,6 +66,7 @@ namespace Metagame
 		
 		private void _Leave()
 		{
+			_roomNameText.text = string.Empty;
 			_playerInfoViews.ForEach(view => view.Leave());
 			_scrollRect.Leave();
 		}

@@ -20,18 +20,14 @@ namespace Metagame
 		
 		public void Enter(PlayerData data)
 		{
-			_nickNameText.text = data.NickName;
-			_Enter();
+			_Enter(data);
+			_Register();
+			_panel.SetActive(true);
 		}
 		
 		public void EnterEmpty()
 		{
-			_nickNameText.text = _emptyNickName;
-			_Enter();
-		}
-		
-		private void _Enter()
-		{
+			_EnterEmpty();
 			_Register();
 			_panel.SetActive(true);
 		}
@@ -40,6 +36,22 @@ namespace Metagame
 		{
 			_Unregister();
 			_panel.SetActive(false);
+			_Leave();
+		}
+		
+		private void _Enter(PlayerData data)
+		{
+			_nickNameText.text = data.NickName;
+		}
+		
+		private void _EnterEmpty()
+		{
+			_nickNameText.text = _emptyNickName;
+		}
+		
+		private void _Leave()
+		{
+			_nickNameText.text = string.Empty;
 		}
 		
 		private void _Register()
