@@ -9,7 +9,7 @@ namespace Metagame
 {
 	public interface IRoomView
 	{
-		void Enter(RoomWithMessagesViewData viewData);
+		void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage);
 		void Leave();
 	}
 	
@@ -17,6 +17,8 @@ namespace Metagame
 	{
 		[SerializeField]
 		private GameObject _panel;
+		[SerializeField]
+		private Button _backButton;
 		[SerializeField]
 		private Text _roomNameText;
 		[SerializeField]
@@ -27,11 +29,12 @@ namespace Metagame
 		private RoomMessageDynamicScrollRect _scrollRect;
 		
 		private RoomWithMessagesViewData _viewData;
+		private Action _switchToMainPage;
 		
-		public void Enter(RoomWithMessagesViewData viewData)
+		public void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage)
 		{
 			_Enter(viewData);
-			_Register();
+			_Register(switchToMainPage);
 			_panel.SetActive(true);
 		}
 		
@@ -67,12 +70,23 @@ namespace Metagame
 			_scrollRect.Leave();
 		}
 		
-		private void _Register()
+		private void _Register(Action switchToMainPage)
 		{
+			_switchToMainPage = switchToMainPage;
+			
+			_backButton.onClick.AddListener(_SwitchToMainPage);
 		}
 		
 		private void _Unregister()
 		{
+			_switchToMainPage = null;
+			
+			_backButton.onClick.RemoveAllListeners();
+		}
+		
+		private void _SwitchToMainPage()
+		{
+			_switchToMainPage?.Invoke();
 		}
 		
 		private void _OnInstantiateMessageElement(int index, IMessageListElementView view)

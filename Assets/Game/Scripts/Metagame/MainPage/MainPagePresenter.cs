@@ -39,7 +39,7 @@ namespace Metagame
 			}
 			
 			var roomViewDatas = _GetRoomViewDatas(monad.Result);
-			_view.Enter(roomViewDatas);
+			_view.Enter(roomViewDatas, _SwitchToRoom);
 			
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
@@ -50,6 +50,12 @@ namespace Metagame
 		{
 			_view.Leave();
 			_commandExecutor.Stop();
+		}
+		
+		private void _SwitchToRoom(int roomId)
+		{
+			_result = new MetagameStatus(MetagameStatusType.Room, roomId);
+			_Stop();
 		}
 		
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)

@@ -72,7 +72,7 @@ namespace Metagame
 			
 			_topMenuView.Enter(_backendPlayerData);
 			
-			var nextStatus = new MetagameStatus(MetagameStatusType.Room, 1);
+			var nextStatus = new MetagameStatus(MetagameStatusType.MainPage);
 			while (nextStatus.Type != MetagameStatusType.EnterGame)
 			{
 				var monad = 

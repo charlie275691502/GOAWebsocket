@@ -9,7 +9,7 @@ namespace Metagame
 {
 	public interface IMainPageView
 	{
-		void Enter(List<RoomViewData> viewDatas);
+		void Enter(List<RoomViewData> viewDatas, Action<int> switchToRoom);
 		void Leave();
 	}
 	
@@ -23,15 +23,16 @@ namespace Metagame
 		private RoomListDynamicScrollRect _scrollRect;
 		
 		private List<RoomViewData> _viewDatas;
+		private Action<int> _switchToRoom;
 		
-		public void Enter(List<RoomViewData> viewDatas)
+		public void Enter(List<RoomViewData> viewDatas, Action<int> switchToRoom)
 		{
 			_viewDatas = viewDatas;
 			
 			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
 			_scrollRect.FillItems(viewDatas.Count);
 			
-			_Register();
+			_Register(switchToRoom);
 			_panel.SetActive(true);
 		}
 		
@@ -42,17 +43,24 @@ namespace Metagame
 			_scrollRect.Leave();
 		}
 		
-		private void _Register()
+		private void _Register(Action<int> switchToRoom)
 		{
+			_switchToRoom = switchToRoom;
 		}
 		
 		private void _Unregister()
 		{
+			_switchToRoom = null;
+		}
+		
+		private void _SwitchToRoom(int roomId)
+		{
+			_switchToRoom?.Invoke(roomId);
 		}
 		
 		private void _OnInstantiateRoomListElement(int index, IRoomListElementView view)
 		{
-			view.Enter(_viewDatas[index]);
+			view.Enter(_viewDatas[index], () => _SwitchToRoom(_viewDatas[index].Id));
 		}
 	}
 }

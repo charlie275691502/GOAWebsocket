@@ -39,7 +39,7 @@ namespace Metagame
 			}
 			
 			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(monad.Result);
-			_view.Enter(roomWithMessagesViewData);
+			_view.Enter(roomWithMessagesViewData, _SwitchToMainPage);
 			
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
@@ -50,6 +50,12 @@ namespace Metagame
 		{
 			_view.Leave();
 			_commandExecutor.Stop();
+		}
+		
+		private void _SwitchToMainPage()
+		{
+			_result = new MetagameStatus(MetagameStatusType.MainPage);
+			_Stop();
 		}
 		
 		private RoomWithMessagesViewData _GetRoomWithMessagesViewData(RoomWithMessagesResult result)
