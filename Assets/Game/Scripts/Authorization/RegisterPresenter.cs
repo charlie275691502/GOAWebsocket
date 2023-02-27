@@ -62,13 +62,7 @@ namespace Authorization
 				yield break;
 			}
 			
-			var monad = _hTTPPresenter.RegisterThenLogin(username, password, email);
-			yield return monad.Do();
-			if(monad.Error != null)
-			{
-				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.Message.ToString());
-				yield break;
-			}
+			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.RegisterThenLogin(username, password, email), _warningPresenter);
 			_result = AuthorizationTabResult.LoginSuccess;
 			_Stop();
 		}

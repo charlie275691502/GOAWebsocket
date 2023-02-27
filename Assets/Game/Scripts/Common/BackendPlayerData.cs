@@ -21,6 +21,12 @@ namespace Common
 			RefreshKey = result.RefreshKey;
 		}
 		
+		public void Accept(GetPlayerProfileResult result)
+		{
+			NickName = result.NickName;
+			Coin = result.Coin;
+		}
+		
 		public void AcceptNickName(string nickName)
 		{
 			NickName = nickName;

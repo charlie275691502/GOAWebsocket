@@ -13,6 +13,7 @@ namespace Web
 	{
 		IMonad<None> Login(string username, string password);
 		IMonad<None> RegisterThenLogin(string username, string password, string email);
+		IMonad<None> GetPlayerProfile();
 		IMonad<None> UpdatePlayerProfile(string nickName);
 	}
 	public class HTTPPresenter : IHTTPPresenter
@@ -58,6 +59,16 @@ namespace Web
 					false)
 				.Then(r => Login(username, password))
 				.Then(r => UpdatePlayerProfile(username));
+		}
+		
+		public IMonad<None> GetPlayerProfile()
+		{
+			return 
+				_Send<GetPlayerProfileResult>(
+					"mainpage/players/me/",
+					HTTPMethods.Get,
+					new Dictionary<string, object>())
+				.Then(r => _backendPlayerPresenter.Accept(r));
 		}
 		
 		public IMonad<None> UpdatePlayerProfile(string nickName)

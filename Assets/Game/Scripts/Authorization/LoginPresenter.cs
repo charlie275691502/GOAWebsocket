@@ -55,13 +55,7 @@ namespace Authorization
 
 		private IEnumerator _Login(string username, string password)
 		{
-			var monad = _hTTPPresenter.Login(username, password);
-			yield return monad.Do();
-			if(monad.Error != null)
-			{
-				yield return _warningPresenter.Run("Error occurs when send to server", monad.Error.Message.ToString());
-				yield break;
-			}
+			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.Login(username, password), _warningPresenter);
 			_result = AuthorizationTabResult.LoginSuccess;
 			_Stop();
 		}

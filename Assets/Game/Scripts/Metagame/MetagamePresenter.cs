@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rayark.Mast;
 using Common;
+using Web;
 
 namespace Metagame
 {
@@ -26,17 +27,23 @@ namespace Metagame
 			Room,
 		}
 		
+		private IHTTPPresenter _hTTPPresenter;
+		private IWarningPresenter _warningPresenter;
 		private IMainPagePresenter _mainPagePresneter;
 		private IRoomPresenter _roomPresneter;
 		private ITopMenuView _topMenuView;
 		private BackendPlayerData _backendPlayerData;
 		
 		public MetagamePresenter(
+			IHTTPPresenter hTTPPresenter,
+			IWarningPresenter warningPresenter,
 			IMainPagePresenter mainPagePresneter,
 			IRoomPresenter roomPresneter,
 			ITopMenuView topMenuView,
 			BackendPlayerData backendPlayerData)
 		{
+			_hTTPPresenter = hTTPPresenter;
+			_warningPresenter = warningPresenter;
 			_mainPagePresneter = mainPagePresneter;
 			_roomPresneter = roomPresneter;
 			_topMenuView = topMenuView;
@@ -50,6 +57,8 @@ namespace Metagame
 		
 		private IEnumerator _Run()
 		{
+			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.GetPlayerProfile(), _warningPresenter);
+			
 			_topMenuView.Enter(_backendPlayerData);
 			
 			var nowTab = Tab.MainPage;

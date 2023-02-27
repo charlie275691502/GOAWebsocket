@@ -11,6 +11,7 @@ namespace Common
 	public interface IBackendPlayerPresenter
 	{
 		void Accept(LoginResult result);
+		void Accept(GetPlayerProfileResult result);
 		void AcceptNickName(string nickName);
 		void AcceptCoin(int coin);
 	} 
@@ -34,6 +35,13 @@ namespace Common
 		public void Accept(LoginResult result)
 		{
 			_data.Accept(result);
+		}
+		
+		public void Accept(GetPlayerProfileResult result)
+		{
+			_data.Accept(result);
+			_views.ForEach(view => view.UpdateNickName(result.NickName));
+			_views.ForEach(view => view.UpdateCoin(result.Coin));
 		}
 		
 		public void AcceptNickName(string nickName)

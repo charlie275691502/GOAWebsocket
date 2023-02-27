@@ -12,4 +12,12 @@ namespace Web
 		[JsonProperty("refresh")]
 		public string RefreshKey;
 	}
+	
+	public class GetPlayerProfileResult
+	{
+		[JsonProperty("nick_name")]
+		public string NickName;
+		[JsonProperty("coin")]
+		public int Coin;
+	}
 }
