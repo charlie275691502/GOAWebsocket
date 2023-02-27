@@ -57,7 +57,7 @@ namespace Metagame
 		
 		private IEnumerator _Run()
 		{
-			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.GetPlayerProfile(), _warningPresenter);
+			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.GetSelfPlayerData(), _warningPresenter);
 			
 			_topMenuView.Enter(_backendPlayerData);
 			

@@ -13,8 +13,9 @@ namespace Web
 	{
 		IMonad<None> Login(string username, string password);
 		IMonad<None> RegisterThenLogin(string username, string password, string email);
-		IMonad<None> GetPlayerProfile();
-		IMonad<None> UpdatePlayerProfile(string nickName);
+		IMonad<None> GetSelfPlayerData();
+		IMonad<None> UpdateSelfPlayerData(string nickName);
+		IMonad<RoomListResult> GetRoomList();
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
@@ -58,20 +59,20 @@ namespace Web
 					},
 					false)
 				.Then(r => Login(username, password))
-				.Then(r => UpdatePlayerProfile(username));
+				.Then(r => UpdateSelfPlayerData(username));
 		}
 		
-		public IMonad<None> GetPlayerProfile()
+		public IMonad<None> GetSelfPlayerData()
 		{
 			return 
-				_Send<GetPlayerProfileResult>(
+				_Send<PlayerDataResult>(
 					"mainpage/players/me/",
 					HTTPMethods.Get,
 					new Dictionary<string, object>())
 				.Then(r => _backendPlayerPresenter.Accept(r));
 		}
 		
-		public IMonad<None> UpdatePlayerProfile(string nickName)
+		public IMonad<None> UpdateSelfPlayerData(string nickName)
 		{
 			return 
 				_Send<None>(
@@ -82,6 +83,17 @@ namespace Web
 						{"nick_name", nickName},
 					})
 				.Then(r => _backendPlayerPresenter.AcceptNickName(nickName));
+		}
+		
+		public IMonad<RoomListResult> GetRoomList()
+		{
+			return 
+				_Send<RoomListResult>(
+					"chat/rooms/",
+					HTTPMethods.Get,
+					new Dictionary<string, object>()
+					{
+					});
 		}
 		
 		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)

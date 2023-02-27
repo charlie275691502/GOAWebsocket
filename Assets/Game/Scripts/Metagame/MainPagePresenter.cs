@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Common;
 using Rayark.Mast;
 using UnityEngine;
@@ -30,7 +31,16 @@ namespace Metagame
 		
 		public IEnumerator Run(IReturn<MetagameTabResult> ret)
 		{
-			_view.Enter();
+			var monad = _hTTPPresenter.GetRoomList();
+			yield return WebUtility.RunAndHandleInternetError(monad, _warningPresenter);
+			if(monad.Error != null)
+			{
+				yield break;
+			}
+			
+			var roomViewDatas = _GetRoomViewDatas(monad.Result);
+			_view.Enter(roomViewDatas);
+			
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
 			ret.Accept(_result);
@@ -40,6 +50,17 @@ namespace Metagame
 		{
 			_view.Leave();
 			_commandExecutor.Stop();
+		}
+		
+		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
+		{
+			return result.Select(roomResult => new RoomViewData()
+					{
+						Id = roomResult.Id,
+						RoomName = roomResult.RoomName,
+						Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+					})
+					.ToList();
 		}
 	}
 }

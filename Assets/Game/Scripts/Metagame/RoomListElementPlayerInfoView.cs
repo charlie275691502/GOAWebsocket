@@ -7,18 +7,12 @@ using UnityEngine.UI;
 
 namespace Metagame
 {
-	public interface IMainPageView
-	{
-		void Enter(List<RoomViewData> viewDatas);
-		void Leave();
-	}
-	
-	public class MainPageView : MonoBehaviour, IMainPageView
+	public class RoomListElementPlayerInfoView : MonoBehaviour
 	{
 		[SerializeField]
 		private GameObject _panel;
 		
-		public void Enter(List<RoomViewData> viewDatas)
+		public void Enter()
 		{
 			_Register();
 			_panel.SetActive(true);

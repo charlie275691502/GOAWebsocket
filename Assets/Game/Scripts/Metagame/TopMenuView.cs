@@ -24,8 +24,8 @@ namespace Metagame
 		
 		public void Enter(BackendPlayerData data)
 		{
-			_nickNameText.text = data.NickName;
-			_coinText.text = data.Coin.ToString();
+			_nickNameText.text = data.PlayerData.NickName;
+			_coinText.text = data.PlayerData.Coin.ToString();
 			_panel.SetActive(true);
 		}
 		

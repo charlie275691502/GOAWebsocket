@@ -13,11 +13,28 @@ namespace Web
 		public string RefreshKey;
 	}
 	
-	public class GetPlayerProfileResult
+	public class PlayerDataResult
 	{
+		[JsonProperty("id")]
+		public int Id;
 		[JsonProperty("nick_name")]
 		public string NickName;
 		[JsonProperty("coin")]
 		public int Coin;
+	}
+	
+	public class RoomResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("room_name")]
+		public string RoomName;
+		[JsonProperty("players")]
+		public List<PlayerDataResult> Players;
+	}
+	
+	public class RoomListResult : List<RoomResult>
+	{
+		
 	}
 }
