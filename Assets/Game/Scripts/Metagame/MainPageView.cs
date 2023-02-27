@@ -17,9 +17,20 @@ namespace Metagame
 	{
 		[SerializeField]
 		private GameObject _panel;
+		[SerializeField]
+		private GameObjectPool _pool;
+		[SerializeField]
+		private RoomListDynamicScrollRect _scrollRect;
+		
+		private List<RoomViewData> _viewDatas;
 		
 		public void Enter(List<RoomViewData> viewDatas)
 		{
+			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
+			_viewDatas = viewDatas;
+			
+			_scrollRect.FillItems(viewDatas.Count);
+			
 			_Register();
 			_panel.SetActive(true);
 		}
@@ -28,6 +39,7 @@ namespace Metagame
 		{
 			_Unregister();
 			_panel.SetActive(false);
+			_scrollRect.Leave();
 		}
 		
 		private void _Register()
@@ -36,6 +48,11 @@ namespace Metagame
 		
 		private void _Unregister()
 		{
+		}
+		
+		private void _OnInstantiateRoomListElement(int index, IRoomListElementView view)
+		{
+			view.Enter(_viewDatas[index]);
 		}
 	}
 }
