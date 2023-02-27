@@ -5,11 +5,21 @@ using Rayark.Mast;
 
 namespace Authorization
 {
-	public enum AuthorizationTabResult
+	public enum AuthorizationStatusType
 	{
-		ToLogin,
-		ToRegister,
-		LoginSuccess,
+		Login,
+		Register,
+		EnterMetagame,
+	}
+	
+	public class AuthorizationStatus
+	{
+		public AuthorizationStatusType Type;
+		
+		public AuthorizationStatus(AuthorizationStatusType type)
+		{
+			Type = type;
+		}
 	}
 	
 	public interface IAuthorizationPresenter
@@ -43,13 +53,13 @@ namespace Authorization
 		
 		private IEnumerator _Run()
 		{
-			var nowTab = Tab.Login;
-			while (true)
+			var nextStatus = new AuthorizationStatus(AuthorizationStatusType.Login);
+			while (nextStatus.Type != AuthorizationStatusType.EnterMetagame)
 			{
 				var monad = 
-					(nowTab == Tab.Login) 
-						? new BlockMonad<AuthorizationTabResult>(r => _loginPresneter.Run(r))
-						: new BlockMonad<AuthorizationTabResult>(r => _registerPresenter.Run(r));
+					(nextStatus.Type == AuthorizationStatusType.Login) 
+						? new BlockMonad<AuthorizationStatus>(r => _loginPresneter.Run(r))
+						: new BlockMonad<AuthorizationStatus>(r => _registerPresenter.Run(r));
 				yield return monad.Do();
 				if (monad.Error != null)
 				{
@@ -57,15 +67,7 @@ namespace Authorization
 					break;
 				}
 				
-				if (monad.Result == AuthorizationTabResult.LoginSuccess)
-				{
-					break;
-				}
-				
-				nowTab = 
-					(monad.Result == AuthorizationTabResult.ToLogin) 
-						? Tab.Login
-						: Tab.Register;
+				nextStatus = monad.Result;
 			}
 		}
 	}

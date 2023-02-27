@@ -26,9 +26,9 @@ namespace Metagame
 		
 		public void Enter(List<RoomViewData> viewDatas)
 		{
-			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
 			_viewDatas = viewDatas;
 			
+			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
 			_scrollRect.FillItems(viewDatas.Count);
 			
 			_Register();

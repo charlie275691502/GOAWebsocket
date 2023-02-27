@@ -9,7 +9,7 @@ namespace Authorization
 {
 	public interface ILoginPresneter
 	{
-		IEnumerator Run(IReturn<AuthorizationTabResult> ret);
+		IEnumerator Run(IReturn<AuthorizationStatus> ret);
 	}
 	public class LoginPresenter : ILoginPresneter
 	{
@@ -18,7 +18,7 @@ namespace Authorization
 		private ILoginView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private AuthorizationTabResult _result;
+		private AuthorizationStatus _result;
 		
 		public LoginPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ILoginView view)
 		{
@@ -27,7 +27,7 @@ namespace Authorization
 			_view = view;
 		}
 		
-		public IEnumerator Run(IReturn<AuthorizationTabResult> ret)
+		public IEnumerator Run(IReturn<AuthorizationStatus> ret)
 		{
 			_view.Enter(_OnSwitchToRegister, _OnLogin);
 			_commandExecutor.Clear();
@@ -43,7 +43,7 @@ namespace Authorization
 		
 		private void _OnSwitchToRegister()
 		{
-			_result = AuthorizationTabResult.ToRegister;
+			_result = new AuthorizationStatus(AuthorizationStatusType.Register);
 			_Stop();
 		}
 		
@@ -56,7 +56,7 @@ namespace Authorization
 		private IEnumerator _Login(string username, string password)
 		{
 			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.Login(username, password), _warningPresenter);
-			_result = AuthorizationTabResult.LoginSuccess;
+			_result = new AuthorizationStatus(AuthorizationStatusType.EnterMetagame);
 			_Stop();
 		}
 	}

@@ -16,6 +16,7 @@ namespace Web
 		IMonad<None> GetSelfPlayerData();
 		IMonad<None> UpdateSelfPlayerData(string nickName);
 		IMonad<RoomListResult> GetRoomList();
+		IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId);
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
@@ -91,9 +92,16 @@ namespace Web
 				_Send<RoomListResult>(
 					"chat/rooms/",
 					HTTPMethods.Get,
-					new Dictionary<string, object>()
-					{
-					});
+					new Dictionary<string, object>());
+		}
+		
+		public IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId)
+		{
+			return 
+				_Send<RoomWithMessagesResult>(
+					string.Format("chat/rooms/{0}", roomId),
+					HTTPMethods.Get,
+					new Dictionary<string, object>());
 		}
 		
 		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)

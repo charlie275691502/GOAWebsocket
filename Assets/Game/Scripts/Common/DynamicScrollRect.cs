@@ -35,7 +35,7 @@ namespace Common
 		private void _AddItem(int index)
 		{
 			var gameObject = _pool.GetGameObject();
-			gameObject.transform.parent = content.transform;
+			gameObject.transform.SetParent(content.transform);
 			_gameObjectList.Add(gameObject);
 			_onInstantiate?.Invoke(index, gameObject.GetComponent<T>());
 		}

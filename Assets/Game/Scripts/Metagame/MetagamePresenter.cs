@@ -7,11 +7,28 @@ using Web;
 
 namespace Metagame
 {
-	public enum MetagameTabResult
+	public enum MetagameStatusType
 	{
-		ToMainPage,
-		ToRoom,
+		MainPage,
+		Room,
 		EnterGame,
+	}
+	
+	public class MetagameStatus
+	{
+		public MetagameStatusType Type;
+		public int ToRoomId;
+		
+		public MetagameStatus(MetagameStatusType type)
+		{
+			Type = type;
+		}
+		
+		public MetagameStatus(MetagameStatusType type, int roomId)
+		{
+			Type = type;
+			ToRoomId = roomId;
+		}
 	}
 	
 	public interface IMetagamePresenter
@@ -21,12 +38,6 @@ namespace Metagame
 	
 	public class MetagamePresenter : IMetagamePresenter
 	{
-		private enum Tab
-		{
-			MainPage,
-			Room,
-		}
-		
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
 		private IMainPagePresenter _mainPagePresneter;
@@ -61,13 +72,13 @@ namespace Metagame
 			
 			_topMenuView.Enter(_backendPlayerData);
 			
-			var nowTab = Tab.MainPage;
-			while (true)
+			var nextStatus = new MetagameStatus(MetagameStatusType.Room, 1);
+			while (nextStatus.Type != MetagameStatusType.EnterGame)
 			{
 				var monad = 
-					(nowTab == Tab.MainPage) 
-						? new BlockMonad<MetagameTabResult>(r => _mainPagePresneter.Run(r))
-						: new BlockMonad<MetagameTabResult>(r => _roomPresneter.Run(r));
+					(nextStatus.Type == MetagameStatusType.MainPage) 
+						? new BlockMonad<MetagameStatus>(r => _mainPagePresneter.Run(r))
+						: new BlockMonad<MetagameStatus>(r => _roomPresneter.Run(nextStatus.ToRoomId, r));
 				yield return monad.Do();
 				if (monad.Error != null)
 				{
@@ -75,15 +86,7 @@ namespace Metagame
 					break;
 				}
 				
-				if (monad.Result == MetagameTabResult.ToRoom)
-				{
-					break;
-				}
-				
-				nowTab = 
-					(monad.Result == MetagameTabResult.ToMainPage) 
-						? Tab.MainPage
-						: Tab.Room;
+				nextStatus = monad.Result;
 			}
 		}
 	}

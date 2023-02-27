@@ -10,7 +10,7 @@ namespace Metagame
 {
 	public interface IMainPagePresenter
 	{
-		IEnumerator Run(IReturn<MetagameTabResult> ret);
+		IEnumerator Run(IReturn<MetagameStatus> ret);
 	}
 	
 	public class MainPagePresenter : IMainPagePresenter
@@ -20,7 +20,7 @@ namespace Metagame
 		private IMainPageView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private MetagameTabResult _result;
+		private MetagameStatus _result;
 		
 		public MainPagePresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IMainPageView view)
 		{
@@ -29,7 +29,7 @@ namespace Metagame
 			_view = view;
 		}
 		
-		public IEnumerator Run(IReturn<MetagameTabResult> ret)
+		public IEnumerator Run(IReturn<MetagameStatus> ret)
 		{
 			var monad = _hTTPPresenter.GetRoomList();
 			yield return WebUtility.RunAndHandleInternetError(monad, _warningPresenter);
@@ -55,12 +55,11 @@ namespace Metagame
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
 		{
 			return result.Select(roomResult => new RoomViewData()
-					{
-						Id = roomResult.Id,
-						RoomName = roomResult.RoomName,
-						Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
-					})
-					.ToList();
+				{
+					Id = roomResult.Id,
+					RoomName = roomResult.RoomName,
+					Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+				}).ToList();
 		}
 	}
 }

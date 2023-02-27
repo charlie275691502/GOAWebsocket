@@ -15,7 +15,6 @@ namespace Metagame
 		private Text _nickNameText;
 		[SerializeField]
 		private Image _avatarImage;
-		
 		[SerializeField]
 		private string _emptyNickName;
 		
