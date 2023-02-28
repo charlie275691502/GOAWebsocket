@@ -9,7 +9,7 @@ namespace Metagame
 {
 	public interface IRoomView
 	{
-		void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage);
+		void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage, Action<string> onSendMessage);
 		void Leave();
 	}
 	
@@ -27,14 +27,19 @@ namespace Metagame
 		private GameObjectPool _pool;
 		[SerializeField]
 		private RoomMessageDynamicScrollRect _scrollRect;
+		[SerializeField]
+		private Button _sendMessageButton;
+		[SerializeField]
+		private InputField _messageInputField;
 		
 		private RoomWithMessagesViewData _viewData;
 		private Action _switchToMainPage;
+		private Action<string> _onSendMessage;
 		
-		public void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage)
+		public void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage, Action<string> onSendMessage)
 		{
 			_Enter(viewData);
-			_Register(switchToMainPage);
+			_Register(switchToMainPage, onSendMessage);
 			_panel.SetActive(true);
 		}
 		
@@ -71,11 +76,13 @@ namespace Metagame
 			_scrollRect.Leave();
 		}
 		
-		private void _Register(Action switchToMainPage)
+		private void _Register(Action switchToMainPage, Action<string> onSendMessage)
 		{
 			_switchToMainPage = switchToMainPage;
+			_onSendMessage = onSendMessage;
 			
 			_backButton.onClick.AddListener(_SwitchToMainPage);
+			_sendMessageButton.onClick.AddListener(_OnSendMessage);
 		}
 		
 		private void _Unregister()
@@ -83,11 +90,17 @@ namespace Metagame
 			_switchToMainPage = null;
 			
 			_backButton.onClick.RemoveAllListeners();
+			_sendMessageButton.onClick.RemoveAllListeners();
 		}
 		
 		private void _SwitchToMainPage()
 		{
 			_switchToMainPage?.Invoke();
+		}
+		
+		private void _OnSendMessage()
+		{
+			_onSendMessage?.Invoke(_messageInputField.text);
 		}
 		
 		private void _OnInstantiateMessageElement(int index, IMessageListElementView view)

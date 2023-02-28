@@ -131,7 +131,10 @@ namespace Web
 			};
 			_loadingView.Enter();
 			
-			HTTPRequest request = new HTTPRequest(new Uri(string.Format("http://{0}:{1}/{2}", WebUtility.Host, WebUtility.Port, path)), method, onRequestFinished);
+			HTTPRequest request = new HTTPRequest(
+				new Uri(string.Format("http://{0}:{1}/{2}", WebUtility.Host, WebUtility.Port, path)),
+				method,
+				onRequestFinished);
 			request.RawData = System.Text.Encoding.UTF8.GetBytes(json);
 			request.SetHeader("Content-Type", "application/json; charset=UTF-8");
 			if(needAuthorization)

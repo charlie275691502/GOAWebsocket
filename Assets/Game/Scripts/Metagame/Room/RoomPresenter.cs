@@ -16,15 +16,18 @@ namespace Metagame
 	public class RoomPresenter : IRoomPresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
+		private IRoomWebSocketPresenter _webSocketPresenter;
 		private IWarningPresenter _warningPresenter;
 		private IRoomView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
+		private CommandExecutor _webSocketExecutor = new CommandExecutor();
 		private MetagameStatus _result;
 		
-		public RoomPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRoomView view)
+		public RoomPresenter(IHTTPPresenter hTTPPresenter, IRoomWebSocketPresenter webSocketPresenter, IWarningPresenter warningPresenter, IRoomView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
+			_webSocketPresenter = webSocketPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
 		}
@@ -32,16 +35,19 @@ namespace Metagame
 		public IEnumerator Run(int roomId, IReturn<MetagameStatus> ret)
 		{
 			var monad = _hTTPPresenter.GetRoomWithMessages(roomId);
-			yield return WebUtility.RunAndHandleInternetError(monad, _warningPresenter);
+			yield return monad.RunAndHandleInternetError(_warningPresenter);
 			if(monad.Error != null)
 			{
 				yield break;
 			}
 			
 			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(monad.Result);
-			_view.Enter(roomWithMessagesViewData, _SwitchToMainPage);
+			_view.Enter(roomWithMessagesViewData, _SwitchToMainPage, _OnSendMessage);
 			
+			_webSocketExecutor.Clear();
+			_webSocketExecutor.Add(_webSocketPresenter.Run().RunAndHandleInternetError(_warningPresenter));
 			_commandExecutor.Clear();
+			_commandExecutor.Add(_webSocketExecutor.Start());
 			yield return _commandExecutor.Start();
 			ret.Accept(_result);
 		}
@@ -49,6 +55,8 @@ namespace Metagame
 		private void _Stop()
 		{
 			_view.Leave();
+			_webSocketPresenter.Stop();
+			_webSocketExecutor.Stop();
 			_commandExecutor.Stop();
 		}
 		
@@ -56,6 +64,11 @@ namespace Metagame
 		{
 			_result = new MetagameStatus(MetagameStatusType.MainPage);
 			_Stop();
+		}
+		
+		private void _OnSendMessage(string message)
+		{
+			_webSocketPresenter.Message(message);
 		}
 		
 		private RoomWithMessagesViewData _GetRoomWithMessagesViewData(RoomWithMessagesResult result)

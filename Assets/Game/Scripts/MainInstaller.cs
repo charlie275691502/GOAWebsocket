@@ -34,6 +34,10 @@ public class MainInstaller : MonoInstaller
 			.Bind<IHTTPPresenter>()
 			.To<HTTPPresenter>()
 			.AsSingle();
+		Container
+			.Bind<IRoomWebSocketPresenter>()
+			.To<RoomWebSocketPresenter>()
+			.AsSingle();
 		
 		Container
 			.Bind<BackendPlayerData>()
@@ -118,6 +122,7 @@ public class MainInstaller : MonoInstaller
 			.Bind<ITopMenuView>()
 			.To<TopMenuView>()
 			.FromInstance(_topMenuView);
+			
 		#endregion
 	}
 }
