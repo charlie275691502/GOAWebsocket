@@ -10,6 +10,7 @@ namespace Metagame
 	public interface IRoomView
 	{
 		void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage, Action<string> onSendMessage);
+		void AppendMessage(MessageViewData viewData);
 		void Leave();
 	}
 	
@@ -69,6 +70,12 @@ namespace Metagame
 			_scrollRect.FillItems(viewData.Messages.Count);
 		}
 		
+		public void AppendMessage(MessageViewData viewData)
+		{
+			_viewData.Messages.Add(viewData);
+			_scrollRect.AppendItem(1);
+		}
+		
 		private void _Leave()
 		{
 			_roomNameText.text = string.Empty;
@@ -101,6 +108,7 @@ namespace Metagame
 		private void _OnSendMessage()
 		{
 			_onSendMessage?.Invoke(_messageInputField.text);
+			_messageInputField.text = string.Empty;
 		}
 		
 		private void _OnInstantiateMessageElement(int index, IMessageListElementView view)

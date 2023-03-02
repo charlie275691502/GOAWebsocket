@@ -32,6 +32,15 @@ namespace Common
 			}
 		}
 		
+		public void AppendItem(int count)
+		{
+			var curCount = _gameObjectList.Count;
+			for(int i=curCount; i < curCount + count; i++)
+			{
+				_AddItem(i);
+			}
+		}
+		
 		private void _AddItem(int index)
 		{
 			var gameObject = _pool.GetGameObject();

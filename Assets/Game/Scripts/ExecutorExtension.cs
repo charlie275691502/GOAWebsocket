@@ -7,7 +7,8 @@ namespace Common
 {
 	public class CommandExecutor : Executor
 	{
-		private bool _isStop;
+		public bool IsRunning { get{return !_isStop; }}
+		private bool _isStop = true;
 		public IEnumerator Start()
 		{
 			_isStop = false;

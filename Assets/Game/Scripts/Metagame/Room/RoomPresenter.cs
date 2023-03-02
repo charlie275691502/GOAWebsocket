@@ -71,7 +71,15 @@ namespace Metagame
 		
 		private void _OnReceiveMessage(MessageResult result)
 		{
-			Debug.Log(result.Content);
+			if(_commandExecutor.IsRunning)
+			{
+				_view.AppendMessage(new MessageViewData()
+				{
+					Id = result.Id,
+					Content = result.Content,
+					NickName = result.Player.NickName,
+				});
+			}
 		}
 		
 		private RoomWithMessagesViewData _GetRoomWithMessagesViewData(RoomWithMessagesResult result)
