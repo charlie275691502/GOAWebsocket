@@ -5,6 +5,7 @@ using BestHTTP;
 using BestHTTP.WebSocket;
 using Common;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Rayark.Mast;
 using UnityEngine;
 
@@ -23,6 +24,7 @@ namespace Web
 		
 		private Exception _error;
 		private WebSocket _webSocket;
+		private Dictionary<string, Action<JToken>> _onReceiveMessageActionDic = new Dictionary<string, Action<JToken>>();
 		
 		protected string _path = string.Empty;
 		
@@ -40,6 +42,7 @@ namespace Web
 		
 		public void Stop()
 		{
+			_onReceiveMessageActionDic.Clear();
 			_webSocket.Close();
 		}
 		
@@ -79,6 +82,11 @@ namespace Web
 				yield return null;
 			}
 		}
+		
+		protected void _RegisterOnReceiveMessage<T>(string command, Action<T> action)
+		{
+			_onReceiveMessageActionDic[command] = (jtoken) => action?.Invoke(jtoken.ToObject<T>());
+		}
 
 		private void _OnWebSocketOpen(WebSocket webSocket)
 		{
@@ -93,6 +101,15 @@ namespace Web
 			if(WebUtility.RequestDebugMode)
 			{
 				Debug.LogFormat("Text Message received from path : {0}\nmessage : {1}", _path, message);
+			}
+			
+			var jObject = JObject.Parse(message);
+			var command = jObject["command"].ToObject<string>();
+			var data = jObject["data"];
+			
+			if (_onReceiveMessageActionDic.TryGetValue(command, out var action))
+			{
+				action?.Invoke(data);
 			}
 		}
 		

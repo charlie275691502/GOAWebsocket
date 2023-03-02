@@ -1,15 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
 using Rayark.Mast;
 using UnityEngine;
+using Web;
 
-namespace Web
+namespace Metagame
 {
 	public interface IRoomWebSocketPresenter : IWebSocketPresenter
 	{
 		IMonad<None> Run(int roomId);
 		void Message(string message);
+		void RegisterOnReceiveMessage(Action<MessageResult> onReceiveMessage);
 	}
 	
 	public class RoomWebSocketPresenter : WebSocketPresenter, IRoomWebSocketPresenter
@@ -23,7 +26,6 @@ namespace Web
 			return _Run(string.Format("chat/rooms/{0}/", roomId.ToString()));
 		}
 		
-		
 		public void Message(string content)
 		{
 			var body = new Dictionary<string, object>()
@@ -33,6 +35,11 @@ namespace Web
 			};
 			
 			_Send(body);
+		}
+		
+		public void RegisterOnReceiveMessage(Action<MessageResult> onReceiveMessage)
+		{
+			_RegisterOnReceiveMessage<MessageResult>("send_message", onReceiveMessage);
 		}
 	}
 }

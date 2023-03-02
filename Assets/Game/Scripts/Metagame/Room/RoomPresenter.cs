@@ -34,6 +34,7 @@ namespace Metagame
 		public IEnumerator Run(int roomId, IReturn<MetagameStatus> ret)
 		{
 			var httpMonad = _hTTPPresenter.GetRoomWithMessages(roomId);
+			_webSocketPresenter.RegisterOnReceiveMessage(_OnReceiveMessage);
 			var webSocketMonad = _webSocketPresenter.Run(roomId);
 			
 			yield return Monad.WhenAll(httpMonad, webSocketMonad).RunAndHandleInternetError(_warningPresenter);
@@ -41,9 +42,6 @@ namespace Metagame
 			{
 				yield break;
 			}
-			
-			// yield return httpMonad.RunAndHandleInternetError(_warningPresenter);
-			// yield return webSocketMonad.RunAndHandleInternetError(_warningPresenter);
 			
 			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(httpMonad.Result);
 			_view.Enter(roomWithMessagesViewData, _SwitchToMainPage, _OnSendMessage);
@@ -69,6 +67,11 @@ namespace Metagame
 		private void _OnSendMessage(string message)
 		{
 			_webSocketPresenter.Message(message);
+		}
+		
+		private void _OnReceiveMessage(MessageResult result)
+		{
+			Debug.Log(result.Content);
 		}
 		
 		private RoomWithMessagesViewData _GetRoomWithMessagesViewData(RoomWithMessagesResult result)
