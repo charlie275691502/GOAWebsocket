@@ -21,7 +21,6 @@ namespace Metagame
 		private IRoomView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private CommandExecutor _webSocketExecutor = new CommandExecutor();
 		private MetagameStatus _result;
 		
 		public RoomPresenter(IHTTPPresenter hTTPPresenter, IRoomWebSocketPresenter webSocketPresenter, IWarningPresenter warningPresenter, IRoomView view)
@@ -34,20 +33,22 @@ namespace Metagame
 		
 		public IEnumerator Run(int roomId, IReturn<MetagameStatus> ret)
 		{
-			var monad = _hTTPPresenter.GetRoomWithMessages(roomId);
-			yield return monad.RunAndHandleInternetError(_warningPresenter);
-			if(monad.Error != null)
+			var httpMonad = _hTTPPresenter.GetRoomWithMessages(roomId);
+			var webSocketMonad = _webSocketPresenter.Run(roomId);
+			
+			yield return Monad.WhenAll(httpMonad, webSocketMonad).RunAndHandleInternetError(_warningPresenter);
+			if(httpMonad.Error != null || webSocketMonad.Error != null)
 			{
 				yield break;
 			}
 			
-			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(monad.Result);
+			// yield return httpMonad.RunAndHandleInternetError(_warningPresenter);
+			// yield return webSocketMonad.RunAndHandleInternetError(_warningPresenter);
+			
+			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(httpMonad.Result);
 			_view.Enter(roomWithMessagesViewData, _SwitchToMainPage, _OnSendMessage);
 			
-			_webSocketExecutor.Clear();
-			_webSocketExecutor.Add(_webSocketPresenter.Run().RunAndHandleInternetError(_warningPresenter));
 			_commandExecutor.Clear();
-			_commandExecutor.Add(_webSocketExecutor.Start());
 			yield return _commandExecutor.Start();
 			ret.Accept(_result);
 		}
@@ -56,7 +57,6 @@ namespace Metagame
 		{
 			_view.Leave();
 			_webSocketPresenter.Stop();
-			_webSocketExecutor.Stop();
 			_commandExecutor.Stop();
 		}
 		

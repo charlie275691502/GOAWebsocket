@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using Rayark.Mast;
 using UnityEngine;
 
 namespace Web
 {
 	public interface IRoomWebSocketPresenter : IWebSocketPresenter
 	{
+		IMonad<None> Run(int roomId);
 		void Message(string message);
 	}
 	
@@ -14,14 +16,20 @@ namespace Web
 	{
 		public RoomWebSocketPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData) : base(loadingView, backendPlayerPresenter, backendPlayerData)
 		{
-			_path = "rooms/lobby/";
 		}
 		
-		public void Message(string message)
+		public IMonad<None> Run(int roomId)
+		{
+			return _Run(string.Format("chat/rooms/{0}/", roomId.ToString()));
+		}
+		
+		
+		public void Message(string content)
 		{
 			var body = new Dictionary<string, object>()
 			{
-				{"message", message},
+				{"command", "send_message"},
+				{"content", content},
 			};
 			
 			_Send(body);

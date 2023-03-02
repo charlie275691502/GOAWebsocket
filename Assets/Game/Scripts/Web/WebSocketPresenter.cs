@@ -12,7 +12,6 @@ namespace Web
 {
 	public interface IWebSocketPresenter
 	{
-		IMonad<None> Run();
 		void Stop();
 	}
 	
@@ -22,7 +21,6 @@ namespace Web
 		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
 		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private Exception _error;
 		private WebSocket _webSocket;
 		
@@ -35,20 +33,20 @@ namespace Web
 			_backendPlayerData = backendPlayerData;
 		}
 		
-		public IMonad<None> Run()
+		protected IMonad<None> _Run(string path)
 		{
-			return new BlockMonad<None>(_Run);
+			return new BlockMonad<None>(r => _Run(path, r));
 		}
 		
 		public void Stop()
 		{
-			_webSocket = null;
-			_commandExecutor.Stop();
+			_webSocket.Close();
 		}
 		
-		private IEnumerator _Run(IReturn<None> ret)
+		private IEnumerator _Run(string path, IReturn<None> ret)
 		{
-			if(_webSocket != null)
+			_path = path;
+			if(_webSocket != null && _webSocket.IsOpen)
 			{
 				var errorMessage = string.Format("WebSocket already running on path : {0}", _path);
 				Debug.LogError(errorMessage);
@@ -61,6 +59,7 @@ namespace Web
 				string.Format("http://{0}:{1}/", WebUtility.Host, WebUtility.Port),
 				string.Empty);
 				
+			_webSocket.OnInternalRequestCreated += (ws, req) => req.AddHeader("authorization", _backendPlayerData.AccessKey);
 			_webSocket.OnOpen += _OnWebSocketOpen;
 			_webSocket.OnMessage += _OnMessageReceived;
 			_webSocket.OnBinary += _OnBinaryMessageReceived;
@@ -69,15 +68,16 @@ namespace Web
 				
 			_error = null;
 			_webSocket.Open();
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			_webSocket.Close();
-			
-			if(_error != null)
+			while (!_webSocket.IsOpen && _error == null)
 			{
-				ret.Fail(_error);
+				if(_error != null)
+				{
+					ret.Fail(_error);
+					Stop();
+					yield break;
+				}
+				yield return null;
 			}
-			_webSocket = null;
 		}
 
 		private void _OnWebSocketOpen(WebSocket webSocket)
@@ -119,12 +119,11 @@ namespace Web
 				Debug.LogErrorFormat("Receive Error from path : {0}\nError : {1}", _path, error);
 			}
 			_error = new Exception(error);
-			Stop();
 		}
 		
 		protected void _Send(Dictionary<string, object> body)
 		{
-			if(_webSocket == null)
+			if(!_webSocket.IsOpen)
 			{
 				Debug.LogErrorFormat("WebSocket isn't running on path : {0}", _path);
 				return;
