@@ -59,8 +59,7 @@ namespace Web
 						{"email", email},
 					},
 					false)
-				.Then(r => Login(username, password))
-				.Then(r => UpdateSelfPlayerData(username));
+				.Then(r => Login(username, password));
 		}
 		
 		public IMonad<None> GetSelfPlayerData()
