@@ -13,6 +13,7 @@ namespace Metagame
 	{
 		IEnumerator Run(int roomId, Action<string> onSendMessage, Action<int> onLeaveRoom, IReturn<MetagameStatus> ret);
 		void AppendMessage(MessageResult result);
+		void LeaveRoom();
 	}
 	
 	public class RoomPresenter : IRoomPresenter
@@ -76,12 +77,15 @@ namespace Metagame
 		private void _OnLeaveRoom()
 		{
 			_onLeaveRoom?.Invoke(_roomId);
-			_result = new MetagameStatus(MetagameStatusType.MainPage);
-			_Stop();
 		}
 		
 		private void _OnSendMessage(string message)
 		{
+			if (string.IsNullOrEmpty(message))
+			{
+				return;
+			}
+			
 			_onSendMessage?.Invoke(message);
 		}
 		
@@ -109,6 +113,12 @@ namespace Metagame
 				Content = result.Content,
 				NickName = result.Player.NickName,
 			});
+		}
+		
+		public void LeaveRoom()
+		{
+			_result = new MetagameStatus(MetagameStatusType.MainPage);
+			_Stop();
 		}
 	}
 }
