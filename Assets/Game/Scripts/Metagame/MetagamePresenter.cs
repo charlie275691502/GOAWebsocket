@@ -136,7 +136,13 @@ namespace Metagame
 				yield break;
 			}
 			
-			_webSocketPresenter.JoinRoom(roomId);
+			var joinRoomMonad = _webSocketPresenter.JoinRoomMonad(roomId);
+			yield return joinRoomMonad.RunAndHandleInternetError(_warningPresenter);
+			if(joinRoomMonad.Error != null)
+			{
+				yield break;
+			}
+			
 			_mainPagePresneter.SwitchToRoom(roomId);
 		}
 		

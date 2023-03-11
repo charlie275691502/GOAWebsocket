@@ -12,7 +12,7 @@ namespace Metagame
 	{
 		IMonad<None> Run(int roomId);
 		void SendMessage(string message);
-		void JoinRoom(int roomId);
+		IMonad<None> JoinRoomMonad(int roomId);
 		void LeaveRoom(int roomId);
 		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
 		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
@@ -40,7 +40,7 @@ namespace Metagame
 			_Send(body);
 		}
 		
-		public void JoinRoom(int roomId)
+		public IMonad<None> JoinRoomMonad(int roomId)
 		{
 			var body = new Dictionary<string, object>()
 			{
@@ -48,7 +48,7 @@ namespace Metagame
 				{"room_id", roomId},
 			};
 			
-			_Send(body);
+			return _SendWaitTillReturnMonad<None>("join_room", body);
 		}
 		
 		public void LeaveRoom(int roomId)

@@ -83,9 +83,47 @@ namespace Web
 			}
 		}
 		
+		private IEnumerator _SendWaitTillReturn<T>(string command, Dictionary<string, object> body, IReturn<T> ret)
+		{
+			string successCommand = command + "_success";
+			string failCommand = command + "_fail";
+			var leave = false;
+			_RegisterOnReceiveMessage<T>(successCommand, (result) => 
+			{
+				leave = true;
+				ret.Accept(result);
+			});
+			
+			_RegisterOnReceiveMessage<string>(failCommand, (message) => 
+			{
+				leave = true;
+				ret.Fail(new Exception(message));
+			});
+			
+			_Send(body);
+			
+			while (!leave)
+			{
+				yield return null;
+			}
+			
+			_UnregisterOnReceiveMessage(successCommand);
+			_UnregisterOnReceiveMessage(failCommand);
+		}
+		
+		protected IMonad<T> _SendWaitTillReturnMonad<T>(string command, Dictionary<string, object> body)
+		{
+			return new BlockMonad<T>(r => _SendWaitTillReturn(command, body, r));
+		}
+		
 		protected void _RegisterOnReceiveMessage<T>(string command, Action<T> action)
 		{
-			_onReceiveMessageActionDic[command] = (jtoken) => action?.Invoke(jtoken.ToObject<T>());
+			_onReceiveMessageActionDic[command] = (jtoken) => action?.Invoke(jtoken.HasValues ? jtoken.ToObject<T>() : default(T));
+		}
+		
+		protected void _UnregisterOnReceiveMessage(string command)
+		{
+			_onReceiveMessageActionDic[command] = null;
 		}
 
 		private void _OnWebSocketOpen(WebSocket webSocket)
