@@ -116,12 +116,13 @@ namespace Metagame
 		
 		private void _OnLeaveRoom(int roomId)
 		{
+			_webSocketPresenter.LeaveRoom(roomId);
 			_webSocketPresenter.Stop();
 		}
 		
 		private void _OnSendMessage(string message)
 		{
-			_webSocketPresenter.Message(message);
+			_webSocketPresenter.SendMessage(message);
 		}
 		
 		private IEnumerator _JoinRoom(int roomId)
@@ -135,6 +136,7 @@ namespace Metagame
 				yield break;
 			}
 			
+			_webSocketPresenter.JoinRoom(roomId);
 			_mainPagePresneter.SwitchToRoom(roomId);
 		}
 		

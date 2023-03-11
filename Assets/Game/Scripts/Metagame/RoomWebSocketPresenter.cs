@@ -11,7 +11,9 @@ namespace Metagame
 	public interface IRoomWebSocketPresenter : IWebSocketPresenter
 	{
 		IMonad<None> Run(int roomId);
-		void Message(string message);
+		void SendMessage(string message);
+		void JoinRoom(int roomId);
+		void LeaveRoom(int roomId);
 		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
 		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
 	}
@@ -27,12 +29,34 @@ namespace Metagame
 			return _Run(string.Format("chat/rooms/{0}/", roomId.ToString()));
 		}
 		
-		public void Message(string content)
+		public void SendMessage(string content)
 		{
 			var body = new Dictionary<string, object>()
 			{
 				{"command", "send_message"},
 				{"content", content},
+			};
+			
+			_Send(body);
+		}
+		
+		public void JoinRoom(int roomId)
+		{
+			var body = new Dictionary<string, object>()
+			{
+				{"command", "join_room"},
+				{"room_id", roomId},
+			};
+			
+			_Send(body);
+		}
+		
+		public void LeaveRoom(int roomId)
+		{
+			var body = new Dictionary<string, object>()
+			{
+				{"command", "leave_room"},
+				{"room_id", roomId},
 			};
 			
 			_Send(body);
