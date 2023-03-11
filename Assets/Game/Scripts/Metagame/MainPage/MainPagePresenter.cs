@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,8 @@ namespace Metagame
 {
 	public interface IMainPagePresenter
 	{
-		IEnumerator Run(IReturn<MetagameStatus> ret);
+		IEnumerator Run(IReturn<MetagameStatus> ret, Action<int> onJoinRoom);
+		void SwitchToRoom(int roomId);
 	}
 	
 	public class MainPagePresenter : IMainPagePresenter
@@ -21,6 +23,7 @@ namespace Metagame
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
 		private MetagameStatus _result;
+		private Action<int> _onJoinRoom;
 		
 		public MainPagePresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IMainPageView view)
 		{
@@ -29,17 +32,18 @@ namespace Metagame
 			_view = view;
 		}
 		
-		public IEnumerator Run(IReturn<MetagameStatus> ret)
+		public IEnumerator Run(IReturn<MetagameStatus> ret, Action<int> onJoinRoom)
 		{
+			_Register(onJoinRoom);
 			var monad = _hTTPPresenter.GetRoomList();
-			yield return WebUtility.RunAndHandleInternetError(monad, _warningPresenter);
+			yield return monad.RunAndHandleInternetError(_warningPresenter);
 			if(monad.Error != null)
 			{
 				yield break;
 			}
 			
 			var roomViewDatas = _GetRoomViewDatas(monad.Result);
-			_view.Enter(roomViewDatas, _SwitchToRoom);
+			_view.Enter(roomViewDatas, _OnJoinRoom);
 			
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
@@ -48,14 +52,24 @@ namespace Metagame
 		
 		private void _Stop()
 		{
+			_Unregister();
 			_view.Leave();
 			_commandExecutor.Stop();
 		}
 		
-		private void _SwitchToRoom(int roomId)
+		private void _Register(Action<int> onJoinRoom)
 		{
-			_result = new MetagameStatus(MetagameStatusType.Room, roomId);
-			_Stop();
+			_onJoinRoom = onJoinRoom;
+		}
+		
+		private void _Unregister()
+		{
+			_onJoinRoom = null;
+		}
+		
+		private void _OnJoinRoom(int roomId)
+		{
+			_onJoinRoom?.Invoke(roomId);
 		}
 		
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
@@ -66,6 +80,12 @@ namespace Metagame
 					RoomName = roomResult.RoomName,
 					Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				}).ToList();
+		}
+		
+		public void SwitchToRoom(int roomId)
+		{
+			_result = new MetagameStatus(MetagameStatusType.Room, roomId);
+			_Stop();
 		}
 	}
 }

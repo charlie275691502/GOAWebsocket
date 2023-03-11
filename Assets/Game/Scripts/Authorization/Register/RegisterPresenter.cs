@@ -50,8 +50,7 @@ namespace Authorization
 		
 		private void _OnRegister(string username, string password, string confirmPassword, string email)
 		{
-			if(_commandExecutor.Empty)
-				_commandExecutor.Add(_Register(username, password, confirmPassword, email));
+			_commandExecutor.TryAdd(_Register(username, password, confirmPassword, email));
 		}
 
 		private IEnumerator _Register(string username, string password, string confirmPassword, string email)
@@ -62,7 +61,7 @@ namespace Authorization
 				yield break;
 			}
 			
-			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.RegisterThenLogin(username, password, email), _warningPresenter);
+			yield return _hTTPPresenter.RegisterThenLogin(username, password, email).RunAndHandleInternetError(_warningPresenter);
 			_result = new AuthorizationStatus(AuthorizationStatusType.EnterMetagame);
 			_Stop();
 		}

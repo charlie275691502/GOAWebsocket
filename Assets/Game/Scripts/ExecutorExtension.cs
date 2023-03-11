@@ -23,5 +23,21 @@ namespace Common
 		{
 			_isStop = true;
 		}
+		
+		public void TryAdd(IResumable resumable)
+		{
+			if(Empty)
+			{
+				Add(resumable);
+			}
+		}
+		
+		public void TryAdd(IEnumerator block)
+		{
+			if(Empty)
+			{
+				this.Add(block);
+			}
+		}
 	}
 }

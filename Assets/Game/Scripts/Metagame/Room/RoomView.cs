@@ -9,7 +9,7 @@ namespace Metagame
 {
 	public interface IRoomView
 	{
-		void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage, Action<string> onSendMessage);
+		void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage);
 		void AppendMessage(MessageViewData viewData);
 		void Leave();
 	}
@@ -34,13 +34,13 @@ namespace Metagame
 		private InputField _messageInputField;
 		
 		private RoomWithMessagesViewData _viewData;
-		private Action _switchToMainPage;
+		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
 		
-		public void Enter(RoomWithMessagesViewData viewData, Action switchToMainPage, Action<string> onSendMessage)
+		public void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage)
 		{
 			_Enter(viewData);
-			_Register(switchToMainPage, onSendMessage);
+			_Register(onLeaveRoom, onSendMessage);
 			_panel.SetActive(true);
 		}
 		
@@ -83,9 +83,9 @@ namespace Metagame
 			_scrollRect.Leave();
 		}
 		
-		private void _Register(Action switchToMainPage, Action<string> onSendMessage)
+		private void _Register(Action onLeaveRoom, Action<string> onSendMessage)
 		{
-			_switchToMainPage = switchToMainPage;
+			_onLeaveRoom = onLeaveRoom;
 			_onSendMessage = onSendMessage;
 			
 			_backButton.onClick.AddListener(_SwitchToMainPage);
@@ -94,7 +94,7 @@ namespace Metagame
 		
 		private void _Unregister()
 		{
-			_switchToMainPage = null;
+			_onLeaveRoom = null;
 			
 			_backButton.onClick.RemoveAllListeners();
 			_sendMessageButton.onClick.RemoveAllListeners();
@@ -102,7 +102,7 @@ namespace Metagame
 		
 		private void _SwitchToMainPage()
 		{
-			_switchToMainPage?.Invoke();
+			_onLeaveRoom?.Invoke();
 		}
 		
 		private void _OnSendMessage()

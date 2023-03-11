@@ -12,7 +12,8 @@ namespace Metagame
 	{
 		IMonad<None> Run(int roomId);
 		void Message(string message);
-		void RegisterOnReceiveMessage(Action<MessageResult> onReceiveMessage);
+		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
+		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
 	}
 	
 	public class RoomWebSocketPresenter : WebSocketPresenter, IRoomWebSocketPresenter
@@ -37,9 +38,14 @@ namespace Metagame
 			_Send(body);
 		}
 		
-		public void RegisterOnReceiveMessage(Action<MessageResult> onReceiveMessage)
+		public void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage)
 		{
-			_RegisterOnReceiveMessage<MessageResult>("send_message", onReceiveMessage);
+			_RegisterOnReceiveMessage<MessageResult>("append_message", onReceiveMessage);
+		}
+		
+		public void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage)
+		{
+			_RegisterOnReceiveMessage<RoomResult>("update_room", onReceiveMessage);
 		}
 	}
 }

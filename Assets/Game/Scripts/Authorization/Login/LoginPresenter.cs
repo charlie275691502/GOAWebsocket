@@ -49,13 +49,12 @@ namespace Authorization
 		
 		private void _OnLogin(string username, string password)
 		{
-			if(_commandExecutor.Empty)
-				_commandExecutor.Add(_Login(username, password));
+			_commandExecutor.TryAdd(_Login(username, password));
 		}
 
 		private IEnumerator _Login(string username, string password)
 		{
-			yield return WebUtility.RunAndHandleInternetError(_hTTPPresenter.Login(username, password), _warningPresenter);
+			yield return _hTTPPresenter.Login(username, password).RunAndHandleInternetError(_warningPresenter);
 			_result = new AuthorizationStatus(AuthorizationStatusType.EnterMetagame);
 			_Stop();
 		}
