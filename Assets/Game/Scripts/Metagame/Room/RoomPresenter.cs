@@ -13,6 +13,7 @@ namespace Metagame
 	{
 		IEnumerator Run(int roomId, Action<string> onSendMessage, Action<int> onLeaveRoom, IReturn<MetagameStatus> ret);
 		void AppendMessage(MessageResult result);
+		void UpdateRoom(RoomResult result);
 		void LeaveRoom();
 	}
 	
@@ -93,26 +94,42 @@ namespace Metagame
 		{
 			return new RoomWithMessagesViewData()
 			{
-					Id = result.Id,
-					RoomName = result.RoomName,
-					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
-					Messages = result.Messages.Select(message => new MessageViewData()
-					{
-						Id = message.Id,
-						Content = message.Content,
-						NickName = message.Player.NickName,
-					}).ToList(),
+				Id = result.Id,
+				RoomName = result.RoomName,
+				Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+				Messages = result.Messages.Select(message => new MessageViewData()
+				{
+					Id = message.Id,
+					Content = message.Content,
+					NickName = message.Player.NickName,
+				}).ToList(),
 			};
 		}
 		
 		public void AppendMessage(MessageResult result)
 		{
-			_view.AppendMessage(new MessageViewData()
+			if(_commandExecutor.IsRunning)
 			{
-				Id = result.Id,
-				Content = result.Content,
-				NickName = result.Player.NickName,
-			});
+				_view.AppendMessage(new MessageViewData()
+				{
+					Id = result.Id,
+					Content = result.Content,
+					NickName = result.Player.NickName,
+				});
+			}
+		}
+		
+		public void UpdateRoom(RoomResult result)
+		{
+			if(_commandExecutor.IsRunning)
+			{
+				_view.UpdateRoom(new RoomViewData()
+				{
+					Id = result.Id,
+					RoomName = result.RoomName,
+					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+				});
+			}
 		}
 		
 		public void LeaveRoom()

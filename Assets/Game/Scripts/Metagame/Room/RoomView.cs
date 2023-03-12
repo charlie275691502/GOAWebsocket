@@ -11,6 +11,7 @@ namespace Metagame
 	{
 		void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage);
 		void AppendMessage(MessageViewData viewData);
+		void UpdateRoom(RoomViewData viewData);
 		void Leave();
 	}
 	
@@ -54,18 +55,8 @@ namespace Metagame
 		private void _Enter(RoomWithMessagesViewData viewData)
 		{
 			_viewData = viewData;
-			_roomNameText.text = viewData.RoomName;
-			for (int i=0; i < _playerInfoViews.Count; i++)
-			{
-				if (i < viewData.Players.Count) 
-				{
-					_playerInfoViews[i].Enter(viewData.Players[i]);
-				} else 
-				{
-					_playerInfoViews[i].EnterEmpty();
-				}
-			}
 			
+			_UpdateRoom();
 			_scrollRect.Enter(_pool, _OnInstantiateMessageElement);
 			_scrollRect.FillItems(viewData.Messages.Count);
 		}
@@ -74,6 +65,13 @@ namespace Metagame
 		{
 			_viewData.Messages.Add(viewData);
 			_scrollRect.AppendItem(1);
+		}
+		public void UpdateRoom(RoomViewData viewData)
+		{
+			_viewData.Id = viewData.Id;
+			_viewData.RoomName = viewData.RoomName;
+			_viewData.Players = viewData.Players;
+			_UpdateRoom();
 		}
 		
 		private void _Leave()
@@ -114,6 +112,21 @@ namespace Metagame
 		private void _OnInstantiateMessageElement(int index, IMessageListElementView view)
 		{
 			view.Enter(_viewData.Messages[index]);
+		}
+		
+		private void _UpdateRoom()
+		{
+			_roomNameText.text = _viewData.RoomName;
+			for (int i=0; i < _playerInfoViews.Count; i++)
+			{
+				if (i < _viewData.Players.Count) 
+				{
+					_playerInfoViews[i].Enter(_viewData.Players[i]);
+				} else 
+				{
+					_playerInfoViews[i].EnterEmpty();
+				}
+			}
 		}
 	}
 }

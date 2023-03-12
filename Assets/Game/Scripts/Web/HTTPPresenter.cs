@@ -15,6 +15,7 @@ namespace Web
 		IMonad<None> RegisterThenLogin(string username, string password, string email);
 		IMonad<None> GetSelfPlayerData();
 		IMonad<None> UpdateSelfPlayerData(string nickName);
+		IMonad<RoomResult> CreateRoom(string roomName);
 		IMonad<RoomListResult> GetRoomList();
 		IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId);
 	}
@@ -83,6 +84,18 @@ namespace Web
 						{"nick_name", nickName},
 					})
 				.Then(r => _backendPlayerPresenter.AcceptNickName(nickName));
+		}
+		
+		public IMonad<RoomResult> CreateRoom(string roomName)
+		{
+			return 
+				_Send<RoomResult>(
+					"chat/rooms/",
+					HTTPMethods.Post,
+					new Dictionary<string, object>()
+					{
+						{"room_name", roomName},
+					});
 		}
 		
 		public IMonad<RoomListResult> GetRoomList()

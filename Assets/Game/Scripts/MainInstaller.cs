@@ -22,6 +22,8 @@ public class MainInstaller : MonoInstaller
 	[SerializeField]
 	private MainPageView _mainPageView;
 	[SerializeField]
+	private CreateRoomView _createRoomView;
+	[SerializeField]
 	private RoomView _roomView;
 	[SerializeField]
 	private TopMenuView _topMenuView;
@@ -110,6 +112,14 @@ public class MainInstaller : MonoInstaller
 			.Bind<IMainPageView>()
 			.To<MainPageView>()
 			.FromInstance(_mainPageView);
+		Container
+			.Bind<ICreateRoomPresenter>()
+			.To<CreateRoomPresenter>()
+			.AsSingle();
+		Container
+			.Bind<ICreateRoomView>()
+			.To<CreateRoomView>()
+			.FromInstance(_createRoomView);
 		Container
 			.Bind<IRoomPresenter>()
 			.To<RoomPresenter>()

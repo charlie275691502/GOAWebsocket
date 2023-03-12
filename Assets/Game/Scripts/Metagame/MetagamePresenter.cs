@@ -127,6 +127,7 @@ namespace Metagame
 		private IEnumerator _JoinRoom(int roomId)
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(_OnReceiveAppendMessage);
+			_webSocketPresenter.RegisterOnReceiveUpdateRoom(_OnReceiveUpdateRoom);
 			var webSocketMonad = _webSocketPresenter.Run(roomId);
 			yield return webSocketMonad.RunAndHandleInternetError(_warningPresenter);
 			if(webSocketMonad.Error != null)
@@ -141,7 +142,6 @@ namespace Metagame
 				yield break;
 			}
 			
-			_webSocketPresenter.RegisterOnReceiveUpdateRoom(_OnReceiveUpdateRoom);
 			_mainPagePresneter.SwitchToRoom(roomId);
 		}
 		
@@ -165,7 +165,7 @@ namespace Metagame
 		
 		private void _OnReceiveUpdateRoom(RoomResult result)
 		{
-			
+			_roomPresneter.UpdateRoom(result);
 		}
 	}
 }

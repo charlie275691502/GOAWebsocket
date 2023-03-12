@@ -9,7 +9,7 @@ namespace Metagame
 {
 	public interface IRoomListElementView
 	{
-		void Enter(RoomViewData viewData, Action switchToRoom);
+		void Enter(RoomViewData viewData, Action onJoinRoom);
 		void Leave();
 	}
 	
@@ -24,12 +24,12 @@ namespace Metagame
 		[SerializeField]
 		private List<RoomListElementPlayerInfoView> _playerInfoViews;
 		
-		private Action _switchToRoom;
+		private Action _onJoinRoom;
 		
-		public void Enter(RoomViewData viewData, Action switchToRoom)
+		public void Enter(RoomViewData viewData, Action onJoinRoom)
 		{
 			_Enter(viewData);
-			_Register(switchToRoom);
+			_Register(onJoinRoom);
 			_panel.SetActive(true);
 		}
 		
@@ -60,23 +60,23 @@ namespace Metagame
 			_playerInfoViews.ForEach(view => view.Leave());
 		}
 		
-		private void _Register(Action switchToRoom)
+		private void _Register(Action onJoinRoom)
 		{
-			_switchToRoom = switchToRoom;
+			_onJoinRoom = onJoinRoom;
 			
-			_button.onClick.AddListener(_SwitchToRoom);
+			_button.onClick.AddListener(_OnJoinRoom);
 		}
 		
 		private void _Unregister()
 		{
-			_switchToRoom = null;
+			_onJoinRoom = null;
 			
 			_button.onClick.RemoveAllListeners();
 		}
 		
-		private void _SwitchToRoom()
+		private void _OnJoinRoom()
 		{
-			_switchToRoom?.Invoke();
+			_onJoinRoom?.Invoke();
 		}
 	}
 }
