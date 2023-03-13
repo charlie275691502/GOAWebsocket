@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,15 +29,25 @@ namespace Metagame
 		[SerializeField]
 		private GameObjectPool _pool;
 		[SerializeField]
-		private RoomMessageDynamicScrollRect _scrollRect;
+		private EnhancedScroller _scroller;
+		[SerializeField]
+		private GameObject _prefab;
 		[SerializeField]
 		private Button _sendMessageButton;
 		[SerializeField]
 		private InputField _messageInputField;
 		
 		private RoomWithMessagesViewData _viewData;
+		private SimpleEnhancedScrollerController<MessageListElementView, MessageViewData> _scrollerController;
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
+		
+		[Zenject.Inject]
+		public void Zenject()
+		{
+			_scrollerController = new SimpleEnhancedScrollerController<MessageListElementView, MessageViewData>();
+			_scrollerController.Init(_scroller, _prefab);
+		}
 		
 		public void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage)
 		{
@@ -57,14 +68,13 @@ namespace Metagame
 			_viewData = viewData;
 			
 			_UpdateRoom();
-			_scrollRect.Enter(_pool, _OnInstantiateMessageElement);
-			_scrollRect.FillItems(viewData.Messages.Count);
+			_scrollerController.Display(_viewData.Messages, 1);
 		}
 		
 		public void AppendMessage(MessageViewData viewData)
 		{
 			_viewData.Messages.Add(viewData);
-			_scrollRect.AppendItem(1);
+			_scrollerController.Display(_viewData.Messages, 1);
 		}
 		public void UpdateRoom(RoomViewData viewData)
 		{
@@ -78,7 +88,7 @@ namespace Metagame
 		{
 			_roomNameText.text = string.Empty;
 			_playerInfoViews.ForEach(view => view.Leave());
-			_scrollRect.Leave();
+			_scrollerController.Clear();
 		}
 		
 		private void _Register(Action onLeaveRoom, Action<string> onSendMessage)
@@ -107,11 +117,6 @@ namespace Metagame
 		{
 			_onSendMessage?.Invoke(_messageInputField.text);
 			_messageInputField.text = string.Empty;
-		}
-		
-		private void _OnInstantiateMessageElement(int index, IMessageListElementView view)
-		{
-			view.Enter(_viewData.Messages[index]);
 		}
 		
 		private void _UpdateRoom()

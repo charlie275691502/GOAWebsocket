@@ -2,16 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using EnhancedUI.EnhancedScroller;
 
 namespace Metagame
 {
-	public interface IMessageListElementView
-	{
-		void Enter(MessageViewData viewData);
-		void Leave();
-	}
-
-	public class MessageListElementView : MonoBehaviour, IMessageListElementView
+	public class MessageListElementView : EnhancedScrollerCellView, ISimpleEnhancedScrollerElement<MessageViewData>
 	{
 		[SerializeField]
 		private GameObject _panel;

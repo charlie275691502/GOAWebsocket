@@ -1833,7 +1833,7 @@ namespace EnhancedUI.EnhancedScroller
         /// <summary>
         /// Caches and initializes the scroller
         /// </summary>
-        void Awake()
+        public void Init()
         {
             GameObject go;
 
