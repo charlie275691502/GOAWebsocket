@@ -48,7 +48,7 @@ namespace EnhancedUI.EnhancedScroller
 			_scroller.Init();
 		}
 		
-		public void Clear()
+		public void Leave()
 		{
 			_viewDatas.Clear();
 			_scroller.ReloadData();

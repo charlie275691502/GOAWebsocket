@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,15 +19,25 @@ namespace Metagame
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private GameObjectPool _pool;
+		private EnhancedScroller _scroller;
 		[SerializeField]
-		private RoomListDynamicScrollRect _scrollRect;
+		private GameObject _prefab;
 		[SerializeField]
 		private Button _createRoomButton;
 		
 		private List<RoomViewData> _viewDatas;
+		private SimpleEnhancedScrollerController<RoomListElementView, RoomViewData> _scrollerController;
+		
 		private Action<int> _onJoinRoom;
 		private Action _onCreateRoom;
+		
+		[Zenject.Inject]
+		public void Zenject()
+		{
+			_scrollerController = new SimpleEnhancedScrollerController<RoomListElementView, RoomViewData>();
+			_scrollerController.Init(_scroller, _prefab);
+			_scrollerController.OnInstantiateCell += _OnInstantiateCell;
+		}
 		
 		public void Enter(List<RoomViewData> viewDatas, Action<int> onJoinRoom, Action onCreateRoom)
 		{
@@ -46,13 +57,12 @@ namespace Metagame
 		{
 			_viewDatas = viewDatas;
 			
-			_scrollRect.Enter(_pool, _OnInstantiateRoomListElement);
-			_scrollRect.FillItems(viewDatas.Count);
+			_scrollerController.Display(viewDatas);
 		}
 		
 		private void _Leave()
 		{
-			_scrollRect.Leave();
+			_scrollerController.Leave();
 		}
 		
 		private void _Register(Action<int> onJoinRoom, Action onCreateRoom)
@@ -60,7 +70,7 @@ namespace Metagame
 			_onJoinRoom = onJoinRoom;
 			_onCreateRoom = onCreateRoom;
 			
-			_createRoomButton.onClick.AddListener(_OnCretaeRoom);
+			_createRoomButton.onClick.AddListener(_OnCreateRoom);
 		}
 		
 		private void _Unregister()
@@ -71,19 +81,19 @@ namespace Metagame
 			_createRoomButton.onClick.RemoveAllListeners();
 		}
 		
+		private void _OnInstantiateCell(RoomListElementView view, RoomViewData viewData, int dataIndex)
+		{
+			view.Init(() => _OnJoinRoom(viewData.Id));
+		}
+		
 		private void _OnJoinRoom(int roomId)
 		{
 			_onJoinRoom?.Invoke(roomId);
 		}
 		
-		private void _OnCretaeRoom()
+		private void _OnCreateRoom()
 		{
 			_onCreateRoom?.Invoke();
-		}
-		
-		private void _OnInstantiateRoomListElement(int index, IRoomListElementView view)
-		{
-			view.Enter(_viewDatas[index], () => _OnJoinRoom(_viewDatas[index].Id));
 		}
 	}
 }

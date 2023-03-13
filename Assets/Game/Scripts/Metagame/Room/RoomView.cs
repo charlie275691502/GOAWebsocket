@@ -27,8 +27,6 @@ namespace Metagame
 		[SerializeField]
 		private List<RoomPlayerInfoView> _playerInfoViews;
 		[SerializeField]
-		private GameObjectPool _pool;
-		[SerializeField]
 		private EnhancedScroller _scroller;
 		[SerializeField]
 		private GameObject _prefab;
@@ -39,6 +37,7 @@ namespace Metagame
 		
 		private RoomWithMessagesViewData _viewData;
 		private SimpleEnhancedScrollerController<MessageListElementView, MessageViewData> _scrollerController;
+		
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
 		
@@ -88,7 +87,7 @@ namespace Metagame
 		{
 			_roomNameText.text = string.Empty;
 			_playerInfoViews.ForEach(view => view.Leave());
-			_scrollerController.Clear();
+			_scrollerController.Leave();
 		}
 		
 		private void _Register(Action onLeaveRoom, Action<string> onSendMessage)

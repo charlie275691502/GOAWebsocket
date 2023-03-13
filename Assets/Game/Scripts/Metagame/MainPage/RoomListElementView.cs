@@ -4,16 +4,11 @@ using System.Collections.Generic;
 using Common;
 using UnityEngine;
 using UnityEngine.UI;
+using EnhancedUI.EnhancedScroller;
 
 namespace Metagame
 {
-	public interface IRoomListElementView
-	{
-		void Enter(RoomViewData viewData, Action onJoinRoom);
-		void Leave();
-	}
-	
-	public class RoomListElementView : MonoBehaviour, IRoomListElementView
+	public class RoomListElementView : EnhancedScrollerCellView, ISimpleEnhancedScrollerElement<RoomViewData>
 	{
 		[SerializeField]
 		private GameObject _panel;
@@ -26,10 +21,14 @@ namespace Metagame
 		
 		private Action _onJoinRoom;
 		
-		public void Enter(RoomViewData viewData, Action onJoinRoom)
+		public void Init(Action onJoinRoom)
+		{
+			_Register(onJoinRoom);
+		}
+		
+		public void Enter(RoomViewData viewData)
 		{
 			_Enter(viewData);
-			_Register(onJoinRoom);
 			_panel.SetActive(true);
 		}
 		
