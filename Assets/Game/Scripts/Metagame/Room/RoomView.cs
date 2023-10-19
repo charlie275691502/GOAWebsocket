@@ -141,7 +141,7 @@ namespace Metagame
 		
 		private void _UpdateRoom()
 		{
-			_roomNameText.text = _viewData.RoomName;
+			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(_viewData.GameType)}] {_viewData.RoomName}";
 			for (int i=0; i < _playerInfoViews.Count; i++)
 			{
 				if (i < _viewData.Players.Count) 

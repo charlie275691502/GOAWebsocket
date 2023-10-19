@@ -34,7 +34,7 @@ namespace Metagame
 		
 		protected override void _Display(RoomViewData viewData)
 		{
-			_roomNameText.text = viewData.RoomName;
+			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(viewData.GameType)}] {viewData.RoomName}";
 			for (int i=0; i < _playerInfoViews.Count; i++)
 			{
 				if (i < viewData.Players.Count) 

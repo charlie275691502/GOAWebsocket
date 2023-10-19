@@ -10,6 +10,7 @@ namespace Metagame
 	{
 		public int Id;
 		public string RoomName;
+		public GameType GameType;
 		public List<PlayerData> Players;
 	}
 }

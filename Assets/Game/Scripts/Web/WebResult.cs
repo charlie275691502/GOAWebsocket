@@ -29,6 +29,8 @@ namespace Web
 		public int Id;
 		[JsonProperty("room_name")]
 		public string RoomName;
+		[JsonProperty("game_type")]
+		public string GameType;
 		[JsonProperty("players")]
 		public List<PlayerDataResult> Players;
 	}

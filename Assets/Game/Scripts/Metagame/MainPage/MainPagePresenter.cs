@@ -110,6 +110,7 @@ namespace Metagame
 				{
 					Id = roomResult.Id,
 					RoomName = roomResult.RoomName,
+					GameType = GameTypeUtility.GetGameType(roomResult.GameType),
 					Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				}).ToList();
 		}

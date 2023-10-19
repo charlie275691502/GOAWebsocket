@@ -96,6 +96,7 @@ namespace Metagame
 			{
 				Id = result.Id,
 				RoomName = result.RoomName,
+				GameType = GameTypeUtility.GetGameType(result.GameType),
 				Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				Messages = result.Messages.Select(message => new MessageViewData()
 				{
@@ -127,6 +128,7 @@ namespace Metagame
 				{
 					Id = result.Id,
 					RoomName = result.RoomName,
+					GameType = GameTypeUtility.GetGameType(result.GameType),
 					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				});
 			}
