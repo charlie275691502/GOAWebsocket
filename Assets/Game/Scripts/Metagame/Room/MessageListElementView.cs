@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using EnhancedUI.EnhancedScroller;
+using Zenject;
 
 namespace Metagame
 {
-	public class MessageListElementView : EnhancedScrollerCellView, ISimpleEnhancedScrollerElement<MessageViewData>
+	public class MessageListElementView : SimpleEnhancedScrollerElement<MessageViewData>
 	{
-		[SerializeField]
-		private GameObject _panel;
 		[SerializeField]
 		private Image _avatar;
 		[SerializeField]
@@ -17,38 +16,55 @@ namespace Metagame
 		[SerializeField]
 		private Text _nickNameText;
 		
-		public void Enter(MessageViewData viewData)
+#region EnhancedScrollerElement
+		
+		protected override void _Update()
 		{
-			_Enter(viewData);
-			_Register();
-			_panel.SetActive(true);
+			
 		}
 		
-		public void Leave()
+		protected override void _Resolve(DiContainer container)
 		{
-			_Leave();
-			_Unregister();
-			_panel.SetActive(false);
+			
 		}
 		
-		private void _Enter(MessageViewData viewData)
+		protected override void _Display(MessageViewData viewData)
 		{
 			_contentText.text = viewData.Content;
 			_nickNameText.text = viewData.NickName;
 		}
 		
-		private void _Leave()
+		protected override void _DisplayEmpty()
 		{
 			_contentText.text = string.Empty;
 			_nickNameText.text = string.Empty;
 		}
 		
-		private void _Register()
+		protected override void _Refresh(MessageViewData viewData)
 		{
+			
 		}
 		
-		private void _Unregister()
+		protected override IEnumerator _LoadAsset(MessageViewData viewData)
 		{
+			yield break;
 		}
+		
+		protected override void _Leave()
+		{
+			
+		}
+		
+		protected override void _Register()
+		{
+			
+		}
+		
+		protected override void _Unregister()
+		{
+			
+		}
+		
+#endregion
 	}
 }

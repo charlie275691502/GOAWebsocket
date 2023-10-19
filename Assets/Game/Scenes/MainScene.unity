@@ -2868,10 +2868,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _panel: {fileID: 1470793579}
-  _pool: {fileID: 0}
+  _createRoomButton: {fileID: 1312321650}
   _scroller: {fileID: 1961219329}
   _prefab: {fileID: 1295627013575725189, guid: 45a34413fe4463d448ee13b9f24b3347, type: 3}
-  _createRoomButton: {fileID: 1312321650}
+  _scrollingAudioKey: 
+  _lookAheadBefore: 200
+  _lookAheadAfter: 200
 --- !u!222 &550011295
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5539,7 +5541,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1072028345}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c1b74f910281224a8cae6d8e4fc1f43, type: 3}
+  m_Script: {fileID: 11500000, guid: e170c871f1bf7f14db41a9e791b67b32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   scrollDirection: 0
@@ -6533,10 +6535,13 @@ MonoBehaviour:
   - {fileID: 977340636}
   - {fileID: 479853111}
   - {fileID: 351340029}
-  _scroller: {fileID: 1072028350}
-  _prefab: {fileID: 1343289085410752104, guid: 2616461e9dfa4ba47be6d774ace4643c, type: 3}
   _sendMessageButton: {fileID: 602469366}
   _messageInputField: {fileID: 419118018}
+  _scroller: {fileID: 1072028350}
+  _prefab: {fileID: 1343289085410752104, guid: 2616461e9dfa4ba47be6d774ace4643c, type: 3}
+  _scrollingAudioKey: 
+  _lookAheadBefore: 200
+  _lookAheadAfter: 200
 --- !u!222 &1313344141
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9497,7 +9502,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1961219324}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c1b74f910281224a8cae6d8e4fc1f43, type: 3}
+  m_Script: {fileID: 11500000, guid: e170c871f1bf7f14db41a9e791b67b32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   scrollDirection: 0

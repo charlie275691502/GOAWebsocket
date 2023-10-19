@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1343289084190015316}
   - component: {fileID: 1343289084190015317}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -336,7 +336,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cellIdentifier: 
-  _panel: {fileID: 1343289084190015275}
+  _rootFolder: {fileID: 1343289084190015275}
   _avatar: {fileID: 1343289084731226492}
   _contentText: {fileID: 1343289085539302145}
   _nickNameText: {fileID: 1343289085264507114}

@@ -1,105 +1,247 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using Zenject;
+using EnhancedUI.EnhancedScroller.Internal;
 
 namespace EnhancedUI.EnhancedScroller
 {
-	public interface ISimpleEnhancedScrollerElement<T>
-	{
-		void Enter(T viewData);
-		void Leave();
-	}
-	
-	/// <summary>
-	/// T1 is view
-	/// T2 is viewData
-	/// </summary>
-	public class SimpleEnhancedScrollerController<T1, T2>: IEnhancedScrollerDelegate where T1 : EnhancedScrollerCellView, ISimpleEnhancedScrollerElement<T2>
-	{
-		private EnhancedScroller _scroller;
-		private T1 _prefabView;
-		private float _cellViewSize;
-		private List<T2> _viewDatas = new List<T2>();
-		private GameObject _headSliderHint;
-		private GameObject _tailliderHint;
-		public Action<T1, T2, int> OnInstantiateCell;
-		public Action<T1> OnReturnCell;
-		
-		public void RegisterHeadSliderHint(GameObject headSliderHint)
-		{
-			_headSliderHint = headSliderHint;
-		}
-		
-		public void RegisterTailSliderHint(GameObject tailliderHint)
-		{
-			_tailliderHint = tailliderHint;
-		}
-		
-		public void Init(EnhancedScroller scroller, GameObject prefab)
-		{
-			_scroller = scroller;
-			_prefabView = prefab.GetComponent<T1>();
-			_cellViewSize = (_scroller.scrollDirection == EnhancedScroller.ScrollDirectionEnum.Horizontal) 
-				? prefab.GetComponent<RectTransform>().rect.width 
-				: prefab.GetComponent<RectTransform>().rect.height;
-			_scroller.cellViewWillRecycle += _OnReturnCell;
-			_scroller.Delegate = this;
-			_scroller.Init();
-		}
-		
-		public void Leave()
-		{
-			_viewDatas.Clear();
-			_scroller.ReloadData();
-		}
-		
-		public void Display(List<T2> viewDatas, float scrollPositionFactor = 0)
-		{
-			_viewDatas = viewDatas;
-			_scroller.ReloadData(scrollPositionFactor);
-		}
-		
-		public int GetNumberOfCells(EnhancedScroller scroller)
-		{
-			return _viewDatas.Count;
-		}
-		
-		public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
-		{
-			return _cellViewSize;
-		}
+    public class SimpleEnhancedScrollerController: IEnhancedScrollerDelegate
+    {
+        protected EnhancedScrollerProxy _scroller;
+        protected IEnhancedScrollerDataModel _dataModel;
+        protected string _scrollingAudioKey;
+        protected float _lookAheadBefore;
+        protected float _lookAheadAfter;
+        protected GameObject _headSliderHint;
+        protected GameObject _tailSliderHint;
+        protected DiContainer _container;
+        
+        protected bool _isFinishDisplay = false;
+        protected int _prevStartDataIndex;
+        protected int _prevEndDataIndex;
+        
+        public bool IsFinishDisplay { get { return _isFinishDisplay; }}
+        
+        public SimpleEnhancedScrollerController(
+            EnhancedScrollerProxy scroller,
+            IEnhancedScrollerDataModel dataModel,
+            string scrollingAudioKey,
+            float lookAheadBefore,
+            float lookAheadAfter,
+            DiContainer container)
+        {
+            _scroller = scroller;
+            _dataModel = dataModel;
+            _scrollingAudioKey = scrollingAudioKey;
+            _scroller.scrollerScrolled += _OnScrollerScrolled;
+            _scroller.cellViewWillRecycle += _OnReturnCell;
+            _scroller.Delegate = this;
+            _lookAheadBefore = lookAheadBefore;
+            _lookAheadAfter = lookAheadAfter;
+            _container = container;
+            _isFinishDisplay = false;
+        }
+        
+        public void RegisterHeadSliderHint(GameObject headSliderHint)
+        {
+            _headSliderHint = headSliderHint;
+        }
+        
+        public void RegisterTailSliderHint(GameObject tailSliderHint)
+        {
+            _tailSliderHint = tailSliderHint;
+        }
+        
+        public virtual void Display(float normalizedScrollPosition = 0f)
+        {
+            _isFinishDisplay = false;
+            _scroller.lookAheadBefore = _lookAheadBefore;
+            _scroller.lookAheadAfter = _lookAheadAfter;
+            _scroller.ReloadData(normalizedScrollPosition);
+            _InitStartEndDataIndexAndHint();
+            _isFinishDisplay = true;
+        }
+        
+        public void RefreshActiveViews()
+        {
+            if (_isFinishDisplay)
+            {
+                _GetActiveViewsWithIndex().ForEach(pair => pair.view.Refresh(_dataModel.GetViewData(pair.index)));
+            }
+        }
+        
+        private List<(int index, SimpleEnhancedScrollerCellView view)> _GetActiveViewsWithIndex()
+        {
+            return (_scroller.NumberOfCells == 0)
+                ? new List<(int, SimpleEnhancedScrollerCellView)>()
+                : Enumerable.Range(_scroller.StartDataIndex, _scroller.EndDataIndex - _scroller.StartDataIndex + 1)
+                    .Select(i => (index: i, view: _scroller.GetCellViewAtDataIndex(i) as SimpleEnhancedScrollerCellView))
+                    .Where(pair => pair.view != null)
+                    .ToList();
+        }
+        
+        public virtual void Clear()
+        {
+            _dataModel.Clear();
+            _scroller.ClearAll();
+            _isFinishDisplay = false;
+        }
+        
+        public float GetNormalizedScrollPosition()
+        {
+            return _scroller.NormalizedScrollPosition;
+        }
+        
+        public float GetScrollPosition()
+        {
+            return _scroller.ScrollPosition;
+        }
+        
+        public float NormalizedScrollPosition(float scrollPosition)
+        {
+            var predictScrollerSize = PredictItemScrollPosition(GetNumberOfCells(_scroller) - 1);
+            return predictScrollerSize == 0f ? 0 : scrollPosition / predictScrollerSize;
+        }
+        
+        public float PredictItemNormalizedScrollPosition(int dataIndex)
+        {
+            return NormalizedScrollPosition(PredictItemScrollPosition(dataIndex));
+        }
+        
+        public float PredictItemScrollPosition(int dataIndex)
+        {
+            var sum = 0f;
+            for(int i=0; i<dataIndex; i++)
+            {
+                sum += GetCellViewSize(_scroller, i);
+            }
+            return sum;
+        }
+        
+        public void FocusToIndex(int dataIndex)
+        {
+            var scrollPosition = _scroller.GetScrollPositionForDataIndex(dataIndex, EnhancedScroller.CellViewPositionEnum.Before);
+            FocusToPosition(scrollPosition);
+        }
+        
+        public virtual void FocusToPosition(float scrollPosition)
+        {
+            _scroller.ReloadData();
+            _scroller.SetScrollPositionImmediately(scrollPosition);
+        }
+        
+        public void EnableDragging()
+        {
+            _scroller.EnableDragging();
+        }
+        
+        public void DisableDragging()
+        {
+            _scroller.DisableDragging();
+        }
+        
+        public EnhancedScrollerCellView GetViewAtIndex(int dataIndex)
+        {
+            return _scroller.GetCellViewAtDataIndex(dataIndex);
+        }
+        
+        #region IEnhancedScrollerDelegate
+        
+        public int GetNumberOfCells(EnhancedScroller scroller)
+        {
+            return _dataModel.GetNumberOfCells();
+        }
+        
+        public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
+        {
+            return _dataModel.GetCellViewSize(dataIndex);
+        }
 
-		public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
-		{
-			var view = scroller.GetCellView(_prefabView) as T1;
-			OnInstantiateCell?.Invoke(view, _viewDatas[dataIndex], dataIndex);
-			view.Enter(_viewDatas[dataIndex]);
-			
-			if(dataIndex == 0)
-			{
-				_headSliderHint?.SetActive(false);
-			} else if (dataIndex == _viewDatas.Count - 1)
-			{
-				_tailliderHint?.SetActive(false);
-			}
-			
-			return view;
-		}
-		
-		private void _OnReturnCell(EnhancedScrollerCellView cellView)
-		{
-			var view = cellView as T1;
-			OnReturnCell?.Invoke(view);
-			view.Leave();
-			
-			if(cellView.dataIndex == 0)
-			{
-				_headSliderHint?.SetActive(true);
-			} else if (cellView.dataIndex == _viewDatas.Count - 1)
-			{
-				_tailliderHint?.SetActive(true);
-			}
-		}
-	}
+        public virtual EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
+        {
+            var prefab = _dataModel.GetPrefabView(dataIndex);
+            var cellView = scroller.GetCellView(prefab);
+            var view = cellView as SimpleEnhancedScrollerCellView;
+            var viewData = _dataModel.GetViewData(dataIndex);
+            
+            var onIndtantiateCell = _dataModel.GetOnInstantiateCell(dataIndex);
+            onIndtantiateCell?.Invoke(view, viewData, dataIndex);
+            
+            view.Resolve(_container);
+            _Display(view, viewData, dataIndex);
+            
+            return cellView;
+        }
+        
+        #endregion
+        
+        protected virtual void _Display(SimpleEnhancedScrollerCellView view, IEnhancedScrollerElementViewData viewData, int dataIndex)
+        {
+            view.Display(viewData);
+        }
+        
+        protected virtual void _OnReturnCell(EnhancedScrollerCellView cellView)
+        {
+            var dataIndex = cellView.dataIndex;
+            var view = cellView as SimpleEnhancedScrollerCellView;
+            var onReturnCell = _dataModel.GetOnReturnCell(dataIndex);
+            onReturnCell?.Invoke(view);
+            view.Leave();
+        }
+        
+        protected void _InitStartEndDataIndexAndHint()
+        {
+            var startIndex = _GetScreenStartElementIndex();
+            var endIndex = _GetScreenEndElementIndex();
+            _UpdateStartEndDataIndex(startIndex, endIndex);
+            _UpdateHint(startIndex, endIndex);
+        }
+        
+        private void _OnScrollerScrolled(EnhancedScroller scroller, Vector2 val, float scrollPosition)
+        {
+            var startIndex = _GetScreenStartElementIndex();
+            var endIndex = _GetScreenEndElementIndex();
+            if(_isFinishDisplay && _scroller.NumberOfCells > 0 && (startIndex != _prevStartDataIndex || endIndex != _prevEndDataIndex))
+            {
+                _UpdateStartEndDataIndex(startIndex, endIndex);
+                _UpdateHint(startIndex, endIndex);
+                _PlayScrollingAudio();
+            }
+        }
+        
+        private void _UpdateStartEndDataIndex(int startIndex, int endIndex)
+        {
+            _prevStartDataIndex = startIndex;
+            _prevEndDataIndex = endIndex;
+        }
+        
+        private void _UpdateHint(int startIndex, int endIndex)
+        {
+            _headSliderHint?.SetActive(startIndex > 0);
+            _tailSliderHint?.SetActive(endIndex < _scroller.NumberOfCells - 1);
+        }
+        
+        protected int _GetScreenStartElementIndex()
+        {
+            var startPosition = _scroller._scrollPosition;
+            return _scroller.GetCellViewIndexAtPosition(startPosition);
+        }
+        
+        protected int _GetScreenEndElementIndex()
+        {
+            var endPosition = _scroller._scrollPosition + _scroller.ScrollRectSize;
+            return _scroller.GetCellViewIndexAtPosition(endPosition);
+        }
+        
+        public void UpdateScrollingAudioKey(string scrollingAudioKey)
+        {
+            _scrollingAudioKey = scrollingAudioKey;
+        }
+
+        private void _PlayScrollingAudio()
+        {
+            // _audioPresenter?.PlayGameAudio(_scrollingAudioKey);
+        }
+    }
 }

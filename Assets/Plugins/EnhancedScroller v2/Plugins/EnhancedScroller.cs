@@ -131,24 +131,24 @@ namespace EnhancedUI.EnhancedScroller
         [SerializeField]
         private bool loop;
 
-		/// <summary>
+        /// <summary>
         /// Whether the scroller should process loop jumping while being dragged.
-		/// Note: if this is turned off while using a small list size, you may
-		/// see elements missing while dragging near the edges of the list. Turning
-		/// this value off can sometimes help with Unity adding a lot of velocity
-		/// while dragging near the end of a list that loops. If this value is turned
-		/// off, you can mitigate the large inertial velocity by setting the maxVelocity
-		/// value to a non-zero amount (see maxVelocity).
+        /// Note: if this is turned off while using a small list size, you may
+        /// see elements missing while dragging near the edges of the list. Turning
+        /// this value off can sometimes help with Unity adding a lot of velocity
+        /// while dragging near the end of a list that loops. If this value is turned
+        /// off, you can mitigate the large inertial velocity by setting the maxVelocity
+        /// value to a non-zero amount (see maxVelocity).
         /// </summary>
-		public bool loopWhileDragging = true;
+        public bool loopWhileDragging = true;
 
-		/// <summary>
+        /// <summary>
         /// The maximum speed the scroller can go. This can be useful to eliminate
-		/// aggressive scrolling by the user. It can also be used to mitigate the
-		/// large inertial velocity that Unity adds in the ScrollRect when dragging
-		/// and looping near the edge of the list (See loopWhileDragging).
+        /// aggressive scrolling by the user. It can also be used to mitigate the
+        /// large inertial velocity that Unity adds in the ScrollRect when dragging
+        /// and looping near the edge of the list (See loopWhileDragging).
         /// </summary>
-		public float maxVelocity;
+        public float maxVelocity;
 
         /// <summary>
         /// Whether the scollbar should be shown
@@ -227,7 +227,7 @@ namespace EnhancedUI.EnhancedScroller
         /// While true keeps snapping while the scroller is dragged.
         /// While false, this will disable snapping until the dragging stops.
         /// </summary>
-		public bool snapWhileDragging;
+        public bool snapWhileDragging;
 
         /// <summary>
         /// The amount of space to look ahead before the scroller position.
@@ -327,25 +327,25 @@ namespace EnhancedUI.EnhancedScroller
             }
             set
             {
-				if (loop)
-				{
-					// if we are looping, we need to make sure the new position isn't past the jump trigger.
-					// if it is we need to reset back to the jump position on the other side of the area.
+                if (loop)
+                {
+                    // if we are looping, we need to make sure the new position isn't past the jump trigger.
+                    // if it is we need to reset back to the jump position on the other side of the area.
 
-					//if (value > _loopLastJumpTrigger)
-					//{
-					//	value = _loopFirstScrollPosition + (value - _loopLastJumpTrigger);
-					//}
-					//else if (value < _loopFirstJumpTrigger)
-					//{
-					//	value = _loopLastScrollPosition - (_loopFirstJumpTrigger - value);
-					//}
-				}
-				else
-				{
+                    //if (value > _loopLastJumpTrigger)
+                    //{
+                    //	value = _loopFirstScrollPosition + (value - _loopLastJumpTrigger);
+                    //}
+                    //else if (value < _loopFirstJumpTrigger)
+                    //{
+                    //	value = _loopLastScrollPosition - (_loopFirstJumpTrigger - value);
+                    //}
+                }
+                else
+                {
                     // make sure the position is in the bounds of the current set of views
                     value = Mathf.Clamp(value, 0, ScrollSize); 
-				}
+                }
 
                 // only if the value has changed
                 if (_scrollPosition != value)
@@ -713,7 +713,7 @@ namespace EnhancedUI.EnhancedScroller
         /// This resets the internal size list and refreshes the cell views
         /// </summary>
         /// <param name="scrollPositionFactor">The percentage of the scroller to start at between 0 and 1, 0 being the start of the scroller</param>
-        public void ReloadData(float scrollPositionFactor = 0)
+        public virtual void ReloadData(float scrollPositionFactor = 0)
         {
             _reloadData = false;
 
@@ -906,14 +906,14 @@ namespace EnhancedUI.EnhancedScroller
                 // if looping, then we need to determine the closest jump position.
                 // we do that by checking all three sets of data locations, and returning the closest one
 
-				var numberOfCells = NumberOfCells;
+                var numberOfCells = NumberOfCells;
 
                 // get the scroll positions for each data set.
                 // Note: we are calculating the position based on the cell view index, not the data index here
 
-				var set1CellViewIndex = _loopFirstCellIndex - (numberOfCells - dataIndex);
-				var set2CellViewIndex = _loopFirstCellIndex + dataIndex;
-				var set3CellViewIndex = _loopFirstCellIndex + numberOfCells + dataIndex;
+                var set1CellViewIndex = _loopFirstCellIndex - (numberOfCells - dataIndex);
+                var set2CellViewIndex = _loopFirstCellIndex + dataIndex;
+                var set3CellViewIndex = _loopFirstCellIndex + numberOfCells + dataIndex;
 
                 var set1Position = GetScrollPositionForCellViewIndex(set1CellViewIndex, CellViewPositionEnum.Before) + offset;
                 var set2Position = GetScrollPositionForCellViewIndex(set2CellViewIndex, CellViewPositionEnum.Before) + offset;
@@ -924,32 +924,32 @@ namespace EnhancedUI.EnhancedScroller
                 var set2Diff = (Mathf.Abs(_scrollPosition - set2Position));
                 var set3Diff = (Mathf.Abs(_scrollPosition - set3Position));
 
-				var setOffset = -(scrollerOffset * ScrollRectSize);
+                var setOffset = -(scrollerOffset * ScrollRectSize);
 
-				var currentSet = 0;
-				var currentCellViewIndex = 0;
-				var nextCellViewIndex = 0;
+                var currentSet = 0;
+                var currentCellViewIndex = 0;
+                var nextCellViewIndex = 0;
 
-				if (loopJumpDirection == LoopJumpDirectionEnum.Up || loopJumpDirection == LoopJumpDirectionEnum.Down)
-				{
-					currentCellViewIndex = GetCellViewIndexAtPosition(_scrollPosition - setOffset + 0.0001f);
+                if (loopJumpDirection == LoopJumpDirectionEnum.Up || loopJumpDirection == LoopJumpDirectionEnum.Down)
+                {
+                    currentCellViewIndex = GetCellViewIndexAtPosition(_scrollPosition - setOffset + 0.0001f);
 
-					if (currentCellViewIndex < numberOfCells)
-					{
-						currentSet = 1;
-						nextCellViewIndex = dataIndex;
-					}
-					else if (currentCellViewIndex >= numberOfCells && currentCellViewIndex < (numberOfCells * 2))
-					{
-						currentSet = 2;
-						nextCellViewIndex = dataIndex + numberOfCells;
-					}
-					else
-					{
-						currentSet = 3;
-						nextCellViewIndex = dataIndex + (numberOfCells * 2);
-					}
-				}
+                    if (currentCellViewIndex < numberOfCells)
+                    {
+                        currentSet = 1;
+                        nextCellViewIndex = dataIndex;
+                    }
+                    else if (currentCellViewIndex >= numberOfCells && currentCellViewIndex < (numberOfCells * 2))
+                    {
+                        currentSet = 2;
+                        nextCellViewIndex = dataIndex + numberOfCells;
+                    }
+                    else
+                    {
+                        currentSet = 3;
+                        nextCellViewIndex = dataIndex + (numberOfCells * 2);
+                    }
+                }
 
                 switch (loopJumpDirection)
                 {
@@ -983,54 +983,54 @@ namespace EnhancedUI.EnhancedScroller
 
                     case LoopJumpDirectionEnum.Up:
 
-						if (nextCellViewIndex < currentCellViewIndex)
-						{
-							newScrollPosition = (currentSet == 1 ? set1Position : (currentSet == 2 ? set2Position : set3Position));
-						}
-						else
-						{
-							if (currentSet == 1 && (currentCellViewIndex == dataIndex))
-							{
-								newScrollPosition = set1Position - _singleLoopGroupSize;
-							}
-							else
-							{
-								newScrollPosition = (currentSet == 1 ? set3Position : (currentSet == 2 ? set1Position : set2Position));
-							}
-						}
+                        if (nextCellViewIndex < currentCellViewIndex)
+                        {
+                            newScrollPosition = (currentSet == 1 ? set1Position : (currentSet == 2 ? set2Position : set3Position));
+                        }
+                        else
+                        {
+                            if (currentSet == 1 && (currentCellViewIndex == dataIndex))
+                            {
+                                newScrollPosition = set1Position - _singleLoopGroupSize;
+                            }
+                            else
+                            {
+                                newScrollPosition = (currentSet == 1 ? set3Position : (currentSet == 2 ? set1Position : set2Position));
+                            }
+                        }
 
                         break;
 
                     case LoopJumpDirectionEnum.Down:
 
-						if (nextCellViewIndex > currentCellViewIndex)
-						{
-							newScrollPosition = (currentSet == 1 ? set1Position : (currentSet == 2 ? set2Position : set3Position));
-						}
-						else
-						{
-							if (currentSet == 3 && (currentCellViewIndex == nextCellViewIndex))
-							{
-								newScrollPosition = set3Position + _singleLoopGroupSize;
-							}
-							else
-							{
-								newScrollPosition = (currentSet == 1 ? set2Position : (currentSet == 2 ? set3Position : set1Position));
-							}
-						}
+                        if (nextCellViewIndex > currentCellViewIndex)
+                        {
+                            newScrollPosition = (currentSet == 1 ? set1Position : (currentSet == 2 ? set2Position : set3Position));
+                        }
+                        else
+                        {
+                            if (currentSet == 3 && (currentCellViewIndex == nextCellViewIndex))
+                            {
+                                newScrollPosition = set3Position + _singleLoopGroupSize;
+                            }
+                            else
+                            {
+                                newScrollPosition = (currentSet == 1 ? set2Position : (currentSet == 2 ? set3Position : set1Position));
+                            }
+                        }
 
-						break;
+                        break;
 
                 }
 
-				if (useSpacing)
-				{
-					newScrollPosition -= spacing;
-				}
+                if (useSpacing)
+                {
+                    newScrollPosition -= spacing;
+                }
             }
             else
             {
-				// not looping, so just get the scroll position from the dataIndex
+                // not looping, so just get the scroll position from the dataIndex
                 newScrollPosition = GetScrollPositionForDataIndex(dataIndex, CellViewPositionEnum.Before) + offset;
 
                 // clamp the scroll position to a valid location
@@ -1172,7 +1172,7 @@ namespace EnhancedUI.EnhancedScroller
         /// Set after the scroller is first created. This allwos
         /// us to ignore OnValidate changes at the start
         /// </summary>
-        private bool _initialized = false;
+        protected bool _initialized = false;
 
         /// <summary>
         /// Set when the spacing is changed in the inspector. Since we cannot
@@ -1351,20 +1351,20 @@ namespace EnhancedUI.EnhancedScroller
         /// </summary>
         private ScrollbarVisibilityEnum _lastScrollbarVisibility;
 
-		/// <summary>
-		/// The number of cells in one third of the allocated scroller space
+        /// <summary>
+        /// The number of cells in one third of the allocated scroller space
         /// </summary>
-		private float _singleLoopGroupSize;
+        private float _singleLoopGroupSize;
 
-		/// <summary>
-		/// The snap value to store before the user begins dragging
+        /// <summary>
+        /// The snap value to store before the user begins dragging
         /// </summary>
-		private bool _snapBeforeDrag;
+        private bool _snapBeforeDrag;
 
-		/// <summary>
-		/// The loop value to store before the user begins dragging.
+        /// <summary>
+        /// The loop value to store before the user begins dragging.
         /// </summary>
-		private bool _loopBeforeDrag;
+        private bool _loopBeforeDrag;
 
         /// <summary>
         /// Flag to ignore the jump loop that gives the illusion
@@ -1486,13 +1486,13 @@ namespace EnhancedUI.EnhancedScroller
         private float _AddCellViewSizes()
         {
             var offset = 0f;
-			_singleLoopGroupSize = 0;
+            _singleLoopGroupSize = 0;
             // add a size for each row in our data based on how many the delegate tells us to create
             for (var i = 0; i < NumberOfCells; i++)
             {
                 // add the size of this cell based on what the delegate tells us to use. Also add spacing if this cell isn't the first one
                 _cellViewSizeArray.Add(_delegate.GetCellViewSize(this, i) + (i == 0 ? 0 : _layoutGroup.spacing));
-				_singleLoopGroupSize += _cellViewSizeArray[_cellViewSizeArray.Count - 1];
+                _singleLoopGroupSize += _cellViewSizeArray[_cellViewSizeArray.Count - 1];
                 offset += _cellViewSizeArray[_cellViewSizeArray.Count - 1];
             }
 
@@ -1807,6 +1807,7 @@ namespace EnhancedUI.EnhancedScroller
 
         /// <summary>
         /// Gets the index of a cell at a given position based on a subset range.
+      
         /// This function uses a recursive binary sort to find the index faster.
         /// </summary>
         /// <param name="position">The pixel offset from the start of the scroller</param>
@@ -1833,7 +1834,14 @@ namespace EnhancedUI.EnhancedScroller
         /// <summary>
         /// Caches and initializes the scroller
         /// </summary>
-        public void Init()
+        public void Awake()
+        {
+            // We don't want to rely on unity to call the awake function
+            // Instead, we move all the code writen here into _Initialize()
+            // so that we ensure EnhancedScroller class will be initialized before the Reload function at SdoricaEnhancedScroller.Reload()
+        }
+        
+        protected void _Initialize()
         {
             GameObject go;
 
@@ -1924,45 +1932,45 @@ namespace EnhancedUI.EnhancedScroller
             _initialized = true;
         }
 
-		/// <summary>
+        /// <summary>
         /// This event is fired when the user begins dragging on the scroller.
-		/// We can disable looping or snapping while dragging if desired.
-		/// <param name="data">The event data for the drag</param>
+        /// We can disable looping or snapping while dragging if desired.
+        /// <param name="data">The event data for the drag</param>
         /// </summary>
-		public void OnBeginDrag(PointerEventData data)
-		{
+        public void OnBeginDrag(PointerEventData data)
+        {
             _dragFingerCount++;
             if (_dragFingerCount > 1) return;
 
-			// capture the snapping and set it to false if desired
-			_snapBeforeDrag = snapping;
-			if (!snapWhileDragging)
-			{
-				snapping = false;
-			}
+            // capture the snapping and set it to false if desired
+            _snapBeforeDrag = snapping;
+            if (!snapWhileDragging)
+            {
+                snapping = false;
+            }
 
-			// capture the looping and set it to false if desired
-			_loopBeforeDrag = loop;
-			if (!loopWhileDragging)
-			{
-				loop = false;
-			}
-		}
+            // capture the looping and set it to false if desired
+            _loopBeforeDrag = loop;
+            if (!loopWhileDragging)
+            {
+                loop = false;
+            }
+        }
 
-		/// <summary>
+        /// <summary>
         /// This event is fired when the user ends dragging on the scroller.
-		/// We can re-enable looping or snapping while dragging if desired.
-		/// <param name="data">The event data for the drag</param>
+        /// We can re-enable looping or snapping while dragging if desired.
+        /// <param name="data">The event data for the drag</param>
         /// </summary>
-		public void OnEndDrag(PointerEventData data)
-		{
+        public void OnEndDrag(PointerEventData data)
+        {
             _dragFingerCount--;
             if (_dragFingerCount < 0) _dragFingerCount = 0;
 
-			// reset the snapping and looping to what it was before the drag
-			snapping = _snapBeforeDrag;
-			loop = _loopBeforeDrag;
-		}
+            // reset the snapping and looping to what it was before the drag
+            snapping = _snapBeforeDrag;
+            loop = _loopBeforeDrag;
+        }
 
         void Update()
         {
@@ -2025,35 +2033,42 @@ namespace EnhancedUI.EnhancedScroller
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// Fired at the end of the frame.
         /// </summary>
         void LateUpdate()
         {
-			// if maxVelocity is not zero, we can set the speed cap based on the scroll direction
-			if (maxVelocity > 0)
-			{
-				if (scrollDirection == ScrollDirectionEnum.Horizontal)
-				{
-					Velocity = new Vector2(Mathf.Clamp(Mathf.Abs(Velocity.x), 0, maxVelocity) * Mathf.Sign(Velocity.x), Velocity.y);
-				}
-				else
-				{
-					Velocity = new Vector2(Velocity.x, Mathf.Clamp(Mathf.Abs(Velocity.y), 0, maxVelocity) * Mathf.Sign(Velocity.y));
-				}
-			}
+            // if maxVelocity is not zero, we can set the speed cap based on the scroll direction
+            if (maxVelocity > 0)
+            {
+                if (scrollDirection == ScrollDirectionEnum.Horizontal)
+                {
+                    Velocity = new Vector2(Mathf.Clamp(Mathf.Abs(Velocity.x), 0, maxVelocity) * Mathf.Sign(Velocity.x), Velocity.y);
+                }
+                else
+                {
+                    Velocity = new Vector2(Velocity.x, Mathf.Clamp(Mathf.Abs(Velocity.y), 0, maxVelocity) * Mathf.Sign(Velocity.y));
+                }
+            }
         }
 
         void OnEnable()
         {
-            // when the scroller is enabled, add a listener to the onValueChanged handler
-            _scrollRect.onValueChanged.AddListener(_ScrollRect_OnValueChanged);
+            // We don't want to rely on unity to call the Enable function
+            // Instead, we move all the code writen here into _Register() and call it after _Initialize()
         }
 
         void OnDisable()
         {
-            // when the scroller is disabled, remove the listener
-            _scrollRect.onValueChanged.RemoveListener(_ScrollRect_OnValueChanged);
+            // We don't want to rely on unity to call the Disable function
+            // Instead, we move all the code writen here into _Register() and call it in _Initialize()
+        }
+        
+        protected void _Register()
+        {
+            // when the scroller is enabled, add a listener to the onValueChanged handler
+            _scrollRect.onValueChanged.RemoveAllListeners();
+            _scrollRect.onValueChanged.AddListener(_ScrollRect_OnValueChanged);
         }
 
         /// <summary>

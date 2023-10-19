@@ -5,13 +5,12 @@ using Common;
 using UnityEngine;
 using UnityEngine.UI;
 using EnhancedUI.EnhancedScroller;
+using Zenject;
 
 namespace Metagame
 {
-	public class RoomListElementView : EnhancedScrollerCellView, ISimpleEnhancedScrollerElement<RoomViewData>
+	public class RoomListElementView : SimpleEnhancedScrollerElement<RoomViewData>
 	{
-		[SerializeField]
-		private GameObject _panel;
 		[SerializeField]
 		private Button _button;
 		[SerializeField]
@@ -19,27 +18,21 @@ namespace Metagame
 		[SerializeField]
 		private List<RoomListElementPlayerInfoView> _playerInfoViews;
 		
-		private Action _onJoinRoom;
+		public Action OnJoinRoom;
 		
-		public void Init(Action onJoinRoom)
+#region EnhancedScrollerElement
+		
+		protected override void _Update()
 		{
-			_Register(onJoinRoom);
+			
 		}
 		
-		public void Enter(RoomViewData viewData)
+		protected override void _Resolve(DiContainer container)
 		{
-			_Enter(viewData);
-			_panel.SetActive(true);
+			
 		}
 		
-		public void Leave()
-		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
-		}
-		
-		private void _Enter(RoomViewData viewData)
+		protected override void _Display(RoomViewData viewData)
 		{
 			_roomNameText.text = viewData.RoomName;
 			for (int i=0; i < _playerInfoViews.Count; i++)
@@ -54,28 +47,43 @@ namespace Metagame
 			}
 		}
 		
-		private void _Leave()
+		protected override void _DisplayEmpty()
+		{
+			_roomNameText.text = string.Empty;
+			_playerInfoViews.ForEach(view => view.EnterEmpty());
+		}
+		
+		protected override void _Refresh(RoomViewData viewData)
+		{
+			
+		}
+		
+		protected override IEnumerator _LoadAsset(RoomViewData viewData)
+		{
+			yield break;
+		}
+		
+		protected override void _Leave()
 		{
 			_playerInfoViews.ForEach(view => view.Leave());
 		}
 		
-		private void _Register(Action onJoinRoom)
+		protected override void _Register()
 		{
-			_onJoinRoom = onJoinRoom;
-			
 			_button.onClick.AddListener(_OnJoinRoom);
 		}
 		
-		private void _Unregister()
+		protected override void _Unregister()
 		{
-			_onJoinRoom = null;
-			
+			OnJoinRoom = null;
 			_button.onClick.RemoveAllListeners();
 		}
 		
+#endregion
+		
 		private void _OnJoinRoom()
 		{
-			_onJoinRoom?.Invoke();
+			OnJoinRoom?.Invoke();
 		}
 	}
 }

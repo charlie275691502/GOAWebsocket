@@ -5,6 +5,7 @@ using Common;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Metagame
 {
@@ -19,24 +20,41 @@ namespace Metagame
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private EnhancedScroller _scroller;
+		private Button _createRoomButton;
+		
+		[Header("Scroller")]
+		[SerializeField]
+		private EnhancedScrollerProxy _scroller;
 		[SerializeField]
 		private GameObject _prefab;
 		[SerializeField]
-		private Button _createRoomButton;
+		private string _scrollingAudioKey;
+		[SerializeField]
+		private float _lookAheadBefore;
+		[SerializeField]
+		private float _lookAheadAfter;
 		
-		private List<RoomViewData> _viewDatas;
-		private SimpleEnhancedScrollerController<RoomListElementView, RoomViewData> _scrollerController;
+		private SimpleEnhancedScrollerController _scrollerController;
+		private EnhancedScrollerDataModel<RoomListElementView, EnhancedScrollerElementViewData<RoomViewData>> _dataModel;
 		
 		private Action<int> _onJoinRoom;
 		private Action _onCreateRoom;
 		
 		[Zenject.Inject]
-		public void Zenject()
+		public void Zenject(DiContainer container)
 		{
-			_scrollerController = new SimpleEnhancedScrollerController<RoomListElementView, RoomViewData>();
-			_scrollerController.Init(_scroller, _prefab);
-			_scrollerController.OnInstantiateCell += _OnInstantiateCell;
+			_dataModel = new EnhancedScrollerDataModel<RoomListElementView, EnhancedScrollerElementViewData<RoomViewData>>(
+				_prefab,
+				_scroller.scrollDirection);
+			_dataModel.OnInstantiateCell += _OnInstantiateCell;
+				
+			_scrollerController = new SimpleEnhancedScrollerController(
+				_scroller,
+				_dataModel,
+				_scrollingAudioKey,
+				_lookAheadBefore,
+				_lookAheadAfter,
+				container);
 		}
 		
 		public void Enter(List<RoomViewData> viewDatas, Action<int> onJoinRoom, Action onCreateRoom)
@@ -55,14 +73,13 @@ namespace Metagame
 		
 		private void _Enter(List<RoomViewData> viewDatas)
 		{
-			_viewDatas = viewDatas;
-			
-			_scrollerController.Display(viewDatas);
+			_dataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(viewDatas));
+			_scrollerController.Display();
 		}
 		
 		private void _Leave()
 		{
-			_scrollerController.Leave();
+			_scrollerController.Clear();
 		}
 		
 		private void _Register(Action<int> onJoinRoom, Action onCreateRoom)
@@ -81,9 +98,9 @@ namespace Metagame
 			_createRoomButton.onClick.RemoveAllListeners();
 		}
 		
-		private void _OnInstantiateCell(RoomListElementView view, RoomViewData viewData, int dataIndex)
+		private void _OnInstantiateCell(RoomListElementView view, EnhancedScrollerElementViewData<RoomViewData> viewData, int dataIndex)
 		{
-			view.Init(() => _OnJoinRoom(viewData.Id));
+			view.OnJoinRoom += () => _OnJoinRoom(viewData.Data.Id);
 		}
 		
 		private void _OnJoinRoom(int roomId)

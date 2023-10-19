@@ -134,7 +134,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 720474fed0cc7254690e4c7160cdd36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _panel: {fileID: 1559205302943491471}
+  cellIdentifier: 
+  _rootFolder: {fileID: 1559205302943491471}
   _button: {fileID: 909413932963258319}
   _roomNameText: {fileID: 1038667941940721404}
   _playerInfoViews:
@@ -243,7 +244,7 @@ GameObject:
   - component: {fileID: 1559205302943491470}
   - component: {fileID: 1559205302943491185}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
