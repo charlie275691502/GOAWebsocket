@@ -9,6 +9,7 @@ namespace Metagame
 {
 	public enum GameType
 	{
+		None,
 		Tic_Tac_Toe,
 		Generation_Of_Authority,
 	};
@@ -17,6 +18,7 @@ namespace Metagame
 	{
 		private static Dictionary<GameType, string> _dic = new Dictionary<GameType, string>()
 		{
+			{GameType.None, "NON"},
 			{GameType.Tic_Tac_Toe, "TTT"},
 			{GameType.Generation_Of_Authority, "GOA"},
 		};

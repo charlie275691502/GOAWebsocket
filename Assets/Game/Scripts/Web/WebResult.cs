@@ -23,14 +23,24 @@ namespace Web
 		public int Coin;
 	}
 	
+	public class GameSettingResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("game_type")]
+		public string GameType;
+		[JsonProperty("player_spot")]
+		public int PlayerSpot;
+	}
+	
 	public class RoomResult
 	{
 		[JsonProperty("id")]
 		public int Id;
 		[JsonProperty("room_name")]
 		public string RoomName;
-		[JsonProperty("game_type")]
-		public string GameType;
+		[JsonProperty("game_setting")]
+		public GameSettingResult GameSetting;
 		[JsonProperty("players")]
 		public List<PlayerDataResult> Players;
 	}
