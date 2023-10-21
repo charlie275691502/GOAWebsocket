@@ -114,7 +114,7 @@ namespace Metagame
 				{
 					Id = roomResult.Id,
 					RoomName = roomResult.RoomName,
-					GameType = GameTypeUtility.GetGameType(roomResult.GameSetting.GameType),
+					GameSetting = new GameSetting(roomResult.GameSetting),
 					Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				}).ToList();
 		}

@@ -4,6 +4,7 @@ using TMPro;
 using Optional;
 using Optional.Collections;
 using Optional.Unsafe;
+using Web;
 
 namespace Metagame
 {
@@ -13,6 +14,18 @@ namespace Metagame
 		Tic_Tac_Toe,
 		Generation_Of_Authority,
 	};
+	
+	public class GameSetting
+	{
+		public GameType GameType;
+		public int PlayerPlot;
+		
+		public GameSetting(GameSettingResult result)
+		{
+			GameType = GameTypeUtility.GetGameType(result.GameType);
+			PlayerPlot = result.PlayerPlot;
+		}
+	}
 	
 	public static class GameTypeUtility
 	{

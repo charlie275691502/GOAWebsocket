@@ -26,27 +26,41 @@ namespace Metagame
 		[SerializeField]
 		private Text _roomNameText;
 		[SerializeField]
-		private List<RoomPlayerInfoView> _playerInfoViews;
-		[SerializeField]
 		private Button _sendMessageButton;
 		[SerializeField]
 		private InputField _messageInputField;
 		
-		[Header("Scroller")]
+		[Header("MessageScroller")]
 		[SerializeField]
-		private EnhancedScrollerProxy _scroller;
+		private EnhancedScrollerProxy _messageScroller;
 		[SerializeField]
-		private GameObject _prefab;
+		private GameObject _messagePrefab;
 		[SerializeField]
-		private string _scrollingAudioKey;
+		private string _messageScrollingAudioKey;
 		[SerializeField]
-		private float _lookAheadBefore;
+		private float _messageLookAheadBefore;
 		[SerializeField]
-		private float _lookAheadAfter;
+		private float _messageLookAheadAfter;
+		
+		[Header("PlayerScroller")]
+		[SerializeField]
+		private EnhancedScrollerProxy _playerScroller;
+		[SerializeField]
+		private GameObject _playerPrefab;
+		[SerializeField]
+		private string _playerScrollingAudioKey;
+		[SerializeField]
+		private float _playerLookAheadBefore;
+		[SerializeField]
+		private float _playerLookAheadAfter;
 		
 		private RoomWithMessagesViewData _viewData;
-		private SimpleEnhancedScrollerController _scrollerController;
-		private EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>> _dataModel;
+		private SimpleEnhancedScrollerController _messageScrollerController;
+		private EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>> _messageDataModel;
+		private SimpleEnhancedScrollerController _playerScrollerController;
+		private EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerData>> _playerDataModel;
+		
+
 		
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
@@ -54,16 +68,26 @@ namespace Metagame
 		[Zenject.Inject]
 		public void Zenject(DiContainer container)
 		{
-			_dataModel = new EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>>(
-				_prefab,
-				_scroller.scrollDirection);
+			_messageDataModel = new EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>>(
+				_messagePrefab,
+				_messageScroller.scrollDirection);
+			_playerDataModel = new EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerData>>(
+				_playerPrefab,
+				_playerScroller.scrollDirection);
 				
-			_scrollerController = new SimpleEnhancedScrollerController(
-				_scroller,
-				_dataModel,
-				_scrollingAudioKey,
-				_lookAheadBefore,
-				_lookAheadAfter,
+			_messageScrollerController = new SimpleEnhancedScrollerController(
+				_messageScroller,
+				_messageDataModel,
+				_messageScrollingAudioKey,
+				_messageLookAheadBefore,
+				_messageLookAheadAfter,
+				container);
+			_playerScrollerController = new SimpleEnhancedScrollerController(
+				_playerScroller,
+				_playerDataModel,
+				_playerScrollingAudioKey,
+				_playerLookAheadBefore,
+				_playerLookAheadAfter,
 				container);
 		}
 		
@@ -86,15 +110,15 @@ namespace Metagame
 			_viewData = viewData;
 			
 			_UpdateRoom();
-			_dataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
-			_scrollerController.Display(1);
+			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
+			_messageScrollerController.Display(1);
 		}
 		
 		public void AppendMessage(MessageViewData viewData)
 		{
 			_viewData.Messages.Add(viewData);
-			_dataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
-			_scrollerController.Display(1);
+			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
+			_messageScrollerController.Display(1);
 		}
 		public void UpdateRoom(RoomViewData viewData)
 		{
@@ -107,8 +131,8 @@ namespace Metagame
 		private void _Leave()
 		{
 			_roomNameText.text = string.Empty;
-			_playerInfoViews.ForEach(view => view.Leave());
-			_scrollerController.Clear();
+			_messageScrollerController.Clear();
+			_playerScrollerController.Clear();
 		}
 		
 		private void _Register(Action onLeaveRoom, Action<string> onSendMessage)
@@ -141,17 +165,9 @@ namespace Metagame
 		
 		private void _UpdateRoom()
 		{
-			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(_viewData.GameType)}] {_viewData.RoomName}";
-			for (int i=0; i < _playerInfoViews.Count; i++)
-			{
-				if (i < _viewData.Players.Count) 
-				{
-					_playerInfoViews[i].Enter(_viewData.Players[i]);
-				} else 
-				{
-					_playerInfoViews[i].EnterEmpty();
-				}
-			}
+			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(_viewData.GameSetting.GameType)}] {_viewData.RoomName}";
+			_playerDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Players, _viewData.GameSetting.PlayerPlot));
+			_playerScrollerController.Display();
 		}
 	}
 }
