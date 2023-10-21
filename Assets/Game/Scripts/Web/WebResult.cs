@@ -29,8 +29,8 @@ namespace Web
 		public int Id;
 		[JsonProperty("game_type")]
 		public string GameType;
-		[JsonProperty("player_spot")]
-		public int PlayerSpot;
+		[JsonProperty("player_plot")]
+		public int PlayerPlot;
 	}
 	
 	public class RoomResult
