@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BestHTTP;
 using Common;
+using Metagame;
 using Newtonsoft.Json;
 using Rayark.Mast;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace Web
 		IMonad<None> RegisterThenLogin(string username, string password, string email);
 		IMonad<None> GetSelfPlayerData();
 		IMonad<None> UpdateSelfPlayerData(string nickName);
-		IMonad<RoomResult> CreateRoom(string roomName);
+		IMonad<RoomResult> CreateRoom(string roomName, string gameType, int playerPlot);
 		IMonad<RoomListResult> GetRoomList();
 		IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId);
 	}
@@ -86,7 +87,7 @@ namespace Web
 				.Then(r => _backendPlayerPresenter.AcceptNickName(nickName));
 		}
 		
-		public IMonad<RoomResult> CreateRoom(string roomName)
+		public IMonad<RoomResult> CreateRoom(string roomName, string gameType, int playerPlot)
 		{
 			return 
 				_Send<RoomResult>(
@@ -95,6 +96,11 @@ namespace Web
 					new Dictionary<string, object>()
 					{
 						{"room_name", roomName},
+						{"game_setting", new Dictionary<string, object>
+							{
+								{"game_type", gameType},
+								{"player_plot", playerPlot},
+							}},
 					});
 		}
 		

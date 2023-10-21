@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Common;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,7 +10,7 @@ namespace Metagame
 {
 	public interface ICreateRoomView
 	{
-		void Enter(Action<string> onConfirm, Action onCancel);
+		void Enter(Action<string, GameType , int> onConfirm, Action onCancel);
 		void Leave();
 	}
 	
@@ -23,11 +24,36 @@ namespace Metagame
 		private Button _cancelButton;
 		[SerializeField]
 		private InputField _roomNameInputField;
+		[SerializeField]
+		private Dropdown _gameTypeDropdown;
+		[SerializeField]
+		private InputField _playerPlotInputField;
 		
-		private Action<string> _onConfirm;
+		[SerializeField]
+		private DropDownOptionPair[] _dropdownOptions;
+		[Serializable]
+		public struct DropDownOptionPair
+		{
+			public string Name;
+			public GameType GameType;
+		}
+		
+		private GameType[] _dropdownGameTypes;
+		private Action<string, GameType , int> _onConfirm;
 		private Action _onCancel;
 		
-		public void Enter(Action<string> onConfirm, Action onCancel)
+		private void Start()
+		{
+			_gameTypeDropdown.options = _dropdownOptions
+				.Select(option => new Dropdown.OptionData(option.Name))
+				.ToList();
+				
+			_dropdownGameTypes = _dropdownOptions
+				.Select(option => option.GameType)
+				.ToArray();
+		}
+		
+		public void Enter(Action<string, GameType , int> onConfirm, Action onCancel)
 		{
 			_Enter();
 			_Register(onConfirm, onCancel);
@@ -44,13 +70,15 @@ namespace Metagame
 		private void _Enter()
 		{
 			_roomNameInputField.text = string.Empty;
+			_gameTypeDropdown.value = 0;
+			_playerPlotInputField.text = "2";
 		}
 		
 		private void _Leave()
 		{
 		}
 		
-		private void _Register(Action<string> onConfirm, Action onCancel)
+		private void _Register(Action<string, GameType , int> onConfirm, Action onCancel)
 		{
 			_onConfirm = onConfirm;
 			_onCancel = onCancel;
@@ -70,7 +98,12 @@ namespace Metagame
 		
 		private void _OnConfirm()
 		{
-			_onConfirm?.Invoke(_roomNameInputField.text);
+			_onConfirm?.Invoke(
+				_roomNameInputField.text,
+				_dropdownGameTypes[_gameTypeDropdown.value],
+				int.TryParse(_playerPlotInputField.text, out var playerPlot)
+					? playerPlot
+					: 2);
 		}
 		
 		private void _OnCancel()

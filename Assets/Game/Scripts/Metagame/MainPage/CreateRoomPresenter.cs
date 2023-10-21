@@ -3,24 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using Optional;
 using Rayark.Mast;
 using UnityEngine;
 using Web;
 
 namespace Metagame
 {
+	public record CreateRoomReturn(
+		string RoomName,
+		GameType GameType,
+		int PlayerPlot);
+		
 	public interface ICreateRoomPresenter
 	{
-		IEnumerator Run(IReturn<string> ret);
+		IEnumerator Run(IReturn<CreateRoomReturn> ret);
 	}
 	
 	public class CreateRoomPresenter : ICreateRoomPresenter
 	{
+		
 		private IWarningPresenter _warningPresenter;
 		private ICreateRoomView _view;
 		
 		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private string _result;
+		private Option<CreateRoomReturn> _result;
 		
 		public CreateRoomPresenter(IWarningPresenter warningPresenter, ICreateRoomView view)
 		{
@@ -28,20 +35,17 @@ namespace Metagame
 			_view = view;
 		}
 		
-		public IEnumerator Run(IReturn<string> ret)
+		public IEnumerator Run(IReturn<CreateRoomReturn> ret)
 		{
 			_view.Enter(_OnConfirm, _OnCancel);
 			
 			_commandExecutor.Clear();
 			yield return _commandExecutor.Start();
 			
-			if(string.IsNullOrEmpty(_result))
-			{
-				ret.Fail(new Exception("User Cancel"));
-			} else 
-			{
-				ret.Accept(_result);
-			}
+			_result.Match(
+				result => ret.Accept(result),
+				() => ret.Fail(new Exception("User Cancel"))
+			);
 		}
 		
 		private void _Stop()
@@ -50,18 +54,18 @@ namespace Metagame
 			_commandExecutor.Stop();
 		}
 		
-		private void _OnConfirm(string roomName)
+		private void _OnConfirm(string roomName, GameType gameType, int playerPlot)
 		{
-			_commandExecutor.TryAdd(_CreateRoom(roomName));
+			_commandExecutor.TryAdd(_CreateRoom(roomName, gameType, playerPlot));
 		}
 		
 		private void _OnCancel()
 		{
-			_result = string.Empty;
+			_result = Option.None<CreateRoomReturn>();
 			_Stop();
 		}
 		
-		public IEnumerator _CreateRoom(string roomName)
+		public IEnumerator _CreateRoom(string roomName, GameType gameType, int playerPlot)
 		{
 			if(string.IsNullOrEmpty(roomName))
 			{
@@ -69,7 +73,12 @@ namespace Metagame
 				yield break;
 			}
 			
-			_result = roomName;
+			_result = new CreateRoomReturn(
+				RoomName: roomName,
+				GameType: gameType,
+				PlayerPlot: playerPlot
+			).Some();
+			
 			_Stop();
 		}
 	}

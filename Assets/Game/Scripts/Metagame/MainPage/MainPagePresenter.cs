@@ -87,14 +87,18 @@ namespace Metagame
 		
 		private IEnumerator _CreateRoom()
 		{
-			var createRoomMonad = new BlockMonad<string>(_createRoomPresenter.Run);
+			var createRoomMonad = new BlockMonad<CreateRoomReturn>(_createRoomPresenter.Run);
 			yield return createRoomMonad.Do();
 			if (createRoomMonad.Error != null)
 			{
 				yield break;
 			}
 			
-			var monad = _hTTPPresenter.CreateRoom(createRoomMonad.Result);
+			var createRoomReturn = createRoomMonad.Result;
+			var monad = _hTTPPresenter.CreateRoom(
+				createRoomReturn.RoomName,
+				GameTypeUtility.GetAbbreviation(createRoomReturn.GameType),
+				createRoomReturn.PlayerPlot);
 			yield return monad.RunAndHandleInternetError(_warningPresenter);
 			if(monad.Error != null)
 			{
