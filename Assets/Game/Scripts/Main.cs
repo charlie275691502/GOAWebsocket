@@ -1,16 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using Rayark.Mast;
 using UnityEngine;
 using Authorization;
 using Metagame;
+using Cysharp.Threading.Tasks;
 
 public class Main : MonoBehaviour
 {
 	private IAuthorizationPresenter _authorizationPresenter;
 	private IMetagamePresenter _metagamePresenter;
 	
-	private Executor _executor = new Executor();
 	private bool _leave;
 	
 	[Zenject.Inject]
@@ -23,21 +22,16 @@ public class Main : MonoBehaviour
 	void Start()
 	{
 		_leave = false;
-		_executor.Add(_Main());
-	}
-
-	void Update()
-	{
-		_executor.Resume(Time.deltaTime);
+        _ = _Main();
 	}
 	
-	private IEnumerator _Main()
+	private async UniTask _Main()
 	{
 		while(!_leave)
 		{
-			yield return _authorizationPresenter.Run();
-			yield return _metagamePresenter.Run();
-			yield return null;
+			await _authorizationPresenter.Run();
+			await _metagamePresenter.Run();
+			await UniTask.Yield();
 		}
 	}
 }

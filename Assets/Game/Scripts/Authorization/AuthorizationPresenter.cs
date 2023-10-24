@@ -1,22 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Rayark.Mast;
+using Cysharp.Threading.Tasks;
 
 namespace Authorization
 {
-	public enum AuthorizationStatusType
+	public enum AuthorizationReturnType
 	{
 		Login,
 		Register,
 		EnterMetagame,
 	}
 	
-	public class AuthorizationStatus
+	public class AuthorizationReturn
 	{
-		public AuthorizationStatusType Type;
+		public AuthorizationReturnType Type;
 		
-		public AuthorizationStatus(AuthorizationStatusType type)
+		public AuthorizationReturn(AuthorizationReturnType type)
 		{
 			Type = type;
 		}
@@ -24,7 +24,7 @@ namespace Authorization
 	
 	public interface IAuthorizationPresenter
 	{
-		IEnumerator Run();
+		UniTask Run();
 	}
 	
 	public class AuthorizationPresenter : IAuthorizationPresenter
@@ -46,21 +46,16 @@ namespace Authorization
 			_registerPresenter = registerPresenter;
 		}
 		
-		public IEnumerator Run()
+		public async UniTask Run()
 		{
-			yield return _Run();
-		}
-		
-		private IEnumerator _Run()
-		{
-			var nextStatus = new AuthorizationStatus(AuthorizationStatusType.Login);
-			while (nextStatus.Type != AuthorizationStatusType.EnterMetagame)
+			var nextStatus = new AuthorizationReturn(AuthorizationReturnType.Login);
+			while (nextStatus.Type != AuthorizationReturnType.EnterMetagame)
 			{
 				var monad = 
-					(nextStatus.Type == AuthorizationStatusType.Login) 
-						? new BlockMonad<AuthorizationStatus>(r => _loginPresneter.Run(r))
-						: new BlockMonad<AuthorizationStatus>(r => _registerPresenter.Run(r));
-				yield return monad.Do();
+					(nextStatus.Type == AuthorizationReturnType.Login) 
+						? new BlockMonad<AuthorizationReturn>(r => _loginPresneter.Run(r))
+						: new BlockMonad<AuthorizationReturn>(r => _registerPresenter.Run(r));
+				await monad.Do();
 				if (monad.Error != null)
 				{
 					Debug.LogError(monad.Error);

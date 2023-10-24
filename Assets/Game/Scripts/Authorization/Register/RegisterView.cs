@@ -5,12 +5,12 @@ using Common;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Authorization
+namespace Authorization.Register
 {
 	public interface IRegisterView
 	{
-		void Enter(Action onSwitchToLogin, Action<string, string, string, string> onRegister);
-		void Leave();
+		void RegisterCallback(Action<string, string, string, string> onRegister, Action onSwitchToLogin);
+		void Render(RegisterProperty prop);
 	}
 	
 	public class RegisterView : MonoBehaviour, IRegisterView
@@ -30,57 +30,69 @@ namespace Authorization
 		[SerializeField]
 		private Button _registerButton;
 		
-		private Action _onSwitchToLogin;
 		private Action<string, string, string, string> _onRegister;
+		private Action _onSwitchToLogin;
 		
-		public void Enter(Action onSwitchToLogin, Action<string, string, string, string> onRegister)
+		private RegisterProperty _prop;
+		
+		void IRegisterView.RegisterCallback(Action<string, string, string, string> onRegister, Action onSwitchToLogin)
 		{
-			_Enter();
-			_Register(onSwitchToLogin, onRegister);
+			_onRegister = onRegister;
+			_onSwitchToLogin = onSwitchToLogin;
+			
+			_registerButton.onClick.AddListener(_OnRegister);
+			_switchToLoginButton.onClick.AddListener(_OnSwitchToLogin);
+		}
+		
+		void IRegisterView.Render(RegisterProperty prop)
+		{
+			if (_prop == prop)
+				return;
+				
+			switch (prop.State)
+			{
+				case RegisterState.Open:
+					_Open();
+					break;
+					
+				case RegisterState.Idle:
+				case RegisterState.Register:
+				case RegisterState.SwitchToLogin:
+					_Render(prop);
+					break;
+					
+				case RegisterState.Close:
+					_Close();
+					break;
+					
+				default:
+					break;
+			}
+		}
+		
+		private void _Open()
+		{
 			_panel.SetActive(true);
 		}
 		
-		public void Leave()
+		private void _Close()
 		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
+			_panel.SetActive(true);
 		}
 		
-		private void _Enter()
+		private void _Render(RegisterProperty prop)
 		{
-		}
-		
-		private void _Leave()
-		{
-		}
-		
-		private void _Register(Action onSwitchToLogin, Action<string, string, string, string> onRegister)
-		{
-			_onSwitchToLogin = onSwitchToLogin;
-			_onRegister = onRegister;
 			
-			_switchToLoginButton.onClick.AddListener(_OnSwitchToLogin);
-			_registerButton.onClick.AddListener(_OnRegister);
-		}
-		
-		private void _Unregister()
-		{
-			_onSwitchToLogin = null;
-			_onRegister = null;
-			
-			_switchToLoginButton.onClick.RemoveAllListeners();
-			_registerButton.onClick.RemoveAllListeners();
-		}
-		
-		private void _OnSwitchToLogin()
-		{
-			_onSwitchToLogin?.Invoke();
 		}
 		
 		private void _OnRegister()
 		{
 			_onRegister?.Invoke(_usernameInputField.text, _passwordInputField.text, _confirmPasswordInputField.text, _emailInputField.text);
+		}
+				
+		private void _OnSwitchToLogin()
+		{
+			_onSwitchToLogin?.Invoke();
 		}
 	}
 }

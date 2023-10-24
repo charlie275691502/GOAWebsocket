@@ -1,16 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Rayark.Mast;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Web;
 
-namespace Authorization
+namespace Authorization.Register
 {
 	public interface IRegisterPresenter
 	{
-		IEnumerator Run(IReturn<AuthorizationStatus> ret);
+		UniTask<AuthorizationReturnType> Run();
 	}
+	
+	public abstract record RegisterState
+	{
+		public record Open() : RegisterState;
+		public record Idle() : RegisterState;
+		public record Register(string Username, string Password, string ConfirmPassword, string Email) : RegisterState;
+		public record SwitchToLogin() : RegisterState;
+		public record Close() : RegisterState;
+	}
+
+	public record RegisterProperty(RegisterState State, AuthorizationReturnType ReturnType);
 	
 	public class RegisterPresenter : IRegisterPresenter
 	{
@@ -18,52 +30,82 @@ namespace Authorization
 		private IWarningPresenter _warningPresenter;
 		private IRegisterView _view;
 		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private AuthorizationStatus _result;
+		private RegisterProperty _prop;
 		
 		public RegisterPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRegisterView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
+			
+			_view.RegisterCallback(
+				(username, password, confirmPassword, email) => 
+					_ChangeStateIfIdle(new RegisterState.Register(username, password, confirmPassword, email)),
+				() => 
+					_ChangeStateIfIdle(new RegisterState.SwitchToLogin()));
 		}
 		
-		public IEnumerator Run(IReturn<AuthorizationStatus> ret)
+		public async UniTask<AuthorizationReturnType> Run()
 		{
-			_view.Enter(_OnSwitchToLogin, _OnRegister);
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			ret.Accept(_result);
-		}
-		
-		private void _Stop()
-		{
-			_view.Leave();
-			_commandExecutor.Stop();
-		}
-		
-		private void _OnSwitchToLogin()
-		{
-			_result = new AuthorizationStatus(AuthorizationStatusType.Login);
-			_Stop();
-		}
-		
-		private void _OnRegister(string username, string password, string confirmPassword, string email)
-		{
-			_commandExecutor.TryAdd(_Register(username, password, confirmPassword, email));
+			_prop = new RegisterProperty(new RegisterState.Open(), AuthorizationReturnType.Register);
+			
+			while (_prop.State is not RegisterState.Close)
+			{
+				_view.Render(_prop);
+				switch (_prop.State)
+				{
+					case RegisterState.Open:
+						_prop = _prop with { State = new RegisterState.Idle() };
+						break;
+						
+					case RegisterState.Idle:
+						break;
+
+					case RegisterState.Register info:
+						await _Register(info.Username, info.Password, info.ConfirmPassword, info.Email);
+						_prop = _prop with { 
+							State = new RegisterState.Close(),
+							ReturnType = AuthorizationReturnType.EnterMetagame };
+						break;
+					
+					case RegisterState.SwitchToLogin:
+						_prop = _prop with { 
+							State = new RegisterState.Close(),
+							ReturnType = AuthorizationReturnType.Login };
+						break;
+						
+					case RegisterState.Close:
+						_prop = _prop with { 
+							State = new RegisterState.Close() };
+						break;
+						
+					default:
+						break;
+				}
+				await UniTask.Yield();
+			}
+			
+			return _prop.ReturnType;
 		}
 
-		private IEnumerator _Register(string username, string password, string confirmPassword, string email)
+		private void _ChangeStateIfIdle(RegisterState targetState, Action onChangeStateSuccess = null)
+		{
+			if (_prop.State is not RegisterState.Idle)
+				return;
+
+			onChangeStateSuccess?.Invoke();
+			_prop = _prop with { State = targetState };
+		}
+
+		private async UniTask _Register(string username, string password, string confirmPassword, string email)
 		{
 			if(password != confirmPassword)
 			{
-				yield return _warningPresenter.Run("Input Fail", "Passwrod and Confirm Password are not the same");
-				yield break;
+				await _warningPresenter.Run("Input Fail", "Passwrod and Confirm Password are not the same");
+				return;
 			}
 			
-			yield return _hTTPPresenter.RegisterThenLogin(username, password, email).RunAndHandleInternetError(_warningPresenter);
-			_result = new AuthorizationStatus(AuthorizationStatusType.EnterMetagame);
-			_Stop();
+			await _hTTPPresenter.RegisterThenLogin(username, password, email).RunAndHandleInternetError(_warningPresenter);
 		}
 	}
 }
