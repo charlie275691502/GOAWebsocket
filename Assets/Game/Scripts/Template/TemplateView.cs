@@ -9,43 +9,71 @@ namespace Template
 {
 	public interface ITemplateView
 	{
-		void Enter();
-		void Leave();
+		void RegisterCallback(Action onConfirm);
+		void Render(TemplateProperty prop);
 	}
-	
+
 	public class TemplateView : MonoBehaviour, ITemplateView
 	{
 		[SerializeField]
 		private GameObject _panel;
-		
-		public void Enter()
+		[SerializeField]
+		private Button _button;
+
+		private Action _onConfirm;
+
+		private TemplateProperty _prop;
+
+		void ITemplateView.RegisterCallback(Action onConfirm)
 		{
-			_Enter();
-			_Register();
+			_onConfirm = onConfirm;
+
+			_button.onClick.AddListener(_OnConfirm);
+		}
+
+		void ITemplateView.Render(TemplateProperty prop)
+		{
+			if (_prop == prop)
+				return;
+
+			switch (prop.State)
+			{
+				case TemplateState.Open:
+					_Open();
+					break;
+
+				case TemplateState.Idle:
+				case TemplateState.Confirm:
+					_Render(prop);
+					break;
+
+				case TemplateState.Close:
+					_Close();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		private void _Open()
+		{
 			_panel.SetActive(true);
 		}
-		
-		public void Leave()
+
+		private void _Close()
 		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
+			_panel.SetActive(true);
 		}
-		
-		private void _Enter()
+
+		private void _Render(TemplateProperty prop)
 		{
+
 		}
-		
-		private void _Leave()
+
+		private void _OnConfirm()
 		{
-		}
-		
-		private void _Register()
-		{
-		}
-		
-		private void _Unregister()
-		{
+			_onConfirm?.Invoke();
 		}
 	}
 }

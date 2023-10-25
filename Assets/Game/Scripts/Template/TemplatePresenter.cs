@@ -1,50 +1,97 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Rayark.Mast;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Web;
 
 namespace Template
 {
-	public enum TemplateTabResult
+	public enum TemplateReturnType
 	{
-		
+		Confirm,
+		Close,
 	}
 	
 	public interface ITemplatePresenter
 	{
-		IEnumerator Run(IReturn<TemplateTabResult> ret);
+		UniTask<TemplateReturnType> Run();
 	}
 	
+	public abstract record TemplateState
+	{
+		public record Open() : TemplateState;
+		public record Idle() : TemplateState;
+		public record Confirm() : TemplateState;
+		public record Close() : TemplateState;
+	}
+
+	public record TemplateProperty(TemplateState State, TemplateReturnType ReturnType);
+
 	public class TemplatePresenter : ITemplatePresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
 		private ITemplateView _view;
-		private TemplateTabResult _result;
-		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		
+
+		private TemplateProperty _prop;
+
 		public TemplatePresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ITemplateView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
+
+			_view.RegisterCallback(
+				() =>
+					_ChangeStateIfIdle(new TemplateState.Confirm()));
 		}
-		
-		public IEnumerator Run(IReturn<TemplateTabResult> ret)
+
+		public async UniTask<TemplateReturnType> Run()
 		{
-			_view.Enter();
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			ret.Accept(_result);
+			_prop = new TemplateProperty(new TemplateState.Open(), TemplateReturnType.Close);
+
+			while (_prop.State is not TemplateState.Close)
+			{
+				_view.Render(_prop);
+				switch (_prop.State)
+				{
+					case TemplateState.Open:
+						_prop = _prop with { State = new TemplateState.Idle() };
+						break;
+
+					case TemplateState.Idle:
+						break;
+
+					case TemplateState.Confirm info:
+						_prop = _prop with
+						{
+							State = new TemplateState.Close(),
+							ReturnType = TemplateReturnType.Confirm
+						};
+						break;
+
+					case TemplateState.Close:
+						_prop = _prop with { State = new TemplateState.Close() };
+						break;
+
+					default:
+						break;
+				}
+				await UniTask.Yield();
+			}
+
+			return _prop.ReturnType;
 		}
-		
-		private void _Stop()
+
+		private void _ChangeStateIfIdle(TemplateState targetState, Action onChangeStateSuccess = null)
 		{
-			_view.Leave();
-			_commandExecutor.Stop();
+			if (_prop.State is not TemplateState.Idle)
+				return;
+
+			onChangeStateSuccess?.Invoke();
+			_prop = _prop with { State = targetState };
 		}
 	}
 }
