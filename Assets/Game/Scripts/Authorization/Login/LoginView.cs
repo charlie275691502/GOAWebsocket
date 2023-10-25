@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Authorization
+namespace Authorization.Login
 {
 	public interface ILoginView
 	{
-		void Enter(Action onSwitchToRegister, Action<string, string> onLogin);
-		void Leave();
+		void RegisterCallback(Action<string, string> onLogin, Action onSwitchToRegister);
+		void Render(LoginProperty prop);
 	}
 	
 	public class LoginView : MonoBehaviour, ILoginView
@@ -25,49 +25,61 @@ namespace Authorization
 		[SerializeField]
 		private Button _loginButton;
 		
-		private Action _onSwitchToRegister;
 		private Action<string, string> _onLogin;
-		
-		public void Enter(Action onSwitchToRegister, Action<string, string> onLogin)
+		private Action _onSwitchToRegister;
+
+		private LoginProperty _prop;
+
+		void ILoginView.RegisterCallback(Action<string, string> onLogin, Action onSwitchToRegister)
 		{
-			_Enter();
-			_Register(onSwitchToRegister, onLogin);
+			_onLogin = onLogin;
+			_onSwitchToRegister = onSwitchToRegister;
+
+			_loginButton.onClick.AddListener(_OnLogin);
+			_switchToRegisterButton.onClick.AddListener(_OnSwitchToRegister);
+		}
+
+		void ILoginView.Render(LoginProperty prop)
+		{
+			if (_prop == prop)
+				return;
+
+			switch (prop.State)
+			{
+				case LoginState.Open:
+					_Open();
+					break;
+
+				case LoginState.Idle:
+				case LoginState.Login:
+				case LoginState.SwitchToRegister:
+					_Render(prop);
+					break;
+
+				case LoginState.Close:
+					_Close();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		private void _Open()
+		{
 			_panel.SetActive(true);
 		}
-		
-		public void Leave()
+
+		private void _Close()
 		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
+			_panel.SetActive(true);
 		}
-		
-		private void _Enter()
+
+		private void _Render(LoginProperty prop)
 		{
+
 		}
-		
-		private void _Leave()
-		{
-		}
-		
-		private void _Register(Action onSwitchToRegister, Action<string, string> onLogin)
-		{
-			_onSwitchToRegister = onSwitchToRegister;
-			_onLogin = onLogin;
-			
-			_switchToRegisterButton.onClick.AddListener(_OnSwitchToRegister);
-			_loginButton.onClick.AddListener(_OnLogin);
-		}
-		
-		private void _Unregister()
-		{
-			_onSwitchToRegister = null;
-			_onLogin = null;
-			
-			_switchToRegisterButton.onClick.RemoveAllListeners();
-			_loginButton.onClick.RemoveAllListeners();
-		}
-		
+
 		private void _OnSwitchToRegister()
 		{
 			_onSwitchToRegister?.Invoke();

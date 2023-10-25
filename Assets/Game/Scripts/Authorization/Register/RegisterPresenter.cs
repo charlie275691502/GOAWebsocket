@@ -8,9 +8,9 @@ using Web;
 
 namespace Authorization.Register
 {
-	public interface IRegisterPresenter
+	public interface IRegisterPresenter: IAuthorizationSubTabPresenter
 	{
-		UniTask<AuthorizationReturnType> Run();
+
 	}
 	
 	public abstract record RegisterState
