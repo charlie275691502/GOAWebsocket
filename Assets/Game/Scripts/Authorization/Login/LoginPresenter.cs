@@ -62,7 +62,7 @@ namespace Authorization.Login
 						break;
 
 					case LoginState.Login info:
-						await _Login(info.Username, info.Password);
+						await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);;
 						_prop = _prop with
 						{
 							State = new LoginState.Close(),
@@ -101,11 +101,6 @@ namespace Authorization.Login
 
 			onChangeStateSuccess?.Invoke();
 			_prop = _prop with { State = targetState };
-		}
-
-		private async UniTask _Login(string username, string password)
-		{
-			await _hTTPPresenter.Login(username, password).RunAndHandleInternetError(_warningPresenter);
 		}
 	}
 }
