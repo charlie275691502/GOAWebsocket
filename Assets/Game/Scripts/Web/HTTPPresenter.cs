@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using BestHTTP;
 using Common;
-using Common.UniTask;
+using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using Metagame;
 using Newtonsoft.Json;

@@ -4,7 +4,7 @@ using OneOf.Types;
 using Optional;
 using System;
 
-namespace Common.UniTask
+namespace Common.UniTaskExtension
 {
     public record UniTaskError(string Error);
 
@@ -25,7 +25,7 @@ namespace Common.UniTask
             return requestOneOf;
         }
 
-        public static async UniTask<OneOf<T, UniTaskError>> OnSuccess<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, Func<T, Cysharp.Threading.Tasks.UniTask> onSuccess)
+        public static async UniTask<OneOf<T, UniTaskError>> OnSuccess<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, Func<T, UniTask> onSuccess)
         {
             var requestOneOf = await uniTask;
             requestOneOf.Switch(

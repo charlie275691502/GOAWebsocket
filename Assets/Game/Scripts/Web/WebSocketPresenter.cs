@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using BestHTTP;
 using BestHTTP.WebSocket;
 using Common;
-using Common.UniTask;
+using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Common.UniTask;
+using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using OneOf;
 using OneOf.Types;
