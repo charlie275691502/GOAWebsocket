@@ -4,14 +4,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Common
+namespace Common.Warning
 {
 	public interface IWarningView
 	{
-		void Enter(string title, string content, Action onConfirm);
-		void Leave();
+		void RegisterCallback(Action onConfirm);
+		void Render(WarningProperty prop);
 	}
-	
+
 	public class WarningView : MonoBehaviour, IWarningView
 	{
 		[SerializeField]
@@ -24,47 +24,59 @@ namespace Common
 		private Button _confirmButton;
 		
 		private Action _onConfirm;
-		
-		public void Enter(string title, string content, Action onConfirm)
+
+		private WarningProperty _prop;
+
+		void IWarningView.RegisterCallback(Action onConfirm)
 		{
-			_Enter(title, content);
-			_Register(onConfirm);
+			_onConfirm = onConfirm;
+
+			_confirmButton.onClick.AddListener(_OnConfirm);
+		}
+
+		void IWarningView.Render(WarningProperty prop)
+		{
+			if (_prop == prop)
+				return;
+
+			switch (prop.State)
+			{
+				case WarningState.Open:
+					_Open();
+					break;
+
+				case WarningState.Idle:
+				case WarningState.Confirm:
+					_Render(prop);
+					break;
+
+				case WarningState.Close:
+					_Close();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		private void _Open()
+		{
 			_panel.SetActive(true);
 		}
-		
-		public void Leave()
+
+		private void _Close()
 		{
-			_Unregister();
 			_panel.SetActive(false);
-			_Leave();
-		}
-		
-		private void _Enter(string title, string content)
-		{
-			_title.text = title;
-			_content.text = content;
-		}
-		
-		private void _Leave()
-		{
 			_title.text = string.Empty;
 			_content.text = string.Empty;
 		}
-		
-		private void _Register(Action onConfirm)
+
+		private void _Render(WarningProperty prop)
 		{
-			_onConfirm = onConfirm;
-			
-			_confirmButton.onClick.AddListener(_OnConfirm);
+			_title.text = prop.Title;
+			_content.text = prop.Content;
 		}
-		
-		private void _Unregister()
-		{
-			_onConfirm = null;
-			
-			_confirmButton.onClick.RemoveAllListeners();
-		}
-		
+
 		private void _OnConfirm()
 		{
 			_onConfirm?.Invoke();
