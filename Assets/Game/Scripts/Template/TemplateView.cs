@@ -63,7 +63,7 @@ namespace Template
 
 		private void _Close()
 		{
-			_panel.SetActive(true);
+			_panel.SetActive(false);
 		}
 
 		private void _Render(TemplateProperty prop)

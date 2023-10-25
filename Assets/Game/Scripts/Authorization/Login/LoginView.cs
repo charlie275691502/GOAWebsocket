@@ -72,7 +72,7 @@ namespace Authorization.Login
 
 		private void _Close()
 		{
-			_panel.SetActive(true);
+			_panel.SetActive(false);
 		}
 
 		private void _Render(LoginProperty prop)
