@@ -2,7 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Rayark.Mast;
+using Common.UniTask;
+using Cysharp.Threading.Tasks;
+using OneOf;
+using OneOf.Types;
+using Optional;
 using UnityEngine;
 using Web;
 
@@ -10,10 +14,10 @@ namespace Metagame
 {
 	public interface IRoomWebSocketPresenter : IWebSocketPresenter
 	{
-		IMonad<None> Run(int roomId);
+		UniTask<OneOf<None, UniTaskError>> Start(int roomId);
 		void SendMessage(string message);
-		IMonad<None> JoinRoomMonad(int roomId);
-		IMonad<None> LeaveRoomMonad(int roomId);
+		UniTask<OneOf<None, UniTaskError>> JoinRoom(int roomId);
+		UniTask<OneOf<None, UniTaskError>> LeaveRoom(int roomId);
 		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
 		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
 	}
@@ -23,10 +27,10 @@ namespace Metagame
 		public RoomWebSocketPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData) : base(loadingView, backendPlayerPresenter, backendPlayerData)
 		{
 		}
-		
-		public IMonad<None> Run(int roomId)
+
+		public UniTask<OneOf<None, UniTaskError>> Start(int roomId)
 		{
-			return _Run(string.Format("chat/rooms/{0}/", roomId.ToString()));
+			return _StartWebsocket(string.Format("chat/rooms/{0}/", roomId.ToString()));
 		}
 		
 		public void SendMessage(string content)
@@ -40,36 +44,34 @@ namespace Metagame
 			_Send(body);
 		}
 		
-		public IMonad<None> JoinRoomMonad(int roomId)
-		{
-			var body = new Dictionary<string, object>()
-			{
-				{"command", "join_room"},
-				{"room_id", roomId},
-			};
-			
-			return _SendWaitTillReturnMonad<None>("join_room", body);
-		}
+		public UniTask<OneOf<None, UniTaskError>> JoinRoom(int roomId)
+			=>
+				_SendWaitTillReturn<None>(
+					"join_room", 
+					new Dictionary<string, object>()
+					{
+						{"command", "join_room"},
+						{"room_id", roomId},
+					});
 		
-		public IMonad<None> LeaveRoomMonad(int roomId)
-		{
-			var body = new Dictionary<string, object>()
-			{
-				{"command", "leave_room"},
-				{"room_id", roomId},
-			};
-			
-			return _SendWaitTillReturnMonad<None>("leave_room", body);
-		}
-		
+		public UniTask<OneOf<None, UniTaskError>> LeaveRoom(int roomId)
+			=>
+				_SendWaitTillReturn<None>(
+					"leave_room", 
+					new Dictionary<string, object>()
+					{
+						{"command", "leave_room"},
+						{"room_id", roomId},
+					});
+
 		public void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage)
 		{
-			_RegisterOnReceiveMessage<MessageResult>("append_message", onReceiveMessage);
+			_RegisterOnReceiveMessage("append_message", onReceiveMessage);
 		}
 		
 		public void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage)
 		{
-			_RegisterOnReceiveMessage<RoomResult>("update_room", onReceiveMessage);
+			_RegisterOnReceiveMessage("update_room", onReceiveMessage);
 		}
 	}
 }

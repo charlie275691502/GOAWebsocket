@@ -1,29 +1,37 @@
 using Cysharp.Threading.Tasks;
+using OneOf;
+using OneOf.Types;
 using Optional;
 using System;
 
 namespace Common.UniTask
 {
+    public record UniTaskError(string Error);
+
     public static class UniTaskExtension
     {
-        public static async UniTask<Option<None>> ToNone<T>(this UniTask<Option<T>> uniTask)
+        public static async UniTask<OneOf<None, UniTaskError>> ToNone<T>(this UniTask<OneOf<T, UniTaskError>> uniTask)
         {
-            var requestOpt = await uniTask;
-            return requestOpt.Map(_ => default(None));
+            var requestOneOf = await uniTask;
+            return requestOneOf.MapT0(_ => default(None));
         }
 
-        public static async UniTask<Option<T>> OnSuccess<T>(this UniTask<Option<T>> uniTask, Action<T> onSuccess)
+        public static async UniTask<OneOf<T, UniTaskError>> OnSuccess<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, Action<T> onSuccess)
         {
-            var resultOpt = await uniTask;
-            resultOpt.MatchSome(result => onSuccess(result));
-            return resultOpt;
+            var requestOneOf = await uniTask;
+            requestOneOf.Switch(
+                result => onSuccess(result),
+                _ => { });
+            return requestOneOf;
         }
 
-        public static async UniTask<Option<T>> OnSuccess<T>(this UniTask<Option<T>> uniTask, Func<T, Cysharp.Threading.Tasks.UniTask> onSuccess)
+        public static async UniTask<OneOf<T, UniTaskError>> OnSuccess<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, Func<T, Cysharp.Threading.Tasks.UniTask> onSuccess)
         {
-            var resultOpt = await uniTask;
-            resultOpt.MatchSome(async result => await onSuccess(result));
-            return resultOpt;
+            var requestOneOf = await uniTask;
+            requestOneOf.Switch(
+                async result => await onSuccess(result),
+                _ => { });
+            return requestOneOf;
         }
     }
 }

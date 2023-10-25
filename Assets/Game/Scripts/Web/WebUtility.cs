@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Rayark.Mast;
+using Common.UniTask;
+using Cysharp.Threading.Tasks;
+using OneOf;
+using OneOf.Types;
+using Optional;
 
 namespace Web
 {
@@ -11,14 +15,14 @@ namespace Web
 		public static string Host = "127.0.0.1";
 		public static string Port = "9000";
 		
-		public static IEnumerator RunAndHandleInternetError<T>(this IMonad<T> monad, IWarningPresenter warningPresenter)
+		public static async UniTask<Option<T>> RunAndHandleInternetError<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, IWarningPresenter warningPresenter)
 		{
-			yield return monad.Do();
-			if(monad.Error != null)
-			{
-				yield return warningPresenter.Run("Error occurs when send to server", monad.Error.Message.ToString());
-				yield break;
-			}
+			var resultOneOf = await uniTask;
+			resultOneOf.Switch(
+				_ => { },
+				async error => await warningPresenter.Run("Error occurs when send to server", error.Error));
+
+			return resultOneOf.Match(result => result.Some(), _ => Option.None<T>());
 		}
 	}
 }

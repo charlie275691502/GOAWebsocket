@@ -4,9 +4,13 @@ using System.Collections.Generic;
 using BestHTTP;
 using BestHTTP.WebSocket;
 using Common;
+using Common.UniTask;
+using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Rayark.Mast;
+using OneOf;
+using OneOf.Types;
+using Optional;
 using UnityEngine;
 
 namespace Web
@@ -22,7 +26,7 @@ namespace Web
 		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
 		
-		private Exception _error;
+		private string _error = string.Empty;
 		private WebSocket _webSocket;
 		private Dictionary<string, Action<JToken>> _onReceiveMessageActionDic = new Dictionary<string, Action<JToken>>();
 		
@@ -35,26 +39,20 @@ namespace Web
 			_backendPlayerData = backendPlayerData;
 		}
 		
-		protected IMonad<None> _Run(string path)
-		{
-			return new BlockMonad<None>(r => _Run(path, r));
-		}
-		
 		public void Stop()
 		{
 			_onReceiveMessageActionDic.Clear();
 			_webSocket.Close();
 		}
-		
-		private IEnumerator _Run(string path, IReturn<None> ret)
+
+		protected async UniTask<OneOf<None, UniTaskError>> _StartWebsocket(string path)
 		{
 			_path = path;
 			if(_webSocket != null && _webSocket.IsOpen)
 			{
 				var errorMessage = string.Format("WebSocket already running on path : {0}", _path);
 				Debug.LogError(errorMessage);
-				ret.Fail(new Exception(errorMessage));
-				yield break;
+				return new UniTaskError(errorMessage);
 			}
 			
 			_webSocket = new WebSocket(
@@ -69,51 +67,50 @@ namespace Web
 			_webSocket.OnClosed += _OnWebSocketClosed;
 			_webSocket.OnError += _OnError;
 				
-			_error = null;
+			_error = string.Empty;
 			_webSocket.Open();
-			while (!_webSocket.IsOpen && _error == null)
+			while (!_webSocket.IsOpen)
 			{
-				if(_error != null)
+				if(!string.IsNullOrEmpty(_error))
 				{
-					ret.Fail(_error);
-					Stop();
-					yield break;
+					return new UniTaskError(_error);
 				}
-				yield return null;
+				await UniTask.Yield();
 			}
+
+			return default(None);
 		}
-		
-		private IEnumerator _SendWaitTillReturn<T>(string command, Dictionary<string, object> body, IReturn<T> ret)
+
+		protected async UniTask<OneOf<T, UniTaskError>> _SendWaitTillReturn<T>(string command, Dictionary<string, object> body)
 		{
 			string successCommand = command + "_success";
 			string failCommand = command + "_fail";
 			var leave = false;
+			var ret = new OneOf<T, UniTaskError>();
+
 			_RegisterOnReceiveMessage<T>(successCommand, (result) => 
 			{
 				leave = true;
-				ret.Accept(result);
+				ret = result;
 			});
 			
 			_RegisterOnReceiveMessage<string>(failCommand, (message) => 
 			{
 				leave = true;
-				ret.Fail(new Exception(message));
+				ret = new UniTaskError(message);
 			});
 			
 			_Send(body);
 			
 			while (!leave)
 			{
-				yield return null;
+				await UniTask.Yield();
 			}
 			
 			_UnregisterOnReceiveMessage(successCommand);
 			_UnregisterOnReceiveMessage(failCommand);
-		}
-		
-		protected IMonad<T> _SendWaitTillReturnMonad<T>(string command, Dictionary<string, object> body)
-		{
-			return new BlockMonad<T>(r => _SendWaitTillReturn(command, body, r));
+
+			return ret;
 		}
 		
 		protected void _RegisterOnReceiveMessage<T>(string command, Action<T> action)
@@ -173,7 +170,7 @@ namespace Web
 			{
 				Debug.LogErrorFormat("Receive Error from path : {0}\nError : {1}", _path, error);
 			}
-			_error = new Exception(error);
+			_error = error;
 		}
 		
 		protected void _Send(Dictionary<string, object> body)

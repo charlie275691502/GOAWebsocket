@@ -135,7 +135,7 @@ namespace Metagame
 				yield break;
 			}
 			
-			var joinRoomMonad = _webSocketPresenter.JoinRoomMonad(roomId);
+			var joinRoomMonad = _webSocketPresenter.JoinRoom(roomId);
 			yield return joinRoomMonad.RunAndHandleInternetError(_warningPresenter);
 			if(joinRoomMonad.Error != null)
 			{
@@ -147,7 +147,7 @@ namespace Metagame
 		
 		private IEnumerator _LeaveRoom(int roomId)
 		{
-			var leaveRoomMonad = _webSocketPresenter.LeaveRoomMonad(roomId);
+			var leaveRoomMonad = _webSocketPresenter.LeaveRoom(roomId);
 			yield return leaveRoomMonad.RunAndHandleInternetError(_warningPresenter);
 			if(leaveRoomMonad.Error != null)
 			{

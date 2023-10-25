@@ -3,28 +3,33 @@ using System.Collections;
 using System.Collections.Generic;
 using BestHTTP;
 using Common;
+using Common.UniTask;
+using Cysharp.Threading.Tasks;
 using Metagame;
 using Newtonsoft.Json;
-using Rayark.Mast;
+using Optional;
 using UnityEngine;
+using OneOf;
+using OneOf.Types;
 
 namespace Web
 {
 	public interface IHTTPPresenter
 	{
-		IMonad<None> Login(string username, string password);
-		IMonad<None> RegisterThenLogin(string username, string password, string email);
-		IMonad<None> GetSelfPlayerData();
-		IMonad<None> UpdateSelfPlayerData(string nickName);
-		IMonad<RoomResult> CreateRoom(string roomName, string gameType, int playerPlot);
-		IMonad<RoomListResult> GetRoomList();
-		IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId);
+		UniTask<OneOf<None, UniTaskError>> Login(string username, string password);
+		UniTask<OneOf<None, UniTaskError>> RegisterThenLogin(string username, string password, string email);
+		UniTask<OneOf<None, UniTaskError>> RefreshSelfPlayerData();
+		UniTask<OneOf<None, UniTaskError>> PutSelfPlayerData(string nickName);
+		UniTask<OneOf<RoomResult, UniTaskError>> CreateRoom(string roomName, string gameType, int playerPlot);
+		UniTask<OneOf<RoomListResult, UniTaskError>> GetRoomList();
+		UniTask<OneOf<RoomWithMessagesResult, UniTaskError>> GetRoomWithMessages(int roomId);
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
 		private ILoadingView _loadingView;
 		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
+
 		
 		public HTTPPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
 		{
@@ -33,9 +38,8 @@ namespace Web
 			_backendPlayerData = backendPlayerData;
 		}
 		
-		public IMonad<None> Login(string username, string password)
-		{
-			return 
+		public UniTask<OneOf<None, UniTaskError>> Login(string username, string password)
+			=>  
 				_Send<LoginResult>(
 					"auth/jwt/create/",
 					HTTPMethods.Post,
@@ -45,13 +49,12 @@ namespace Web
 						{"password", password},
 					},
 					false)
-				.Then(result => _backendPlayerPresenter.Accept(result));
-		}
+				.OnSuccess(result => _backendPlayerPresenter.Accept(result))
+				.ToNone();
 		
-		public IMonad<None> RegisterThenLogin(string username, string password, string email)
-		{
-			return 
-				_Send<None>(
+		public UniTask<OneOf<None, UniTaskError>> RegisterThenLogin(string username, string password, string email)
+			=> 
+				_Send(
 					"auth/users/",
 					HTTPMethods.Post,
 					new Dictionary<string, object>()
@@ -61,35 +64,31 @@ namespace Web
 						{"email", email},
 					},
 					false)
-				.Then(r => Login(username, password));
-		}
-		
-		public IMonad<None> GetSelfPlayerData()
-		{
-			return 
+				.OnSuccess(_ => Login(username, password))
+				.ToNone();
+
+		public UniTask<OneOf<None, UniTaskError>> RefreshSelfPlayerData()
+			=> 
 				_Send<PlayerDataResult>(
 					"mainpage/players/me/",
 					HTTPMethods.Get,
 					new Dictionary<string, object>())
-				.Then(r => _backendPlayerPresenter.Accept(r));
-		}
-		
-		public IMonad<None> UpdateSelfPlayerData(string nickName)
-		{
-			return 
-				_Send<None>(
+				.OnSuccess(result => _backendPlayerPresenter.Accept(result))
+				.ToNone();
+
+		public UniTask<OneOf<None, UniTaskError>> PutSelfPlayerData(string nickName)
+			=> 
+				_Send(
 					"mainpage/players/me/",
 					HTTPMethods.Put,
 					new Dictionary<string, object>()
 					{
 						{"nick_name", nickName},
 					})
-				.Then(r => _backendPlayerPresenter.AcceptNickName(nickName));
-		}
+				.OnSuccess(_ => _backendPlayerPresenter.AcceptNickName(nickName));
 		
-		public IMonad<RoomResult> CreateRoom(string roomName, string gameType, int playerPlot)
-		{
-			return 
+		public UniTask<OneOf<RoomResult, UniTaskError>> CreateRoom(string roomName, string gameType, int playerPlot)
+			=> 
 				_Send<RoomResult>(
 					"chat/rooms/",
 					HTTPMethods.Post,
@@ -102,38 +101,38 @@ namespace Web
 								{"player_plot", playerPlot},
 							}},
 					});
-		}
 		
-		public IMonad<RoomListResult> GetRoomList()
-		{
-			return 
+		public UniTask<OneOf<RoomListResult, UniTaskError>> GetRoomList()
+			=> 
 				_Send<RoomListResult>(
 					"chat/rooms/",
 					HTTPMethods.Get,
 					new Dictionary<string, object>());
-		}
 		
-		public IMonad<RoomWithMessagesResult> GetRoomWithMessages(int roomId)
-		{
-			return 
+		public UniTask<OneOf<RoomWithMessagesResult, UniTaskError>> GetRoomWithMessages(int roomId)
+			=> 
 				_Send<RoomWithMessagesResult>(
 					string.Format("chat/rooms/{0}", roomId),
 					HTTPMethods.Get,
 					new Dictionary<string, object>());
-		}
-		
-		private IMonad<T> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)
+
+		private UniTask<OneOf<None, UniTaskError>> _Send(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)
 		{
-			return new BlockMonad<string>(r => _SendRequest(path, method, body, needAuthorization, r))
-				.Map(r => JsonConvert.DeserializeObject<T>(r));
+			return _SendRequest(path, method, body, needAuthorization).ToNone();
 		}
-		
-		private IEnumerator _SendRequest(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization, IReturn<string> ret)
+
+		private async UniTask<OneOf<T, UniTaskError>> _Send<T>(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization = true)
+		{
+			var requestResultOpt = await _SendRequest(path, method, body, needAuthorization);
+			return requestResultOpt.MapT0(rawString => JsonConvert.DeserializeObject<T>(rawString));
+		}
+
+		private async UniTask<OneOf<string, UniTaskError>> _SendRequest(string path, HTTPMethods method, Dictionary<string, object> body, bool needAuthorization)
 		{
 			var json = JsonConvert.SerializeObject(body);
 			var isFinished = false;
 			var result = string.Empty;
-			Exception error = null;
+			var error = string.Empty;
 			
 			OnRequestFinishedDelegate onRequestFinished = (HTTPRequest request, HTTPResponse response) =>
 			{
@@ -142,7 +141,7 @@ namespace Web
 					result = response.DataAsText;
 				} else 
 				{
-					error = new Exception(string.Format("[{0}] {1}\n\n{2}", response.StatusCode, response.Message, response.DataAsText));
+					error = string.Format("[{0}] {1}\n\n{2}", response.StatusCode, response.Message, response.DataAsText);
 				}
 				
 				isFinished = true;
@@ -160,7 +159,7 @@ namespace Web
 				request.AddHeader("Authorization", string.Format("JWT {0}", _backendPlayerData.AccessKey));
 			}
 			
-			request.Send();
+			_ = request.Send();
 			
 			while (!isFinished)
 			{
@@ -170,29 +169,29 @@ namespace Web
 					request.State == HTTPRequestStates.ConnectionTimedOut ||
 					request.State == HTTPRequestStates.TimedOut)
 				{
-					error = new Exception("Request Finished with Error! " + (request.Exception != null ? (request.Exception.Message + "\n" + request.Exception.StackTrace) : "No Exception"));
+					error = "Request Finished with Error! " + (request.Exception != null ? (request.Exception.Message + "\n" + request.Exception.StackTrace) : "No Further Information");
 					isFinished = true;
 				}
-				
-				yield return null;
+
+				await UniTask.Yield();
 			}
 			
 			_loadingView.Leave();
 			
-			if(error != null)
+			if(!string.IsNullOrEmpty(error))
 			{
 				if(WebUtility.RequestDebugMode)
 				{
 					Debug.LogError(error);
 				}
-				ret.Fail(error);
+				return new UniTaskError(error);
 			} else 
 			{
 				if(WebUtility.RequestDebugMode)
 				{
 					Debug.Log(result);
 				}
-				ret.Accept(result);
+				return result;
 			}
 		}
 	}
