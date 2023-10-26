@@ -36,7 +36,7 @@ namespace Common.Warning
 
 			_view.RegisterCallback(
 				() =>
-					_ChangeStateIfIdle(new TemplateState.Confirm()));
+					_ChangeStateIfIdle(new WarningState.Confirm()));
 		}
 
 		public async UniTask Run(string title, string content, Action onConfirm = null)

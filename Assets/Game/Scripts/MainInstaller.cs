@@ -7,6 +7,7 @@ using Web;
 using Common;
 using Authorization;
 using Metagame;
+using Common.Warning;
 
 public class MainInstaller : MonoInstaller
 {
