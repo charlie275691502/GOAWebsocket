@@ -8,6 +8,8 @@ using Common;
 using Authorization;
 using Metagame;
 using Common.Warning;
+using Authorization.Login;
+using Authorization.Register;
 
 public class MainInstaller : MonoInstaller
 {
