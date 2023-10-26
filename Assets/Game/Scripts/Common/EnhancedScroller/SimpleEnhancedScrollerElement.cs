@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using EnhancedUI.EnhancedScroller.Internal;
 
 namespace EnhancedUI.EnhancedScroller
@@ -15,9 +17,9 @@ namespace EnhancedUI.EnhancedScroller
             _Refresh(((EnhancedScrollerElementViewData<T>)viewData).Data);
         }
         
-        protected override IEnumerator _LoadAsset(IEnhancedScrollerElementViewData viewData)
+        protected override async UniTaskVoid _LoadAsset(IEnhancedScrollerElementViewData viewData, CancellationTokenSource token)
         {
-            yield return _LoadAsset(((EnhancedScrollerElementViewData<T>)viewData).Data);
+            await _LoadAsset(((EnhancedScrollerElementViewData<T>)viewData).Data, token);
         }
         
         protected virtual void _Display(T viewData)
@@ -30,9 +32,9 @@ namespace EnhancedUI.EnhancedScroller
             Display(new EnhancedScrollerElementViewData<T>(viewData));
         }
         
-        protected virtual IEnumerator _LoadAsset(T viewData)
+        protected virtual async UniTask _LoadAsset(T viewData, CancellationTokenSource token)
         {
-            yield break;
+            await UniTask.Yield();
         }
     }
 }

@@ -1,6 +1,7 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
-using Rayark.Mast;
 using Zenject;
 
 namespace EnhancedUI.EnhancedScroller.Internal
@@ -9,12 +10,11 @@ namespace EnhancedUI.EnhancedScroller.Internal
     {
         [SerializeField]
         protected GameObject _rootFolder;
-        
-        protected Executor _loadAssetExecutor = new Executor();
-        
+
+        private CancellationTokenSource _loadAssetToken;
+
         private void Update()
         {
-            _UpdateExecutor();
             _Update();
         }
         
@@ -33,9 +33,10 @@ namespace EnhancedUI.EnhancedScroller.Internal
             {
                 _rootFolder.SetActive(true);
                 _Display(viewData);
-                
-                _loadAssetExecutor.Clear();
-                _loadAssetExecutor.Add(_LoadAsset(viewData));
+
+                _loadAssetToken?.Cancel();
+                _loadAssetToken = new CancellationTokenSource();
+                _LoadAsset(viewData, _loadAssetToken);
             }
         }
         
@@ -58,19 +59,11 @@ namespace EnhancedUI.EnhancedScroller.Internal
         
         public virtual void Leave()
         {
-            _loadAssetExecutor.Clear();
+            _loadAssetToken?.Cancel();
             _rootFolder.SetActive(false);
             _Unregister();
             _DisplayEmpty();
             _Leave();
-        }
-        
-        protected virtual void _UpdateExecutor()
-        {
-            if (!_loadAssetExecutor.Empty)
-            {
-                _loadAssetExecutor.Resume(Time.deltaTime);
-            }
         }
         
         #region Override by child
@@ -94,7 +87,7 @@ namespace EnhancedUI.EnhancedScroller.Internal
         
         protected abstract void _Refresh(IEnhancedScrollerElementViewData viewData);
         
-        protected abstract IEnumerator _LoadAsset(IEnhancedScrollerElementViewData viewData);
+        protected abstract UniTaskVoid _LoadAsset(IEnhancedScrollerElementViewData viewData, CancellationTokenSource token);
         
         protected virtual void _Leave()
         {

@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 using UnityEngine.UI;
@@ -45,12 +47,12 @@ namespace Template
 		{
 			
 		}
-		
-		protected override IEnumerator _LoadAsset(TemplateViewData viewData)
+
+		protected override async UniTask _LoadAsset(TemplateViewData viewData, CancellationTokenSource token)
 		{
-			yield break;
+			await UniTask.Yield();
 		}
-		
+
 		protected override void _Leave()
 		{
 			

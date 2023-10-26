@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using EnhancedUI.EnhancedScroller;
 using Zenject;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace Metagame
 {
@@ -45,12 +47,12 @@ namespace Metagame
 		{
 			
 		}
-		
-		protected override IEnumerator _LoadAsset(PlayerData viewData)
+
+		protected override async UniTask _LoadAsset(PlayerData viewData, CancellationTokenSource token)
 		{
-			yield break;
+			await UniTask.Yield();
 		}
-		
+
 		protected override void _Leave()
 		{
 			_nickNameText.text = string.Empty;
