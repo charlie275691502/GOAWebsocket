@@ -39,7 +39,7 @@ namespace Common.Warning
 					_ChangeStateIfIdle(new WarningState.Confirm()));
 		}
 
-		public async UniTask Run(string title, string content, Action onConfirm = null)
+		async UniTask IWarningPresenter.Run(string title, string content, Action onConfirm = null)
 		{
 			_prop = new WarningProperty(
 				new WarningState.Open(),

@@ -49,7 +49,7 @@ namespace Template
 					_ChangeStateIfIdle(new TemplateState.Confirm()));
 		}
 
-		public async UniTask<TemplateReturnType> Run()
+		async UniTask<TemplateReturnType> ITemplatePresenter.Run()
 		{
 			_prop = new TemplateProperty(new TemplateState.Open(), TemplateReturnType.Close);
 

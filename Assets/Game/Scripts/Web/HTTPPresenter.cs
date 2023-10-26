@@ -38,7 +38,7 @@ namespace Web
 			_backendPlayerData = backendPlayerData;
 		}
 		
-		public UniTask<OneOf<None, UniTaskError>> Login(string username, string password)
+		UniTask<OneOf<None, UniTaskError>> IHTTPPresenter.Login(string username, string password)
 			=>  
 				_Send<LoginResult>(
 					"auth/jwt/create/",
@@ -52,7 +52,7 @@ namespace Web
 				.OnSuccess(result => _backendPlayerPresenter.Accept(result))
 				.ToNone();
 		
-		public UniTask<OneOf<None, UniTaskError>> RegisterThenLogin(string username, string password, string email)
+		UniTask<OneOf<None, UniTaskError>> IHTTPPresenter.RegisterThenLogin(string username, string password, string email)
 			=> 
 				_Send(
 					"auth/users/",
@@ -64,10 +64,10 @@ namespace Web
 						{"email", email},
 					},
 					false)
-				.OnSuccess(_ => Login(username, password))
+				.OnSuccess(_ => (this as IHTTPPresenter).Login(username, password))
 				.ToNone();
 
-		public UniTask<OneOf<None, UniTaskError>> RefreshSelfPlayerData()
+		UniTask<OneOf<None, UniTaskError>> IHTTPPresenter.RefreshSelfPlayerData()
 			=> 
 				_Send<PlayerDataResult>(
 					"mainpage/players/me/",
@@ -76,7 +76,7 @@ namespace Web
 				.OnSuccess(result => _backendPlayerPresenter.Accept(result))
 				.ToNone();
 
-		public UniTask<OneOf<None, UniTaskError>> PutSelfPlayerData(string nickName)
+		UniTask<OneOf<None, UniTaskError>> IHTTPPresenter.PutSelfPlayerData(string nickName)
 			=> 
 				_Send(
 					"mainpage/players/me/",
@@ -87,7 +87,7 @@ namespace Web
 					})
 				.OnSuccess(_ => _backendPlayerPresenter.AcceptNickName(nickName));
 		
-		public UniTask<OneOf<RoomResult, UniTaskError>> CreateRoom(string roomName, string gameType, int playerPlot)
+		UniTask<OneOf<RoomResult, UniTaskError>> IHTTPPresenter.CreateRoom(string roomName, string gameType, int playerPlot)
 			=> 
 				_Send<RoomResult>(
 					"chat/rooms/",
@@ -102,14 +102,14 @@ namespace Web
 							}},
 					});
 		
-		public UniTask<OneOf<RoomListResult, UniTaskError>> GetRoomList()
+		UniTask<OneOf<RoomListResult, UniTaskError>> IHTTPPresenter.GetRoomList()
 			=> 
 				_Send<RoomListResult>(
 					"chat/rooms/",
 					HTTPMethods.Get,
 					new Dictionary<string, object>());
 		
-		public UniTask<OneOf<RoomWithMessagesResult, UniTaskError>> GetRoomWithMessages(int roomId)
+		UniTask<OneOf<RoomWithMessagesResult, UniTaskError>> IHTTPPresenter.GetRoomWithMessages(int roomId)
 			=> 
 				_Send<RoomWithMessagesResult>(
 					string.Format("chat/rooms/{0}", roomId),

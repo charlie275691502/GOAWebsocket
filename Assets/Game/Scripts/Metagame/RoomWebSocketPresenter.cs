@@ -24,16 +24,16 @@ namespace Metagame
 	
 	public class RoomWebSocketPresenter : WebSocketPresenter, IRoomWebSocketPresenter
 	{
-		public RoomWebSocketPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData) : base(loadingView, backendPlayerPresenter, backendPlayerData)
+		public RoomWebSocketPresenter(BackendPlayerData backendPlayerData) : base(backendPlayerData)
 		{
 		}
 
-		public UniTask<OneOf<None, UniTaskError>> Start(int roomId)
+		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.Start(int roomId)
 		{
 			return _StartWebsocket(string.Format("chat/rooms/{0}/", roomId.ToString()));
 		}
 		
-		public void SendMessage(string content)
+		void IRoomWebSocketPresenter.SendMessage(string content)
 		{
 			var body = new Dictionary<string, object>()
 			{
@@ -44,7 +44,7 @@ namespace Metagame
 			_Send(body);
 		}
 		
-		public UniTask<OneOf<None, UniTaskError>> JoinRoom(int roomId)
+		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.JoinRoom(int roomId)
 			=>
 				_SendWaitTillReturn<None>(
 					"join_room", 
@@ -54,7 +54,7 @@ namespace Metagame
 						{"room_id", roomId},
 					});
 		
-		public UniTask<OneOf<None, UniTaskError>> LeaveRoom(int roomId)
+		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.LeaveRoom(int roomId)
 			=>
 				_SendWaitTillReturn<None>(
 					"leave_room", 
@@ -64,12 +64,12 @@ namespace Metagame
 						{"room_id", roomId},
 					});
 
-		public void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage)
+		void IRoomWebSocketPresenter.RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage)
 		{
 			_RegisterOnReceiveMessage("append_message", onReceiveMessage);
 		}
 		
-		public void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage)
+		void IRoomWebSocketPresenter.RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage)
 		{
 			_RegisterOnReceiveMessage("update_room", onReceiveMessage);
 		}

@@ -45,7 +45,7 @@ namespace Authorization
 			_registerPresenter = registerPresenter;
 		}
 		
-		public async UniTask Run()
+		async UniTask IAuthorizationPresenter.Run()
 		{
 			var nextStatus = new AuthorizationReturn(AuthorizationReturnType.Login);
 			while (nextStatus.Type != AuthorizationReturnType.EnterMetagame)

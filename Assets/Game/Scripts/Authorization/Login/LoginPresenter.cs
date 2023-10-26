@@ -46,7 +46,7 @@ namespace Authorization.Login
 					_ChangeStateIfIdle(new LoginState.SwitchToRegister()));
 		}
 		
-		public async UniTask<AuthorizationReturnType> Run()
+		async UniTask<AuthorizationReturnType> IAuthorizationSubTabPresenter.Run()
 		{
 			_prop = new LoginProperty(new LoginState.Open(), AuthorizationReturnType.Register);
 

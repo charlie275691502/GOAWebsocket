@@ -20,10 +20,8 @@ namespace Web
 		void Stop();
 	}
 	
-	public class WebSocketPresenter : IWebSocketPresenter
+	public abstract class WebSocketPresenter : IWebSocketPresenter
 	{
-		private ILoadingView _loadingView;
-		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
 		
 		private string _error = string.Empty;
@@ -32,14 +30,12 @@ namespace Web
 		
 		protected string _path = string.Empty;
 		
-		public WebSocketPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
+		public WebSocketPresenter(BackendPlayerData backendPlayerData)
 		{
-			_loadingView = loadingView;
-			_backendPlayerPresenter = backendPlayerPresenter;
 			_backendPlayerData = backendPlayerData;
 		}
-		
-		public void Stop()
+
+		void IWebSocketPresenter.Stop()
 		{
 			_onReceiveMessageActionDic.Clear();
 			_webSocket.Close();
