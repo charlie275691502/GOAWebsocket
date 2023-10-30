@@ -7,23 +7,30 @@ using Authorization.Register;
 
 namespace Authorization
 {
-	public enum AuthorizationReturnType
+	public record AuthorizationState
 	{
-		Login,
-		Register,
-		EnterMetagame,
+		public record Login() : AuthorizationState;
+		public record Register() : AuthorizationState;
+		public record Close() : AuthorizationState;
 	}
-	
-	public record AuthorizationReturn(AuthorizationReturnType Type);
-	
-	public interface IAuthorizationPresenter
+
+	public record AuthorizationSubTabReturnType
 	{
-		UniTask Run();
+		public record Switch(AuthorizationState State) : AuthorizationSubTabReturnType;
+		public record Close() : AuthorizationSubTabReturnType;
+	}
+
+	public record AuthorizationProperty(AuthorizationState State);
+	public record AuthorizationSubTabReturn(AuthorizationSubTabReturnType Type);
+
+	public interface IAuthorizationPresenter : IMainSubTabPresenter
+	{
+
 	}
 
 	public interface IAuthorizationSubTabPresenter
 	{
-		UniTask<AuthorizationReturnType> Run();
+		UniTask<AuthorizationSubTabReturn> Run();
 	}
 
 	public class AuthorizationPresenter : IAuthorizationPresenter
@@ -45,21 +52,31 @@ namespace Authorization
 			_registerPresenter = registerPresenter;
 		}
 		
-		async UniTask IAuthorizationPresenter.Run()
+		async UniTask<MainSubTabReturn> IMainSubTabPresenter.Run()
 		{
-			var nextStatus = new AuthorizationReturn(AuthorizationReturnType.Login);
-			while (nextStatus.Type != AuthorizationReturnType.EnterMetagame)
+			var prop = new AuthorizationProperty(new AuthorizationState.Login());
+			while (prop.State is not AuthorizationState.Close)
 			{
-				var nextType = await _GetCurrentSubTabPresenter(nextStatus.Type).Run();
-				nextStatus = nextStatus with { Type = nextType };
+				var subTabReturn = await _GetCurrentSubTabPresenter(prop.State).Run();
+
+				switch (subTabReturn.Type)
+                {
+					case AuthorizationSubTabReturnType.Close:
+						prop = prop with { State = new AuthorizationState.Close() };
+						break;
+					case AuthorizationSubTabReturnType.Switch info:
+						prop = prop with { State = info.State };
+						break;
+				}
 			}
+			return new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Metagame()));
 		}
 
-		private IAuthorizationSubTabPresenter _GetCurrentSubTabPresenter(AuthorizationReturnType type)
+		private IAuthorizationSubTabPresenter _GetCurrentSubTabPresenter(AuthorizationState type)
 			=> type switch
 			{
-				AuthorizationReturnType.Login => _loginPresneter,
-				AuthorizationReturnType.Register => _registerPresenter,
+				AuthorizationState.Login => _loginPresneter,
+				AuthorizationState.Register => _registerPresenter,
 				_ => null
 			};
 	}

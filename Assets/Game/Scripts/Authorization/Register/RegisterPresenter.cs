@@ -23,7 +23,7 @@ namespace Authorization.Register
 		public record Close() : RegisterState;
 	}
 
-	public record RegisterProperty(RegisterState State, AuthorizationReturnType ReturnType);
+	public record RegisterProperty(RegisterState State);
 	
 	public class RegisterPresenter : IRegisterPresenter
 	{
@@ -46,10 +46,11 @@ namespace Authorization.Register
 					_ChangeStateIfIdle(new RegisterState.SwitchToLogin()));
 		}
 		
-		async UniTask<AuthorizationReturnType> IAuthorizationSubTabPresenter.Run()
+		async UniTask<AuthorizationSubTabReturn> IAuthorizationSubTabPresenter.Run()
 		{
-			_prop = new RegisterProperty(new RegisterState.Open(), AuthorizationReturnType.Register);
-			
+			_prop = new RegisterProperty(new RegisterState.Open());
+			var ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
+
 			while (_prop.State is not RegisterState.Close)
 			{
 				_view.Render(_prop);
@@ -64,17 +65,15 @@ namespace Authorization.Register
 
 					case RegisterState.Register info:
 						await _Register(info.Username, info.Password, info.ConfirmPassword, info.Email);
-						_prop = _prop with { 
-							State = new RegisterState.Close(),
-							ReturnType = AuthorizationReturnType.EnterMetagame };
+						_prop = _prop with { State = new RegisterState.Close() };
+						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 						break;
 					
 					case RegisterState.SwitchToLogin:
-						_prop = _prop with { 
-							State = new RegisterState.Close(),
-							ReturnType = AuthorizationReturnType.Login };
+						_prop = _prop with { State = new RegisterState.Close() };
+						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Switch(new AuthorizationState.Login()));
 						break;
-						
+
 					case RegisterState.Close:
 						_prop = _prop with { 
 							State = new RegisterState.Close() };
@@ -86,7 +85,7 @@ namespace Authorization.Register
 				await UniTask.Yield();
 			}
 			
-			return _prop.ReturnType;
+			return ret;
 		}
 
 		private void _ChangeStateIfIdle(RegisterState targetState, Action onChangeStateSuccess = null)

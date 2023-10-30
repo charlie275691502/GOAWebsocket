@@ -5,12 +5,31 @@ using Authorization;
 using Metagame;
 using Cysharp.Threading.Tasks;
 
+public record MainState
+{
+	public record Authorization() : MainState;
+	public record Metagame() : MainState;
+	public record Close() : MainState;
+}
+
+public record MainSubTabReturnType
+{
+	public record Switch(MainState State) : MainSubTabReturnType;
+	public record Close() : MainSubTabReturnType;
+}
+
+public record MainProperty(MainState State);
+public record MainSubTabReturn(MainSubTabReturnType Type);
+
+public interface IMainSubTabPresenter
+{
+	UniTask<MainSubTabReturn> Run();
+}
+
 public class Main : MonoBehaviour
 {
 	private IAuthorizationPresenter _authorizationPresenter;
 	private IMetagamePresenter _metagamePresenter;
-	
-	private bool _leave;
 	
 	[Zenject.Inject]
 	public void Zenject(IAuthorizationPresenter authorizationPresenter, IMetagamePresenter metagamePresenter)
@@ -21,17 +40,33 @@ public class Main : MonoBehaviour
 
 	void Start()
 	{
-		_leave = false;
         _ = _Main();
 	}
 	
 	private async UniTask _Main()
 	{
-		while(!_leave)
+		var prop = new MainProperty(new MainState.Authorization());
+		while (prop.State is not MainState.Close)
 		{
-			await _authorizationPresenter.Run();
-			await _metagamePresenter.Run();
-			await UniTask.Yield();
+			var subTabReturn = await _GetCurrentSubTabPresenter(prop.State).Run();
+
+			switch (subTabReturn.Type)
+			{
+				case MainSubTabReturnType.Close:
+					prop = prop with { State = new MainState.Close() };
+					break;
+				case MainSubTabReturnType.Switch info:
+					prop = prop with { State = info.State };
+					break;
+			}
 		}
 	}
+
+	private IMainSubTabPresenter _GetCurrentSubTabPresenter(MainState type)
+		=> type switch
+		{
+			MainState.Authorization => _authorizationPresenter,
+			MainState.Metagame => _metagamePresenter,
+			_ => null
+		};
 }

@@ -23,7 +23,7 @@ namespace Authorization.Login
 		public record Close() : LoginState;
 	}
 
-	public record LoginProperty(LoginState State, AuthorizationReturnType ReturnType);
+	public record LoginProperty(LoginState State);
 
 	public class LoginPresenter : ILoginPresneter
 	{
@@ -46,9 +46,10 @@ namespace Authorization.Login
 					_ChangeStateIfIdle(new LoginState.SwitchToRegister()));
 		}
 		
-		async UniTask<AuthorizationReturnType> IAuthorizationSubTabPresenter.Run()
+		async UniTask<AuthorizationSubTabReturn> IAuthorizationSubTabPresenter.Run()
 		{
-			_prop = new LoginProperty(new LoginState.Open(), AuthorizationReturnType.Register);
+			_prop = new LoginProperty(new LoginState.Open());
+			var ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 
 			while (_prop.State is not LoginState.Close)
 			{
@@ -64,26 +65,16 @@ namespace Authorization.Login
 
 					case LoginState.Login info:
 						await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);;
-						_prop = _prop with
-						{
-							State = new LoginState.Close(),
-							ReturnType = AuthorizationReturnType.EnterMetagame
-						};
+						_prop = _prop with { State = new LoginState.Close() };
+						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 						break;
 
 					case LoginState.SwitchToRegister:
-						_prop = _prop with
-						{
-							State = new LoginState.Close(),
-							ReturnType = AuthorizationReturnType.Login
-						};
+						_prop = _prop with { State = new LoginState.Close() };
+						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Switch(new AuthorizationState.Register()));
 						break;
 
 					case LoginState.Close:
-						_prop = _prop with
-						{
-							State = new LoginState.Close()
-						};
 						break;
 
 					default:
@@ -92,7 +83,7 @@ namespace Authorization.Login
 				await UniTask.Yield();
 			}
 
-			return _prop.ReturnType;
+			return ret;
 		}
 
 		private void _ChangeStateIfIdle(LoginState targetState, Action onChangeStateSuccess = null)
