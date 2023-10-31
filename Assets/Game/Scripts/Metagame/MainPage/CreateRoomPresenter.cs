@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Common.Warning;
+using Cysharp.Threading.Tasks;
 using Optional;
 using Rayark.Mast;
 using UnityEngine;
@@ -18,7 +19,7 @@ namespace Metagame
 		
 	public interface ICreateRoomPresenter
 	{
-		IEnumerator Run(IReturn<CreateRoomReturn> ret);
+		UniTask<CreateRoomReturn> Run();
 	}
 	
 	public class CreateRoomPresenter : ICreateRoomPresenter

@@ -9,17 +9,11 @@ using Web;
 
 namespace Template
 {
-	public enum TemplateReturnType
+	public record TemplateSubTabReturnType()
 	{
-		Confirm,
-		Close,
+		public record Close() : TemplateSubTabReturnType;
 	}
-	
-	public interface ITemplatePresenter
-	{
-		UniTask<TemplateReturnType> Run();
-	}
-	
+
 	public abstract record TemplateState
 	{
 		public record Open() : TemplateState;
@@ -28,7 +22,13 @@ namespace Template
 		public record Close() : TemplateState;
 	}
 
-	public record TemplateProperty(TemplateState State, TemplateReturnType ReturnType);
+	public record TemplateProperty(TemplateState State);
+	public record TemplateSubTabReturn(TemplateSubTabReturnType Type);
+
+	public interface ITemplatePresenter
+	{
+		UniTask<TemplateSubTabReturn> Run();
+	}
 
 	public class TemplatePresenter : ITemplatePresenter
 	{
@@ -49,9 +49,10 @@ namespace Template
 					_ChangeStateIfIdle(new TemplateState.Confirm()));
 		}
 
-		async UniTask<TemplateReturnType> ITemplatePresenter.Run()
+		async UniTask<TemplateSubTabReturn> ITemplatePresenter.Run()
 		{
-			_prop = new TemplateProperty(new TemplateState.Open(), TemplateReturnType.Close);
+			_prop = new TemplateProperty(new TemplateState.Open());
+			var ret = new TemplateSubTabReturn(new TemplateSubTabReturnType.Close());
 
 			while (_prop.State is not TemplateState.Close)
 			{
@@ -66,15 +67,10 @@ namespace Template
 						break;
 
 					case TemplateState.Confirm info:
-						_prop = _prop with
-						{
-							State = new TemplateState.Close(),
-							ReturnType = TemplateReturnType.Confirm
-						};
+						_prop = _prop with { State = new TemplateState.Close() };
 						break;
 
 					case TemplateState.Close:
-						_prop = _prop with { State = new TemplateState.Close() };
 						break;
 
 					default:
@@ -83,7 +79,7 @@ namespace Template
 				await UniTask.Yield();
 			}
 
-			return _prop.ReturnType;
+			return ret;
 		}
 
 		private void _ChangeStateIfIdle(TemplateState targetState, Action onChangeStateSuccess = null)

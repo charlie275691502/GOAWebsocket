@@ -64,7 +64,7 @@ namespace Authorization.Login
 						break;
 
 					case LoginState.Login info:
-						await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);;
+						await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);
 						_prop = _prop with { State = new LoginState.Close() };
 						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 						break;

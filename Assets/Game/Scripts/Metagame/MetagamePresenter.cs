@@ -1,40 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Rayark.Mast;
 using Common;
 using Web;
 using Common.Warning;
+using Cysharp.Threading.Tasks;
+using Common.UniTaskExtension;
+using Metagame.MainPage;
 
 namespace Metagame
 {
-	public enum MetagameStatusType
+	public record MetagameState
 	{
-		MainPage,
-		Room,
-		EnterGame,
+		public record MainPage(): MetagameState;
+		public record Room(int RoomId): MetagameState;
+		public record Close() : MetagameState;
 	}
-	
-	public class MetagameStatus
+
+	public record MetagameSubTabReturnType
 	{
-		public MetagameStatusType Type;
-		public int ToRoomId;
-		
-		public MetagameStatus(MetagameStatusType type)
-		{
-			Type = type;
-		}
-		
-		public MetagameStatus(MetagameStatusType type, int roomId)
-		{
-			Type = type;
-			ToRoomId = roomId;
-		}
+		public record Switch(MetagameState State) : MetagameSubTabReturnType;
+		public record Close() : MetagameSubTabReturnType;
 	}
+
+	public record MetagameProperty(MetagameState State);
+	public record MetagameSubTabReturn(MetagameSubTabReturnType Type);
 	
-	public interface IMetagamePresenter
+	public interface IMetagamePresenter : IMainSubTabPresenter
 	{
-		IEnumerator Run();
+
 	}
 	
 	public class MetagamePresenter : IMetagamePresenter
@@ -46,9 +40,6 @@ namespace Metagame
 		private ITopMenuView _topMenuView;
 		private BackendPlayerData _backendPlayerData;
 		private IRoomWebSocketPresenter _webSocketPresenter;
-		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private CommandExecutor _webSocketCommandExecutor = new CommandExecutor();
 		
 		public MetagamePresenter(
 			IHTTPPresenter hTTPPresenter,
@@ -67,52 +58,39 @@ namespace Metagame
 			_backendPlayerData = backendPlayerData;
 			_webSocketPresenter = webSocketPresenter;
 		}
-		
-		public IEnumerator Run()
+
+		async UniTask<MainSubTabReturn> IMainSubTabPresenter.Run()
 		{
-			_commandExecutor.Add(_Run());
-			_commandExecutor.Add(_webSocketCommandExecutor.Start());
-			yield return _commandExecutor.Start();
-		}
-		
-		private IEnumerator _Run()
-		{
-			yield return _hTTPPresenter.GetSelfPlayerData().RunAndHandleInternetError(_warningPresenter);
-			
+			await _hTTPPresenter.RefreshSelfPlayerData().RunAndHandleInternetError(_warningPresenter);
 			_topMenuView.Enter(_backendPlayerData);
-			
-			var nextStatus = new MetagameStatus(MetagameStatusType.MainPage);
-			while (nextStatus.Type != MetagameStatusType.EnterGame)
+
+			var prop = new MetagameProperty(new MetagameState.MainPage());
+			while (prop.State is not MetagameState.Close)
 			{
-				var monad = 
-					(nextStatus.Type == MetagameStatusType.MainPage) 
-						? new BlockMonad<MetagameStatus>(r => _mainPagePresneter.Run(r, _OnJoinRoom))
-						: new BlockMonad<MetagameStatus>(r => _roomPresneter.Run(nextStatus.ToRoomId, _OnSendMessage, _OnLeaveRoom, r));
-				yield return monad.Do();
-				if (monad.Error != null)
+				var subTabReturn = await (prop.State switch
+                {
+                    MetagameState.MainPage => _mainPagePresneter.Run(),
+                    MetagameState.Room info =>
+						_JoinRoom(info.RoomId)
+							.Then(_roomPresneter.Run(info.RoomId)),
+                    _ => throw new System.NotImplementedException(),
+                });
+
+				switch (subTabReturn.Type)
 				{
-					Debug.LogError(monad.Error);
-					break;
+					case MetagameSubTabReturnType.Close:
+						prop = prop with { State = new MetagameState.Close() };
+						break;
+
+					case MetagameSubTabReturnType.Switch info:
+						prop = prop with { State = info.State };
+						break;
 				}
-				
-				nextStatus = monad.Result;
 			}
-			
+
 			_topMenuView.Leave();
-			_Stop();
-		}
-		
-		private void _Stop()
-		{
-			_commandExecutor.Stop();
-			_commandExecutor.Clear();
 			_webSocketPresenter.Stop();
-			_webSocketCommandExecutor.Clear();
-		}
-		
-		private void _OnJoinRoom(int roomId)
-		{
-			_webSocketCommandExecutor.TryAdd(_JoinRoom(roomId));
+			return new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game()));
 		}
 		
 		private void _OnLeaveRoom(int roomId)
@@ -125,36 +103,36 @@ namespace Metagame
 			_webSocketPresenter.SendMessage(message);
 		}
 		
-		private IEnumerator _JoinRoom(int roomId)
+		private async UniTask _JoinRoom(int roomId)
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(_OnReceiveAppendMessage);
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(_OnReceiveUpdateRoom);
-			var webSocketMonad = _webSocketPresenter.Run(roomId);
-			yield return webSocketMonad.RunAndHandleInternetError(_warningPresenter);
-			if(webSocketMonad.Error != null)
+
+			if(await 
+				_webSocketPresenter
+					.Start(roomId)
+					.RunAndHandleInternetError(_warningPresenter)
+					.IsFail())
 			{
-				yield break;
+				return;
 			}
-			
-			var joinRoomMonad = _webSocketPresenter.JoinRoom(roomId);
-			yield return joinRoomMonad.RunAndHandleInternetError(_warningPresenter);
-			if(joinRoomMonad.Error != null)
+
+			if (await
+				_webSocketPresenter
+					.JoinRoom(roomId)
+					.RunAndHandleInternetError(_warningPresenter)
+					.IsFail())
 			{
-				yield break;
+				return;
 			}
-			
-			_mainPagePresneter.SwitchToRoom(roomId);
 		}
-		
-		private IEnumerator _LeaveRoom(int roomId)
+
+		private async UniTask _LeaveRoom(int roomId)
 		{
-			var leaveRoomMonad = _webSocketPresenter.LeaveRoom(roomId);
-			yield return leaveRoomMonad.RunAndHandleInternetError(_warningPresenter);
-			if(leaveRoomMonad.Error != null)
-			{
-				yield break;
-			}
-			
+			await _webSocketPresenter
+				.LeaveRoom(roomId)
+				.RunAndHandleInternetError(_warningPresenter);
+
 			_webSocketPresenter.Stop();
 			_roomPresneter.LeaveRoom();
 		}

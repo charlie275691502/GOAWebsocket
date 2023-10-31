@@ -3,19 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using Common.UniTaskExtension;
 using Common.Warning;
-using Rayark.Mast;
+using Cysharp.Threading.Tasks;
+using Optional;
+using Optional.Unsafe;
 using UnityEngine;
 using Web;
 
-namespace Metagame
+namespace Metagame.MainPage
 {
 	public interface IMainPagePresenter
 	{
-		IEnumerator Run(IReturn<MetagameStatus> ret, Action<int> onJoinRoom);
-		void SwitchToRoom(int roomId);
+		UniTask<MetagameSubTabReturn> Run();
 	}
-	
+
+	public abstract record MainPageState
+	{
+		public record Open() : MainPageState;
+		public record Idle() : MainPageState;
+		public record JoinRoom(int RoomId) : MainPageState;
+		public record CreateRoom() : MainPageState;
+		public record Close() : MainPageState;
+	}
+
+	public record MainPageProperty(MainPageState State, List<RoomViewData> Rooms);
+
 	public class MainPagePresenter : IMainPagePresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
@@ -23,90 +36,83 @@ namespace Metagame
 		private ICreateRoomPresenter _createRoomPresenter;
 		private IMainPageView _view;
 		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private MetagameStatus _result;
-		private Action<int> _onJoinRoom;
-		
+		private MainPageProperty _prop;
+
 		public MainPagePresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ICreateRoomPresenter createRoomPresenter, IMainPageView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_createRoomPresenter = createRoomPresenter;
 			_view = view;
+
+			_view.RegisterCallback(
+				(roomId) =>
+					_ChangeStateIfIdle(new MainPageState.JoinRoom(roomId)),
+				() =>
+					_ChangeStateIfIdle(new MainPageState.CreateRoom()));
 		}
-		
-		public IEnumerator Run(IReturn<MetagameStatus> ret, Action<int> onJoinRoom)
+
+		async UniTask<MetagameSubTabReturn> IMainPagePresenter.Run()
 		{
-			_Register(onJoinRoom);
-			var monad = _hTTPPresenter.GetRoomList();
-			yield return monad.RunAndHandleInternetError(_warningPresenter);
-			if(monad.Error != null)
+			var ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Close());
+
+			var roomListOpt = await _hTTPPresenter.GetRoomList().RunAndHandleInternetError(_warningPresenter);
+			if (!roomListOpt.HasValue)
 			{
-				yield break;
+				return ret;
 			}
-			
-			var roomViewDatas = _GetRoomViewDatas(monad.Result);
-			_view.Enter(roomViewDatas, _OnJoinRoom, _OnCreateRoom);
-			
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			ret.Accept(_result);
-		}
-		
-		private void _Stop()
-		{
-			_Unregister();
-			_view.Leave();
-			_commandExecutor.Stop();
-		}
-		
-		private void _Register(Action<int> onJoinRoom)
-		{
-			_onJoinRoom = onJoinRoom;
-		}
-		
-		private void _Unregister()
-		{
-			_onJoinRoom = null;
-		}
-		
-		private void _OnJoinRoom(int roomId)
-		{
-			_commandExecutor.TryAdd(_JoinRoom(roomId));
-		}
-		
-		private IEnumerator _JoinRoom(int roomId)
-		{
-			_onJoinRoom?.Invoke(roomId);
-			yield break;
-		}
-		
-		private void _OnCreateRoom()
-		{
-			_commandExecutor.TryAdd(_CreateRoom());
-		}
-		
-		private IEnumerator _CreateRoom()
-		{
-			var createRoomMonad = new BlockMonad<CreateRoomReturn>(_createRoomPresenter.Run);
-			yield return createRoomMonad.Do();
-			if (createRoomMonad.Error != null)
+
+			var roomList = roomListOpt.ValueOrFailure();
+			var roomViewDatas = _GetRoomViewDatas(roomList);
+			_prop = new MainPageProperty(new MainPageState.Open(), roomViewDatas);
+
+			while (_prop.State is not MainPageState.Close)
 			{
-				yield break;
+				_view.Render(_prop);
+				switch (_prop.State)
+				{
+					case MainPageState.Open:
+						_prop = _prop with { State = new MainPageState.Idle() };
+						break;
+
+					case MainPageState.Idle:
+						break;
+
+					case MainPageState.JoinRoom info:
+						_prop = _prop with { State = new MainPageState.Close() };
+						ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Switch(new MetagameState.Room(info.RoomId)));
+						break;
+
+					case MainPageState.CreateRoom:
+						await _CreateRoom()
+							.Match(
+								roomId =>
+								{
+									_prop = _prop with { State = new MainPageState.Close() };
+									ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Switch(new MetagameState.Room(roomId)));
+								},
+								() => _prop = _prop with { State = new MainPageState.Close() });
+						break;
+
+					case MainPageState.Close:
+						break;
+
+					default:
+						break;
+				}
+				await UniTask.Yield();
 			}
-			
-			var createRoomReturn = createRoomMonad.Result;
-			var monad = _hTTPPresenter.CreateRoom(
-				createRoomReturn.RoomName,
-				GameTypeUtility.GetAbbreviation(createRoomReturn.GameType),
-				createRoomReturn.PlayerPlot);
-			yield return monad.RunAndHandleInternetError(_warningPresenter);
-			if(monad.Error != null)
-			{
-				yield break;
-			}
-			
-			yield return _JoinRoom(monad.Result.Id);
+
+			return ret;
+		}
+
+		private void _ChangeStateIfIdle(MainPageState targetState, Action onChangeStateSuccess = null)
+		{
+			if (_prop.State is not MainPageState.Idle)
+				return;
+
+			onChangeStateSuccess?.Invoke();
+			_prop = _prop with { State = targetState };
 		}
 		
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
@@ -119,11 +125,17 @@ namespace Metagame
 					Players = roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
 				}).ToList();
 		}
-		
-		public void SwitchToRoom(int roomId)
+
+		private async UniTask<Option<int>> _CreateRoom()
 		{
-			_result = new MetagameStatus(MetagameStatusType.Room, roomId);
-			_Stop();
+			var createRoomReturn = await _createRoomPresenter.Run();
+			return await _hTTPPresenter
+				.CreateRoom(
+					createRoomReturn.RoomName,
+					GameTypeUtility.GetAbbreviation(createRoomReturn.GameType),
+					createRoomReturn.PlayerPlot)
+				.RunAndHandleInternetError(_warningPresenter)
+				.Map(roomResult => roomResult.Id);
 		}
 	}
 }

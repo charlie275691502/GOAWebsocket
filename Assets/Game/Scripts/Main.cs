@@ -9,6 +9,7 @@ public record MainState
 {
 	public record Authorization() : MainState;
 	public record Metagame() : MainState;
+	public record Game() : MainState;
 	public record Close() : MainState;
 }
 

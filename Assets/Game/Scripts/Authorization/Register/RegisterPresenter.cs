@@ -75,8 +75,6 @@ namespace Authorization.Register
 						break;
 
 					case RegisterState.Close:
-						_prop = _prop with { 
-							State = new RegisterState.Close() };
 						break;
 						
 					default:

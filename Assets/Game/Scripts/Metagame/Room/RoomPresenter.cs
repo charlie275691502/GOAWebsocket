@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using Common;
-using Rayark.Mast;
 using UnityEngine;
 using Web;
 using System.Linq;
 using System;
 using Common.Warning;
+using Cysharp.Threading.Tasks;
 
 namespace Metagame
 {
 	public interface IRoomPresenter
 	{
-		IEnumerator Run(int roomId, Action<string> onSendMessage, Action<int> onLeaveRoom, IReturn<MetagameStatus> ret);
+		void RegisterCallback(Action<string> onSendMessage, Action<int> onLeaveRoom);
+		UniTask<MetagameSubTabReturn> Run(int roomId);
 		void AppendMessage(MessageResult result);
 		void UpdateRoom(RoomResult result);
 		void LeaveRoom();
