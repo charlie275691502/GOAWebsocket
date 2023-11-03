@@ -6,17 +6,29 @@ using Common;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Optional;
-using Rayark.Mast;
 using UnityEngine;
 using Web;
 
-namespace Metagame
+namespace Metagame.MainPage.CreateRoom
 {
-	public record CreateRoomReturn(
-		string RoomName,
-		GameType GameType,
-		int PlayerPlot);
-		
+	public record CreateRoomReturnType()
+	{
+		public record Confirm(string RoomName, GameType GameType, int PlayerPlot) : CreateRoomReturnType;
+		public record Cancel() : CreateRoomReturnType;
+	}
+
+	public abstract record CreateRoomState
+	{
+		public record Open() : CreateRoomState;
+		public record Idle() : CreateRoomState;
+		public record Confirm(string RoomName, GameType GameType, int PlayerPlot) : CreateRoomState;
+		public record Cancel() : CreateRoomState;
+		public record Close() : CreateRoomState;
+	}
+
+	public record CreateRoomProperty(CreateRoomState State);
+	public record CreateRoomReturn(CreateRoomReturnType Type);
+
 	public interface ICreateRoomPresenter
 	{
 		UniTask<CreateRoomReturn> Run();
@@ -24,64 +36,81 @@ namespace Metagame
 	
 	public class CreateRoomPresenter : ICreateRoomPresenter
 	{
-		
 		private IWarningPresenter _warningPresenter;
 		private ICreateRoomView _view;
 		
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private Option<CreateRoomReturn> _result;
-		
+		private CreateRoomProperty _prop;
+
 		public CreateRoomPresenter(IWarningPresenter warningPresenter, ICreateRoomView view)
 		{
 			_warningPresenter = warningPresenter;
 			_view = view;
 		}
 		
-		public IEnumerator Run(IReturn<CreateRoomReturn> ret)
+		async UniTask<CreateRoomReturn> ICreateRoomPresenter.Run()
 		{
-			_view.Enter(_OnConfirm, _OnCancel);
-			
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			
-			_result.Match(
-				result => ret.Accept(result),
-				() => ret.Fail(new Exception("User Cancel"))
-			);
+			_prop = new CreateRoomProperty(new CreateRoomState.Open());
+			var ret = new CreateRoomReturn(new CreateRoomReturnType.Cancel());
+
+			while (_prop.State is not CreateRoomState.Close)
+			{
+				_view.Render(_prop);
+				switch (_prop.State)
+				{
+					case CreateRoomState.Open:
+						_prop = _prop with { State = new CreateRoomState.Idle() };
+						break;
+
+					case CreateRoomState.Idle:
+						break;
+
+					case CreateRoomState.Confirm info:
+						var isValid = await _ValidateRoom(info.RoomName, info.GameType, info.PlayerPlot);
+						if (isValid)
+                        {
+							ret = ret with { Type = new CreateRoomReturnType.Confirm(info.RoomName, info.GameType, info.PlayerPlot) };
+							_prop = _prop with { State = new CreateRoomState.Close() };
+						} else
+                        {
+							_prop = _prop with { State = new CreateRoomState.Idle() };
+						}
+						break;
+
+					case CreateRoomState.Cancel:
+						ret = ret with { Type = new CreateRoomReturnType.Cancel() };
+						_prop = _prop with { State = new CreateRoomState.Close() };
+						break;
+
+					case CreateRoomState.Close:
+						break;
+
+					default:
+						break;
+				}
+				await UniTask.Yield();
+			}
+
+			return ret;
+		}
+
+		private void _ChangeStateIfIdle(CreateRoomState targetState, Action onChangeStateSuccess = null)
+		{
+			if (_prop.State is not CreateRoomState.Idle)
+				return;
+
+			onChangeStateSuccess?.Invoke();
+			_prop = _prop with { State = targetState };
 		}
 		
-		private void _Stop()
-		{
-			_view.Leave();
-			_commandExecutor.Stop();
-		}
-		
-		private void _OnConfirm(string roomName, GameType gameType, int playerPlot)
-		{
-			_commandExecutor.TryAdd(_CreateRoom(roomName, gameType, playerPlot));
-		}
-		
-		private void _OnCancel()
-		{
-			_result = Option.None<CreateRoomReturn>();
-			_Stop();
-		}
-		
-		public IEnumerator _CreateRoom(string roomName, GameType gameType, int playerPlot)
+		private async UniTask<bool> _ValidateRoom(string roomName, GameType gameType, int playerPlot)
 		{
 			if(string.IsNullOrEmpty(roomName))
 			{
-				yield return _warningPresenter.Run("Create Room Error", "Room name cannot be empty");
-				yield break;
+				await _warningPresenter.Run("Create Room Error", "Room name cannot be empty");
+				return false;
 			}
-			
-			_result = new CreateRoomReturn(
-				RoomName: roomName,
-				GameType: gameType,
-				PlayerPlot: playerPlot
-			).Some();
-			
-			_Stop();
+
+			return true;
 		}
 	}
 }

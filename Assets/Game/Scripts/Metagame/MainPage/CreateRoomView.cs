@@ -6,12 +6,12 @@ using Common;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Metagame
+namespace Metagame.MainPage.CreateRoom
 {
 	public interface ICreateRoomView
 	{
-		void Enter(Action<string, GameType , int> onConfirm, Action onCancel);
-		void Leave();
+		void RegisterCallback(Action<string, GameType, int> onConfirm, Action onCancel);
+		void Render(CreateRoomProperty prop);
 	}
 	
 	public class CreateRoomView : MonoBehaviour, ICreateRoomView
@@ -41,7 +41,8 @@ namespace Metagame
 		private GameType[] _dropdownGameTypes;
 		private Action<string, GameType , int> _onConfirm;
 		private Action _onCancel;
-		
+		private CreateRoomProperty _prop;
+
 		private void Start()
 		{
 			_gameTypeDropdown.options = _dropdownOptions
@@ -52,29 +53,56 @@ namespace Metagame
 				.Select(option => option.GameType)
 				.ToArray();
 		}
-		
-		public void Enter(Action<string, GameType , int> onConfirm, Action onCancel)
+
+		void ICreateRoomView.RegisterCallback(Action<string, GameType, int> onConfirm, Action onCancel)
 		{
-			_Enter();
-			_Register(onConfirm, onCancel);
+			_onConfirm = onConfirm;
+			_onCancel = onCancel;
+
+			_confirmButton.onClick.AddListener(_OnConfirm);
+			_cancelButton.onClick.AddListener(_OnCancel);
+		}
+
+		void ICreateRoomView.Render(CreateRoomProperty prop)
+		{
+			if (_prop == prop)
+				return;
+
+			switch (prop.State)
+			{
+				case CreateRoomState.Open:
+					_Open();
+					break;
+
+				case CreateRoomState.Idle:
+				case CreateRoomState.Confirm:
+				case CreateRoomState.Cancel:
+					_Render(prop);
+					break;
+
+				case CreateRoomState.Close:
+					_Close();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		private void _Open()
+		{
 			_panel.SetActive(true);
-		}
-		
-		public void Leave()
-		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
-		}
-		
-		private void _Enter()
-		{
 			_roomNameInputField.text = string.Empty;
 			_gameTypeDropdown.value = 0;
 			_playerPlotInputField.text = "2";
 		}
-		
-		private void _Leave()
+
+		private void _Close()
+		{
+			_panel.SetActive(false);
+		}
+
+		private void _Render(CreateRoomProperty prop)
 		{
 		}
 		
@@ -85,15 +113,6 @@ namespace Metagame
 			
 			_confirmButton.onClick.AddListener(_OnConfirm);
 			_cancelButton.onClick.AddListener(_OnCancel);
-		}
-		
-		private void _Unregister()
-		{
-			_onConfirm = null;
-			_onCancel = null;
-			
-			_confirmButton.onClick.RemoveAllListeners();
-			_cancelButton.onClick.RemoveAllListeners();
 		}
 		
 		private void _OnConfirm()
