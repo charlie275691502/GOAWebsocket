@@ -10,6 +10,7 @@ using Optional;
 using Optional.Unsafe;
 using UnityEngine;
 using Web;
+using Metagame.MainPage.CreateRoom;
 
 namespace Metagame.MainPage
 {
@@ -91,7 +92,7 @@ namespace Metagame.MainPage
 									_prop = _prop with { State = new MainPageState.Close() };
 									ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Switch(new MetagameState.Room(roomId)));
 								},
-								() => _prop = _prop with { State = new MainPageState.Close() });
+								() => _prop = _prop with { State = new MainPageState.Idle() });
 						break;
 
 					case MainPageState.Close:
@@ -129,13 +130,20 @@ namespace Metagame.MainPage
 		private async UniTask<Option<int>> _CreateRoom()
 		{
 			var createRoomReturn = await _createRoomPresenter.Run();
-			return await _hTTPPresenter
-				.CreateRoom(
-					createRoomReturn.RoomName,
-					GameTypeUtility.GetAbbreviation(createRoomReturn.GameType),
-					createRoomReturn.PlayerPlot)
-				.RunAndHandleInternetError(_warningPresenter)
-				.Map(roomResult => roomResult.Id);
+			switch (createRoomReturn.Type)
+            {
+				case CreateRoomReturnType.Confirm info:
+					return await _hTTPPresenter
+						.CreateRoom(
+							info.RoomName,
+							GameTypeUtility.GetAbbreviation(info.GameType),
+							info.PlayerPlot)
+						.RunAndHandleInternetError(_warningPresenter)
+						.Map(roomResult => roomResult.Id);
+				case CreateRoomReturnType.Cancel:
+					return Option.None<int>();
+			}
+			return Option.None<int>();
 		}
 	}
 }
