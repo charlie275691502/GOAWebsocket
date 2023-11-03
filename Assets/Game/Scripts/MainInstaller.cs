@@ -10,6 +10,9 @@ using Metagame;
 using Common.Warning;
 using Authorization.Login;
 using Authorization.Register;
+using Metagame.MainPage;
+using Metagame.MainPage.CreateRoom;
+using Metagame.Room;
 
 public class MainInstaller : MonoInstaller
 {
