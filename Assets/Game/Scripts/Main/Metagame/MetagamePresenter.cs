@@ -18,14 +18,7 @@ namespace Metagame
 		public record Close() : MetagameState;
 	}
 
-	public record MetagameSubTabReturnType
-	{
-		public record Switch(MetagameState State) : MetagameSubTabReturnType;
-		public record Close() : MetagameSubTabReturnType;
-	}
-
 	public record MetagameProperty(MetagameState State);
-	public record MetagameSubTabReturn(MetagameSubTabReturnType Type);
 	
 	public interface IMetagamePresenter : IMainSubTabPresenter
 	{

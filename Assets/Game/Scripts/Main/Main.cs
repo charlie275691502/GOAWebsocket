@@ -13,19 +13,7 @@ public record MainState
 	public record Close() : MainState;
 }
 
-public record MainSubTabReturnType
-{
-	public record Switch(MainState State) : MainSubTabReturnType;
-	public record Close() : MainSubTabReturnType;
-}
-
 public record MainProperty(MainState State);
-public record MainSubTabReturn(MainSubTabReturnType Type);
-
-public interface IMainSubTabPresenter
-{
-	UniTask<MainSubTabReturn> Run();
-}
 
 public class Main : MonoBehaviour
 {

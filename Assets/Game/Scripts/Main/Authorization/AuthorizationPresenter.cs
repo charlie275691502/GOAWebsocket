@@ -14,23 +14,11 @@ namespace Authorization
 		public record Close() : AuthorizationState;
 	}
 
-	public record AuthorizationSubTabReturnType
-	{
-		public record Switch(AuthorizationState State) : AuthorizationSubTabReturnType;
-		public record Close() : AuthorizationSubTabReturnType;
-	}
-
 	public record AuthorizationProperty(AuthorizationState State);
-	public record AuthorizationSubTabReturn(AuthorizationSubTabReturnType Type);
 
 	public interface IAuthorizationPresenter : IMainSubTabPresenter
 	{
 
-	}
-
-	public interface IAuthorizationSubTabPresenter
-	{
-		UniTask<AuthorizationSubTabReturn> Run();
 	}
 
 	public class AuthorizationPresenter : IAuthorizationPresenter
