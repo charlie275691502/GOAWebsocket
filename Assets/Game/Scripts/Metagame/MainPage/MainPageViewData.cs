@@ -4,13 +4,7 @@ using Common;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 
-namespace Metagame
+namespace Metagame.MainPage
 {
-	public class RoomViewData
-	{
-		public int Id;
-		public string RoomName;
-		public GameSetting GameSetting;
-		public List<PlayerData> Players;
-	}
+	public record RoomViewData(int Id, string RoomName, GameSetting GameSetting, List<PlayerData> Players);
 }

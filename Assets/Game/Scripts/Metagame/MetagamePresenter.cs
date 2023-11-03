@@ -7,6 +7,7 @@ using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Common.UniTaskExtension;
 using Metagame.MainPage;
+using Metagame.Room;
 
 namespace Metagame
 {
@@ -36,7 +37,7 @@ namespace Metagame
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
 		private IMainPagePresenter _mainPagePresneter;
-		private IRoomPresenter _roomPresneter;
+		private IRoomPresenter _roomPresenter;
 		private ITopMenuView _topMenuView;
 		private BackendPlayerData _backendPlayerData;
 		private IRoomWebSocketPresenter _webSocketPresenter;
@@ -45,7 +46,7 @@ namespace Metagame
 			IHTTPPresenter hTTPPresenter,
 			IWarningPresenter warningPresenter,
 			IMainPagePresenter mainPagePresneter,
-			IRoomPresenter roomPresneter,
+			IRoomPresenter roomPresenter,
 			ITopMenuView topMenuView,
 			BackendPlayerData backendPlayerData,
 			IRoomWebSocketPresenter webSocketPresenter)
@@ -53,7 +54,7 @@ namespace Metagame
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_mainPagePresneter = mainPagePresneter;
-			_roomPresneter = roomPresneter;
+			_roomPresenter = roomPresenter;
 			_topMenuView = topMenuView;
 			_backendPlayerData = backendPlayerData;
 			_webSocketPresenter = webSocketPresenter;
@@ -70,9 +71,7 @@ namespace Metagame
 				var subTabReturn = await (prop.State switch
                 {
                     MetagameState.MainPage => _mainPagePresneter.Run(),
-                    MetagameState.Room info =>
-						_JoinRoom(info.RoomId)
-							.Then(_roomPresneter.Run(info.RoomId)),
+                    MetagameState.Room info => _roomPresenter.Run(info.RoomId),
                     _ => throw new System.NotImplementedException(),
                 });
 
@@ -91,60 +90,6 @@ namespace Metagame
 			_topMenuView.Leave();
 			_webSocketPresenter.Stop();
 			return new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game()));
-		}
-		
-		private void _OnLeaveRoom(int roomId)
-		{
-			_webSocketCommandExecutor.TryAdd(_LeaveRoom(roomId));
-		}
-		
-		private void _OnSendMessage(string message)
-		{
-			_webSocketPresenter.SendMessage(message);
-		}
-		
-		private async UniTask _JoinRoom(int roomId)
-		{
-			_webSocketPresenter.RegisterOnReceiveAppendMessage(_OnReceiveAppendMessage);
-			_webSocketPresenter.RegisterOnReceiveUpdateRoom(_OnReceiveUpdateRoom);
-
-			if(await 
-				_webSocketPresenter
-					.Start(roomId)
-					.RunAndHandleInternetError(_warningPresenter)
-					.IsFail())
-			{
-				return;
-			}
-
-			if (await
-				_webSocketPresenter
-					.JoinRoom(roomId)
-					.RunAndHandleInternetError(_warningPresenter)
-					.IsFail())
-			{
-				return;
-			}
-		}
-
-		private async UniTask _LeaveRoom(int roomId)
-		{
-			await _webSocketPresenter
-				.LeaveRoom(roomId)
-				.RunAndHandleInternetError(_warningPresenter);
-
-			_webSocketPresenter.Stop();
-			_roomPresneter.LeaveRoom();
-		}
-		
-		private void _OnReceiveAppendMessage(MessageResult result)
-		{
-			_roomPresneter.AppendMessage(result);
-		}
-		
-		private void _OnReceiveUpdateRoom(RoomResult result)
-		{
-			_roomPresneter.UpdateRoom(result);
 		}
 	}
 }

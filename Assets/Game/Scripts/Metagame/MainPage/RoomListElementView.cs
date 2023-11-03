@@ -8,6 +8,7 @@ using EnhancedUI.EnhancedScroller;
 using Zenject;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using Metagame.MainPage;
 
 namespace Metagame
 {

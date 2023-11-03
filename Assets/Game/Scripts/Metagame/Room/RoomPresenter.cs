@@ -7,139 +7,186 @@ using System.Linq;
 using System;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
+using Optional.Unsafe;
+using Common.UniTaskExtension;
 
-namespace Metagame
+namespace Metagame.Room
 {
+	public abstract record RoomState
+	{
+		public record Open() : RoomState;
+		public record Idle() : RoomState;
+		public record SendMessage(string Message) : RoomState;
+		public record Leave() : RoomState;
+		public record Close() : RoomState;
+	}
+
+	public record RoomProperty(RoomState State, RoomWithMessagesViewData Room);
+
 	public interface IRoomPresenter
 	{
-		void RegisterCallback(Action<string> onSendMessage, Action<int> onLeaveRoom);
 		UniTask<MetagameSubTabReturn> Run(int roomId);
-		void AppendMessage(MessageResult result);
-		void UpdateRoom(RoomResult result);
-		void LeaveRoom();
 	}
-	
+
 	public class RoomPresenter : IRoomPresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
+		private IRoomWebSocketPresenter _webSocketPresenter;
 		private IRoomView _view;
-		
+
 		private Action<string> _onSendMessage;
 		private Action<int> _onLeaveRoom;
-		private CommandExecutor _commandExecutor = new CommandExecutor();
-		private MetagameStatus _result;
-		private int _roomId;
-		
-		public RoomPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRoomView view)
+		private ActionQueue _actionQueue;
+
+		private RoomProperty _prop;
+
+		public RoomPresenter(IHTTPPresenter hTTPPresenter, IRoomWebSocketPresenter webSocketPresenter, IWarningPresenter warningPresenter, IRoomView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
+
+			_actionQueue = new ActionQueue();
 		}
-		
-		public IEnumerator Run(int roomId, Action<string> onSendMessage, Action<int> onLeaveRoom, IReturn<MetagameStatus> ret)
+
+		async UniTask<MetagameSubTabReturn> IRoomPresenter.Run(int roomId)
 		{
-			_Register(onSendMessage, onLeaveRoom);
-			_roomId = roomId;
-			var httpMonad = _hTTPPresenter.GetRoomWithMessages(roomId);
-			
-			yield return httpMonad.RunAndHandleInternetError(_warningPresenter);
-			if(httpMonad.Error != null)
+			var ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Close());
+
+			var roomWithMessagesOpt = await _hTTPPresenter.GetRoomWithMessages(roomId).RunAndHandleInternetError(_warningPresenter);
+			if (!roomWithMessagesOpt.HasValue)
 			{
-				yield break;
+				return ret;
 			}
-			
-			var roomWithMessagesViewData = _GetRoomWithMessagesViewData(httpMonad.Result);
-			_view.Enter(roomWithMessagesViewData, _OnLeaveRoom, _OnSendMessage);
-			
-			_commandExecutor.Clear();
-			yield return _commandExecutor.Start();
-			ret.Accept(_result);
-		}
-		
-		private void _Stop()
-		{
-			_Unregister();
-			_view.Leave();
-			_commandExecutor.Stop();
-		}
-		
-		private void _Register(Action<string> onSendMessage, Action<int> onLeaveRoom)
-		{
-			_onSendMessage = onSendMessage;
-			_onLeaveRoom = onLeaveRoom;
-		}
-		
-		private void _Unregister()
-		{
-			_onSendMessage = null;
-			_onLeaveRoom = null;
-		}
-		
-		private void _OnLeaveRoom()
-		{
-			_onLeaveRoom?.Invoke(_roomId);
-		}
-		
-		private void _OnSendMessage(string message)
-		{
-			if (string.IsNullOrEmpty(message))
+
+			await _JoinRoom(roomId);
+
+			_prop = new RoomProperty(new RoomState.Open(), _GetRoomWithMessagesViewData(roomWithMessagesOpt.ValueOrFailure()));
+
+			while (_prop.State is not RoomState.Close)
 			{
+				_actionQueue.RunAll();
+				_view.Render(_prop);
+				switch (_prop.State)
+				{
+					case RoomState.Open:
+						_prop = _prop with { State = new RoomState.Idle() };
+						break;
+
+					case RoomState.Idle:
+						break;
+
+					case RoomState.SendMessage info:
+						_webSocketPresenter.SendMessage(info.Message);
+						_prop = _prop with { State = new RoomState.Idle() };
+						break;
+
+					case RoomState.Leave:
+						await _LeaveRoom(roomId);
+						_prop = _prop with { State = new RoomState.Close() };
+						break;
+
+					case RoomState.Close:
+						break;
+
+					default:
+						break;
+				}
+				await UniTask.Yield();
+			}
+
+			return ret;
+		}
+
+		private void _ChangeStateIfIdle(RoomState targetState, Action onChangeStateSuccess = null)
+		{
+			if (_prop.State is not RoomState.Idle)
 				return;
-			}
-			
-			_onSendMessage?.Invoke(message);
+
+			onChangeStateSuccess?.Invoke();
+			_prop = _prop with { State = targetState };
 		}
-		
+
 		private RoomWithMessagesViewData _GetRoomWithMessagesViewData(RoomWithMessagesResult result)
 		{
-			return new RoomWithMessagesViewData()
-			{
-				Id = result.Id,
-				RoomName = result.RoomName,
-				GameSetting = new GameSetting(result.GameSetting),
-				Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
-				Messages = result.Messages.Select(message => new MessageViewData()
+			return new RoomWithMessagesViewData(
+				result.Id,
+				result.RoomName,
+				new GameSetting(result.GameSetting),
+				result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+				result.Messages.Select(message => new MessageViewData()
 				{
 					Id = message.Id,
 					Content = message.Content,
 					NickName = message.Player.NickName,
-				}).ToList(),
-			};
+				}).ToList()
+			);
 		}
-		
-		public void AppendMessage(MessageResult result)
+
+		private async UniTask _JoinRoom(int roomId)
 		{
-			if(_commandExecutor.IsRunning)
+			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
+			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
+
+			if (await
+				_webSocketPresenter
+					.Start(roomId)
+					.RunAndHandleInternetError(_warningPresenter)
+					.IsFail())
 			{
-				_view.AppendMessage(new MessageViewData()
-				{
-					Id = result.Id,
-					Content = result.Content,
-					NickName = result.Player.NickName,
-				});
+				return;
+			}
+
+			if (await
+				_webSocketPresenter
+					.JoinRoom(roomId)
+					.RunAndHandleInternetError(_warningPresenter)
+					.IsFail())
+			{
+				return;
 			}
 		}
-		
-		public void UpdateRoom(RoomResult result)
+
+		private async UniTask _LeaveRoom(int roomId)
 		{
-			if(_commandExecutor.IsRunning)
+			await _webSocketPresenter
+				.LeaveRoom(roomId)
+				.RunAndHandleInternetError(_warningPresenter);
+
+			_webSocketPresenter.Stop();
+		}
+
+		private void _AppendMessage(MessageResult result)
+		{
+			_prop = _prop with
 			{
-				_view.UpdateRoom(new RoomViewData()
+				Room = _prop.Room with
+				{
+					Messages = _prop.Room.Messages
+						.Append(new MessageViewData()
+						{
+							Id = result.Id,
+							Content = result.Content,
+							NickName = result.Player.NickName,
+						})
+						.ToList()
+				}
+			};
+		}
+
+		private void _UpdateRoom(RoomResult result)
+		{
+			_prop = _prop with
+			{
+				Room = _prop.Room with
 				{
 					Id = result.Id,
 					RoomName = result.RoomName,
 					GameSetting = new GameSetting(result.GameSetting),
-					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
-				});
-			}
-		}
-		
-		public void LeaveRoom()
-		{
-			_result = new MetagameStatus(MetagameStatusType.MainPage);
-			_Stop();
+					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList()
+				}
+			};
 		}
 	}
 }

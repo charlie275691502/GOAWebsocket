@@ -7,14 +7,12 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Metagame
+namespace Metagame.Room
 {
 	public interface IRoomView
 	{
-		void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage);
-		void AppendMessage(MessageViewData viewData);
-		void UpdateRoom(RoomViewData viewData);
-		void Leave();
+		void RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage);
+		void Render(RoomProperty prop);
 	}
 	
 	public class RoomView : MonoBehaviour, IRoomView
@@ -54,13 +52,10 @@ namespace Metagame
 		[SerializeField]
 		private float _playerLookAheadAfter;
 		
-		private RoomWithMessagesViewData _viewData;
 		private SimpleEnhancedScrollerController _messageScrollerController;
 		private EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>> _messageDataModel;
 		private SimpleEnhancedScrollerController _playerScrollerController;
 		private EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerData>> _playerDataModel;
-		
-
 		
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
@@ -90,52 +85,10 @@ namespace Metagame
 				_playerLookAheadAfter,
 				container);
 		}
-		
-		public void Enter(RoomWithMessagesViewData viewData, Action onLeaveRoom, Action<string> onSendMessage)
-		{
-			_Enter(viewData);
-			_Register(onLeaveRoom, onSendMessage);
-			_panel.SetActive(true);
-		}
-		
-		public void Leave()
-		{
-			_Unregister();
-			_panel.SetActive(false);
-			_Leave();
-		}
-		
-		private void _Enter(RoomWithMessagesViewData viewData)
-		{
-			_viewData = viewData;
-			
-			_UpdateRoom();
-			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
-			_messageScrollerController.Display(1);
-		}
-		
-		public void AppendMessage(MessageViewData viewData)
-		{
-			_viewData.Messages.Add(viewData);
-			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Messages));
-			_messageScrollerController.Display(1);
-		}
-		public void UpdateRoom(RoomViewData viewData)
-		{
-			_viewData.Id = viewData.Id;
-			_viewData.RoomName = viewData.RoomName;
-			_viewData.Players = viewData.Players;
-			_UpdateRoom();
-		}
-		
-		private void _Leave()
-		{
-			_roomNameText.text = string.Empty;
-			_messageScrollerController.Clear();
-			_playerScrollerController.Clear();
-		}
-		
-		private void _Register(Action onLeaveRoom, Action<string> onSendMessage)
+
+		private RoomProperty _prop;
+
+		void IRoomView.RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage)
 		{
 			_onLeaveRoom = onLeaveRoom;
 			_onSendMessage = onSendMessage;
@@ -143,13 +96,53 @@ namespace Metagame
 			_backButton.onClick.AddListener(_SwitchToMainPage);
 			_sendMessageButton.onClick.AddListener(_OnSendMessage);
 		}
-		
-		private void _Unregister()
+
+		void IRoomView.Render(RoomProperty prop)
 		{
-			_onLeaveRoom = null;
-			
-			_backButton.onClick.RemoveAllListeners();
-			_sendMessageButton.onClick.RemoveAllListeners();
+			if (_prop == prop)
+				return;
+
+			switch (prop.State)
+			{
+				case RoomState.Open:
+					_Open();
+					break;
+
+				case RoomState.Idle:
+				case RoomState.SendMessage:
+				case RoomState.Leave:
+					_Render(prop);
+					break;
+
+				case RoomState.Close:
+					_Close();
+					break;
+
+				default:
+					break;
+			}
+		}
+
+		private void _Open()
+		{
+			_panel.SetActive(true);
+		}
+
+		private void _Close()
+		{
+			_panel.SetActive(false);
+			_roomNameText.text = string.Empty;
+			_messageScrollerController.Clear();
+			_playerScrollerController.Clear();
+		}
+
+		private void _Render(RoomProperty prop)
+		{
+			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(prop.Room.GameSetting.GameType)}] {prop.Room.RoomName}";
+			_playerDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(prop.Room.Players, prop.Room.GameSetting.PlayerPlot));
+			_playerScrollerController.Display();
+			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(prop.Room.Messages));
+			_messageScrollerController.Display(1);
 		}
 		
 		private void _SwitchToMainPage()
@@ -159,15 +152,8 @@ namespace Metagame
 		
 		private void _OnSendMessage()
 		{
-			_onSendMessage?.Invoke(_messageInputField.text);
 			_messageInputField.text = string.Empty;
-		}
-		
-		private void _UpdateRoom()
-		{
-			_roomNameText.text = $"[{GameTypeUtility.GetAbbreviation(_viewData.GameSetting.GameType)}] {_viewData.RoomName}";
-			_playerDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(_viewData.Players, _viewData.GameSetting.PlayerPlot));
-			_playerScrollerController.Display();
+			_onSendMessage?.Invoke(_messageInputField.text);
 		}
 	}
 }
