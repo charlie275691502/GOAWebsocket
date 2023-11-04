@@ -29,7 +29,6 @@ namespace Web
 		private ILoadingView _loadingView;
 		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
-
 		
 		public HTTPPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
 		{

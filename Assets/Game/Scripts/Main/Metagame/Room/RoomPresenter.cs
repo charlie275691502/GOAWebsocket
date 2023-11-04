@@ -42,6 +42,7 @@ namespace Metagame.Room
 		public RoomPresenter(IHTTPPresenter hTTPPresenter, IRoomWebSocketPresenter webSocketPresenter, IWarningPresenter warningPresenter, IRoomView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
+			_webSocketPresenter = webSocketPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
 
@@ -134,6 +135,8 @@ namespace Metagame.Room
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
 
+			Debug.Log("Ready");
+			
 			if (await
 				_webSocketPresenter
 					.Start(roomId)
@@ -142,6 +145,8 @@ namespace Metagame.Room
 			{
 				return;
 			}
+			
+			Debug.Log("Start");
 
 			if (await
 				_webSocketPresenter
@@ -151,6 +156,8 @@ namespace Metagame.Room
 			{
 				return;
 			}
+			
+			Debug.Log("Join");
 		}
 
 		private async UniTask _LeaveRoom(int roomId)
