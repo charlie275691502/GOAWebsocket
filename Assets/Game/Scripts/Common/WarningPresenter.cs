@@ -60,6 +60,7 @@ namespace Common.Warning
 
 					case WarningState.Confirm:
 						onConfirm?.Invoke();
+						_prop = _prop with { State = new WarningState.Close() };
 						break;
 
 					case WarningState.Close:

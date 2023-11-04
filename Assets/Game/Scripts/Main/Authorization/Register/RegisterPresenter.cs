@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using Common.UniTaskExtension;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -64,9 +65,15 @@ namespace Authorization.Register
 						break;
 
 					case RegisterState.Register info:
-						await _Register(info.Username, info.Password, info.ConfirmPassword, info.Email);
-						_prop = _prop with { State = new RegisterState.Close() };
-						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
+						var success = await _Register(info.Username, info.Password, info.ConfirmPassword, info.Email);
+						if (success)
+						{
+							_prop = _prop with { State = new RegisterState.Close() };
+							ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
+						} else 
+						{
+							_prop = _prop with { State = new RegisterState.Idle() };
+						}
 						break;
 					
 					case RegisterState.SwitchToLogin:
@@ -96,15 +103,17 @@ namespace Authorization.Register
 			_prop = _prop with { State = targetState };
 		}
 
-		private async UniTask _Register(string username, string password, string confirmPassword, string email)
+		private async UniTask<bool> _Register(string username, string password, string confirmPassword, string email)
 		{
 			if(password != confirmPassword)
 			{
 				await _warningPresenter.Run("Input Fail", "Passwrod and Confirm Password are not the same");
-				return;
+				return false;
 			}
 			
-			await _hTTPPresenter.RegisterThenLogin(username, password, email).RunAndHandleInternetError(_warningPresenter);
+			return await _hTTPPresenter.RegisterThenLogin(username, password, email)
+				.RunAndHandleInternetError(_warningPresenter)
+				.IsSuccess();
 		}
 	}
 }
