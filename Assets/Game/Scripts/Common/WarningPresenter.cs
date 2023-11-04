@@ -71,6 +71,8 @@ namespace Common.Warning
 				}
 				await UniTask.Yield();
 			}
+			
+			_view.Render(_prop);
 		}
 
 		private void _ChangeStateIfIdle(WarningState targetState, Action onChangeStateSuccess = null)

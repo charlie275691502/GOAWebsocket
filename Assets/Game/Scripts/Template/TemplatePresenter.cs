@@ -79,6 +79,7 @@ namespace Template
 				await UniTask.Yield();
 			}
 
+			_view.Render(_prop);
 			return ret;
 		}
 

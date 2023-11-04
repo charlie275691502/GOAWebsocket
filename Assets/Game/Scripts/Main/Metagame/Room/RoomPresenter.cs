@@ -35,8 +35,6 @@ namespace Metagame.Room
 		private IRoomWebSocketPresenter _webSocketPresenter;
 		private IRoomView _view;
 
-		private Action<string> _onSendMessage;
-		private Action<int> _onLeaveRoom;
 		private ActionQueue _actionQueue;
 
 		private RoomProperty _prop;
@@ -48,6 +46,12 @@ namespace Metagame.Room
 			_view = view;
 
 			_actionQueue = new ActionQueue();
+			
+			_view.RegisterCallback(
+				() =>
+					_ChangeStateIfIdle(new RoomState.Leave()),
+				(message) =>
+					_ChangeStateIfIdle(new RoomState.SendMessage(message)));
 		}
 
 		async UniTask<MetagameSubTabReturn> IRoomPresenter.Run(int roomId)
@@ -96,6 +100,7 @@ namespace Metagame.Room
 				await UniTask.Yield();
 			}
 
+			_view.Render(_prop);
 			return ret;
 		}
 

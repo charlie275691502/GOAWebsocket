@@ -90,6 +90,7 @@ namespace Metagame.MainPage.CreateRoom
 				await UniTask.Yield();
 			}
 
+			_view.Render(_prop);
 			return ret;
 		}
 
