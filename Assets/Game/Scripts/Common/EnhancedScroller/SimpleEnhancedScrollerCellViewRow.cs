@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using EnhancedUI.EnhancedScroller.Internal;
-using System.Collections;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
