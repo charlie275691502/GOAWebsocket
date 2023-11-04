@@ -153,8 +153,8 @@ namespace Metagame.Room
 		
 		private void _OnSendMessage()
 		{
-			_messageInputField.text = string.Empty;
 			_onSendMessage?.Invoke(_messageInputField.text);
+			_messageInputField.text = string.Empty;
 		}
 	}
 }

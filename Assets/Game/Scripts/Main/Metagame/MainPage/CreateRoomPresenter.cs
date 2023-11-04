@@ -45,6 +45,12 @@ namespace Metagame.MainPage.CreateRoom
 		{
 			_warningPresenter = warningPresenter;
 			_view = view;
+
+			_view.RegisterCallback(
+				(roomName, gameType, playerPlot) =>
+					_ChangeStateIfIdle(new CreateRoomState.Confirm(roomName, gameType, playerPlot)),
+				() =>
+					_ChangeStateIfIdle(new CreateRoomState.Cancel()));
 		}
 		
 		async UniTask<CreateRoomReturn> ICreateRoomPresenter.Run()

@@ -57,6 +57,8 @@ namespace Metagame.Room
 
 		async UniTask<MetagameSubTabReturn> IRoomPresenter.Run(int roomId)
 		{
+			await _JoinRoom(roomId);
+			
 			var ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Close());
 
 			var roomWithMessagesOpt = await _hTTPPresenter.GetRoomWithMessages(roomId).RunAndHandleInternetError(_warningPresenter);
@@ -64,8 +66,6 @@ namespace Metagame.Room
 			{
 				return ret;
 			}
-
-			await _JoinRoom(roomId);
 
 			_prop = new RoomProperty(new RoomState.Open(), _GetRoomWithMessagesViewData(roomWithMessagesOpt.ValueOrFailure()));
 
@@ -89,6 +89,7 @@ namespace Metagame.Room
 
 					case RoomState.Leave:
 						await _LeaveRoom(roomId);
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.MainPage()) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
@@ -135,8 +136,6 @@ namespace Metagame.Room
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
 
-			Debug.Log("Ready");
-			
 			if (await
 				_webSocketPresenter
 					.Start(roomId)
@@ -146,8 +145,6 @@ namespace Metagame.Room
 				return;
 			}
 			
-			Debug.Log("Start");
-
 			if (await
 				_webSocketPresenter
 					.JoinRoom(roomId)
@@ -156,8 +153,6 @@ namespace Metagame.Room
 			{
 				return;
 			}
-			
-			Debug.Log("Join");
 		}
 
 		private async UniTask _LeaveRoom(int roomId)
