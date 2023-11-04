@@ -35,7 +35,8 @@ namespace Template
 		{
 			if (_prop == prop)
 				return;
-
+			_prop = prop;
+			
 			switch (prop.State)
 			{
 				case TemplateState.Open:

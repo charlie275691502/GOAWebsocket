@@ -38,6 +38,7 @@ namespace Common.Warning
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 
 			switch (prop.State)
 			{

@@ -48,6 +48,7 @@ namespace Authorization.Register
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 				
 			switch (prop.State)
 			{

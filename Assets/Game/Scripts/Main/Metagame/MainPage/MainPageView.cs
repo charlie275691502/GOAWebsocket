@@ -70,6 +70,7 @@ namespace Metagame.MainPage
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 
 			switch (prop.State)
 			{

@@ -43,6 +43,7 @@ namespace Authorization.Login
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 
 			switch (prop.State)
 			{

@@ -67,6 +67,7 @@ namespace Metagame.MainPage.CreateRoom
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 
 			switch (prop.State)
 			{

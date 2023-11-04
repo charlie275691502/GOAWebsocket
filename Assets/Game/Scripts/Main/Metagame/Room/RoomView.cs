@@ -101,6 +101,7 @@ namespace Metagame.Room
 		{
 			if (_prop == prop)
 				return;
+			_prop = prop;
 
 			switch (prop.State)
 			{
