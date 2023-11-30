@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Authorization.Login;
 using Authorization.Register;
+using Main;
 
 namespace Authorization
 {

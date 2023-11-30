@@ -3,57 +3,60 @@ using Authorization;
 using Metagame;
 using Cysharp.Threading.Tasks;
 
-public record MainState
+namespace Main
 {
-	public record Authorization() : MainState;
-	public record Metagame() : MainState;
-	public record Game() : MainState;
-	public record Close() : MainState;
-}
-
-public record MainProperty(MainState State);
-
-public class Main : MonoBehaviour
-{
-	private IAuthorizationPresenter _authorizationPresenter;
-	private IMetagamePresenter _metagamePresenter;
-	
-	[Zenject.Inject]
-	public void Zenject(IAuthorizationPresenter authorizationPresenter, IMetagamePresenter metagamePresenter)
+	public record MainState
 	{
-		_authorizationPresenter = authorizationPresenter;
-		_metagamePresenter = metagamePresenter;
+		public record Authorization() : MainState;
+		public record Metagame() : MainState;
+		public record Game() : MainState;
+		public record Close() : MainState;
 	}
 
-	void Start()
+	public record MainProperty(MainState State);
+
+	public class Main : MonoBehaviour
 	{
-        _ = _Main();
-	}
-	
-	private async UniTask _Main()
-	{
-		var prop = new MainProperty(new MainState.Authorization());
-		while (prop.State is not MainState.Close)
+		private IAuthorizationPresenter _authorizationPresenter;
+		private IMetagamePresenter _metagamePresenter;
+
+		[Zenject.Inject]
+		public void Zenject(IAuthorizationPresenter authorizationPresenter, IMetagamePresenter metagamePresenter)
 		{
-			var subTabReturn = await _GetCurrentSubTabPresenter(prop.State).Run();
+			_authorizationPresenter = authorizationPresenter;
+			_metagamePresenter = metagamePresenter;
+		}
 
-			switch (subTabReturn.Type)
+		void Start()
+		{
+			_ = _Main();
+		}
+
+		private async UniTask _Main()
+		{
+			var prop = new MainProperty(new MainState.Authorization());
+			while (prop.State is not MainState.Close)
 			{
-				case MainSubTabReturnType.Close:
-					prop = prop with { State = new MainState.Close() };
-					break;
-				case MainSubTabReturnType.Switch info:
-					prop = prop with { State = info.State };
-					break;
+				var subTabReturn = await _GetCurrentSubTabPresenter(prop.State).Run();
+
+				switch (subTabReturn.Type)
+				{
+					case MainSubTabReturnType.Close:
+						prop = prop with { State = new MainState.Close() };
+						break;
+					case MainSubTabReturnType.Switch info:
+						prop = prop with { State = info.State };
+						break;
+				}
 			}
 		}
-	}
 
-	private IMainSubTabPresenter _GetCurrentSubTabPresenter(MainState type)
-		=> type switch
-		{
-			MainState.Authorization => _authorizationPresenter,
-			MainState.Metagame => _metagamePresenter,
-			_ => null
-		};
+		private IMainSubTabPresenter _GetCurrentSubTabPresenter(MainState type)
+			=> type switch
+			{
+				MainState.Authorization => _authorizationPresenter,
+				MainState.Metagame => _metagamePresenter,
+				_ => null
+			};
+	}
 }

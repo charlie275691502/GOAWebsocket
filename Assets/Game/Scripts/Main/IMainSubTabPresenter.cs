@@ -1,14 +1,17 @@
 using Cysharp.Threading.Tasks;
 
-public record MainSubTabReturnType
+namespace Main
 {
-	public record Switch(MainState State) : MainSubTabReturnType;
-	public record Close() : MainSubTabReturnType;
-}
+	public record MainSubTabReturnType
+	{
+		public record Switch(MainState State) : MainSubTabReturnType;
+		public record Close() : MainSubTabReturnType;
+	}
 
-public record MainSubTabReturn(MainSubTabReturnType Type);
+	public record MainSubTabReturn(MainSubTabReturnType Type);
 
-public interface IMainSubTabPresenter
-{
-	UniTask<MainSubTabReturn> Run();
+	public interface IMainSubTabPresenter
+	{
+		UniTask<MainSubTabReturn> Run();
+	}
 }
