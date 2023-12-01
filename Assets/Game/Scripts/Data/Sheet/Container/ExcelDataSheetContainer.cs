@@ -7,6 +7,6 @@ namespace Data.Sheet.Container
 {
     public class ExcelDataSheetContainer : SheetContainerBase
     {
-
+        public ExcelDataSheetContainer(Microsoft.Extensions.Logging.ILogger logger) : base(logger) {}
     }
 }
