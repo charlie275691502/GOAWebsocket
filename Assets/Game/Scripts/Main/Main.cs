@@ -2,6 +2,9 @@ using UnityEngine;
 using Authorization;
 using Metagame;
 using Cysharp.Threading.Tasks;
+using ExcelDataReader;
+using Data.Sheet;
+using Common.AssetSession;
 
 namespace Main
 {
@@ -17,12 +20,17 @@ namespace Main
 
 	public class Main : MonoBehaviour
 	{
+		private IExcelDataSheetLoader _excelDataSheetLoader;
 		private IAuthorizationPresenter _authorizationPresenter;
 		private IMetagamePresenter _metagamePresenter;
 
 		[Zenject.Inject]
-		public void Zenject(IAuthorizationPresenter authorizationPresenter, IMetagamePresenter metagamePresenter)
+		public void Zenject(
+			IExcelDataSheetLoader excelDataSheetLoader,
+			IAuthorizationPresenter authorizationPresenter,
+			IMetagamePresenter metagamePresenter)
 		{
+			_excelDataSheetLoader = excelDataSheetLoader;
 			_authorizationPresenter = authorizationPresenter;
 			_metagamePresenter = metagamePresenter;
 		}
@@ -34,6 +42,7 @@ namespace Main
 
 		private async UniTask _Main()
 		{
+			await _LoadExcelData();
 			var prop = new MainProperty(new MainState.Authorization());
 			while (prop.State is not MainState.Close)
 			{
@@ -49,6 +58,11 @@ namespace Main
 						break;
 				}
 			}
+		}
+		
+		private async UniTask _LoadExcelData()
+		{
+			await _excelDataSheetLoader.Bake();
 		}
 
 		private IMainSubTabPresenter _GetCurrentSubTabPresenter(MainState type)

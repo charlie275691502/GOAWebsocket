@@ -1,4 +1,5 @@
 using Common;
+using Data.Sheet;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,6 +40,8 @@ namespace Metagame
 		private void _Enter(PlayerData data)
 		{
 			_nickNameText.text = data.NickName;
+			
+			
 		}
 		
 		private void _EnterEmpty()

@@ -7,6 +7,7 @@ using Zenject;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using Metagame.MainPage;
+using Data.Sheet;
 
 namespace Metagame
 {
