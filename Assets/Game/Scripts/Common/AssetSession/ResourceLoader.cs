@@ -12,7 +12,8 @@ namespace Common.AssetSession
     {
         public static Dictionary<AssetType, string> _assetPath = new Dictionary<AssetType, string>()
         {
-            { AssetType.Avatar, "Avatar"}
+            { AssetType.Avatar, "Avatars"},
+            { AssetType.DataSheet, "DataSheets"},
         };
 
         void IAssetSession.AsyncLoad<T>(AssetType assetType, string assetName, Action<T> onComplete)

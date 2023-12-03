@@ -10,6 +10,7 @@ using Authorization.Register;
 using Metagame.MainPage;
 using Metagame.MainPage.CreateRoom;
 using Metagame.Room;
+using Common.AssetSession;
 
 namespace Main
 {
@@ -58,6 +59,10 @@ namespace Main
 
 			#region Common
 
+			Container
+				.Bind<IAssetSession>()
+				.To<ResourceLoader>()
+				.AsSingle();
 			Container
 				.Bind<IWarningPresenter>()
 				.To<WarningPresenter>()
