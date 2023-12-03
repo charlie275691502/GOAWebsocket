@@ -215,6 +215,7 @@ GameObject:
   - component: {fileID: 7887937448618100765}
   - component: {fileID: 8401827574701207639}
   - component: {fileID: 7606565331197085911}
+  - component: {fileID: 3329201920313026115}
   m_Layer: 5
   m_Name: Avatar
   m_TagString: Untagged
@@ -280,6 +281,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &3329201920313026115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5506413430577453936}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _image: {fileID: 7606565331197085911}
 --- !u!1 &6888109890452605619
 GameObject:
   m_ObjectHideFlags: 0
@@ -343,5 +357,5 @@ MonoBehaviour:
   _rootFolder: {fileID: 2486865197271998263}
   _panel: {fileID: 2486865197271998263}
   _nickNameText: {fileID: 3407044281894546150}
-  _avatarImage: {fileID: 7606565331197085911}
+  _avatarImage: {fileID: 3329201920313026115}
   _emptyNickName: (Empty)

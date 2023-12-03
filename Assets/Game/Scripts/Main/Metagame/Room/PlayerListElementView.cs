@@ -5,19 +5,22 @@ using EnhancedUI.EnhancedScroller;
 using Zenject;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using Common.AssetSession;
 
 namespace Metagame
 {
-	public class PlayerListElementView : SimpleEnhancedScrollerElement<PlayerData>
+	public class PlayerListElementView : SimpleEnhancedScrollerElement<PlayerViewData>
 	{
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
 		private Text _nickNameText;
 		[SerializeField]
-		private Image _avatarImage;
+		private SyncImage _avatarImage;
 		[SerializeField]
 		private string _emptyNickName;
+		
+		private IAssetSession _assetSession;
 		
 		
 #region EnhancedScrollerElement
@@ -29,10 +32,10 @@ namespace Metagame
 		
 		protected override void _Resolve(DiContainer container)
 		{
-			
+			_assetSession = container.Resolve<IAssetSession>();
 		}
 		
-		protected override void _Display(PlayerData viewData)
+		protected override void _Display(PlayerViewData viewData)
 		{
 			_nickNameText.text = viewData.NickName;
 		}
@@ -40,16 +43,17 @@ namespace Metagame
 		protected override void _DisplayEmpty()
 		{
 			_nickNameText.text = _emptyNickName;
+			_avatarImage.Clear();
 		}
 		
-		protected override void _Refresh(PlayerData viewData)
+		protected override void _Refresh(PlayerViewData viewData)
 		{
 			
 		}
 
-		protected override async UniTask _LoadAsset(PlayerData viewData, CancellationTokenSource token)
+		protected override async UniTask _LoadAsset(PlayerViewData viewData, CancellationTokenSource token)
 		{
-			await UniTask.Yield();
+			await _avatarImage.LoadSprite(_assetSession.SyncLoad<Sprite>(AssetType.Avatar, viewData.AvatarImageKey));
 		}
 
 		protected override void _Leave()

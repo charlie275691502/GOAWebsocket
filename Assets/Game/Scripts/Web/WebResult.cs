@@ -19,6 +19,8 @@ namespace Web
 		public string NickName;
 		[JsonProperty("coin")]
 		public int Coin;
+		[JsonProperty("avatarId")]
+		public string AvatarId;
 	}
 	
 	public class GameSettingResult

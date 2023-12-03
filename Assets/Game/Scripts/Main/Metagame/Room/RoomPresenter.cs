@@ -6,6 +6,7 @@ using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Optional.Unsafe;
 using Common.UniTaskExtension;
+using Data.Sheet;
 
 namespace Metagame.Room
 {
@@ -31,17 +32,24 @@ namespace Metagame.Room
 		private IWarningPresenter _warningPresenter;
 		private IRoomWebSocketPresenter _webSocketPresenter;
 		private IRoomView _view;
+		private IExcelDataSheetLoader _excelDataSheetLoader;
 
 		private ActionQueue _actionQueue;
 
 		private RoomProperty _prop;
 
-		public RoomPresenter(IHTTPPresenter hTTPPresenter, IRoomWebSocketPresenter webSocketPresenter, IWarningPresenter warningPresenter, IRoomView view)
+		public RoomPresenter(
+			IHTTPPresenter hTTPPresenter,
+			IRoomWebSocketPresenter webSocketPresenter,
+			IWarningPresenter warningPresenter,
+			IRoomView view,
+			IExcelDataSheetLoader excelDataSheetLoader)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_webSocketPresenter = webSocketPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
+			_excelDataSheetLoader = excelDataSheetLoader;
 
 			_actionQueue = new ActionQueue();
 			
@@ -118,7 +126,7 @@ namespace Metagame.Room
 				result.Id,
 				result.RoomName,
 				new GameSetting(result.GameSetting),
-				result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList(),
+				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList(),
 				result.Messages.Select(message => new MessageViewData()
 				{
 					Id = message.Id,
@@ -188,7 +196,7 @@ namespace Metagame.Room
 					Id = result.Id,
 					RoomName = result.RoomName,
 					GameSetting = new GameSetting(result.GameSetting),
-					Players = result.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList()
+					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
 				}
 			};
 		}

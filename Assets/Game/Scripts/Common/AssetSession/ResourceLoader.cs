@@ -17,9 +17,9 @@ namespace Common.AssetSession
         };
 
         public string GetPath(AssetType assetType, string assetName)
-            => _assetPath.TryGetValue(assetType, out var folderPath)
-                ? Path.Combine(folderPath, assetName)
-                : string.Empty;
+            => string.IsNullOrEmpty(assetName) || !_assetPath.TryGetValue(assetType, out var folderPath)
+                ? string.Empty
+                : Path.Combine(folderPath, assetName);
 
         void IAssetSession.AsyncLoad<T>(AssetType assetType, string assetName, Action<T> onComplete)
         {
@@ -31,16 +31,16 @@ namespace Common.AssetSession
             });
         }
 
-        Option<T> IAssetSession.SyncLoad<T>(AssetType assetType, string assetName)
-        {
-            var path = GetPath(assetType, assetName);
-            return Resources.Load<T>(path)?.Some() ?? Option.None<T>();
-        }
-
-        UniTask<Option<T>> IAssetSession.Load<T>(AssetType assetType, string assetName)
+        UniTask<Option<T>> IAssetSession.SyncLoad<T>(AssetType assetType, string assetName)
         {
             var path = GetPath(assetType, assetName);
             return _LoadAsync<T>(path);
+        }
+
+        Option<T> IAssetSession.SyncBlockLoad<T>(AssetType assetType, string assetName)
+        {
+            var path = GetPath(assetType, assetName);
+            return Resources.Load<T>(path)?.Some() ?? Option.None<T>();
         }
 
         private async UniTask<Option<T>> _LoadAsync<T>(string path) where T : Object

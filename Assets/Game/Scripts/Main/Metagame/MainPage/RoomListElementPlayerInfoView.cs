@@ -1,9 +1,12 @@
+using System.Threading;
 using Common;
+using Common.AssetSession;
+using Cysharp.Threading.Tasks;
 using Data.Sheet;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Metagame
+namespace Metagame.MainPage
 {
 	public class RoomListElementPlayerInfoView : MonoBehaviour
 	{
@@ -12,11 +15,11 @@ namespace Metagame
 		[SerializeField]
 		private Text _nickNameText;
 		[SerializeField]
-		private Image _avatarImage;
+		private SyncImage _avatarImage;
 		[SerializeField]
 		private string _emptyNickName;
 		
-		public void Enter(PlayerData data)
+		public void Enter(PlayerViewData data)
 		{
 			_Enter(data);
 			_Register();
@@ -37,16 +40,20 @@ namespace Metagame
 			_Leave();
 		}
 		
-		private void _Enter(PlayerData data)
+		private void _Enter(PlayerViewData data)
 		{
 			_nickNameText.text = data.NickName;
-			
-			
 		}
 		
 		private void _EnterEmpty()
 		{
 			_nickNameText.text = _emptyNickName;
+			_avatarImage.Clear();
+		}
+
+		public async UniTask LoadAsset(PlayerViewData viewData, IAssetSession assetSession, CancellationTokenSource token)
+		{
+			await _avatarImage.LoadSprite(assetSession.SyncLoad<Sprite>(AssetType.Avatar, viewData.AvatarImageKey));
 		}
 		
 		private void _Leave()

@@ -15,7 +15,7 @@ namespace Metagame.Room
 		int Id,
 		string RoomName,
 		GameSetting GameSetting,
-		List<PlayerData> Players,
+		List<PlayerViewData> Players,
 		List<MessageViewData> Messages) 
 			: RoomViewData(
 				Id,

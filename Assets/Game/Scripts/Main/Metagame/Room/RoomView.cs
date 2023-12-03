@@ -53,7 +53,7 @@ namespace Metagame.Room
 		private SimpleEnhancedScrollerController _messageScrollerController;
 		private EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>> _messageDataModel;
 		private SimpleEnhancedScrollerController _playerScrollerController;
-		private EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerData>> _playerDataModel;
+		private EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerViewData>> _playerDataModel;
 		
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
@@ -64,7 +64,7 @@ namespace Metagame.Room
 			_messageDataModel = new EnhancedScrollerDataModel<MessageListElementView, EnhancedScrollerElementViewData<MessageViewData>>(
 				_messagePrefab,
 				_messageScroller.scrollDirection);
-			_playerDataModel = new EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerData>>(
+			_playerDataModel = new EnhancedScrollerDataModel<PlayerListElementView, EnhancedScrollerElementViewData<PlayerViewData>>(
 				_playerPrefab,
 				_playerScroller.scrollDirection);
 				

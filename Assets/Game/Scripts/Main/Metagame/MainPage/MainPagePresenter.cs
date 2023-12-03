@@ -10,7 +10,6 @@ using Optional.Unsafe;
 using Web;
 using Metagame.MainPage.CreateRoom;
 using Data.Sheet;
-using System.Diagnostics;
 
 namespace Metagame.MainPage
 {
@@ -127,16 +126,13 @@ namespace Metagame.MainPage
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
 		{
 			var a = _excelDataSheetLoader.Container.Avatars.GetRow("1");
-			UnityEngine.Debug.LogError(a.ValueOrFailure().ImageKey);
-			a = _excelDataSheetLoader.Container.Avatars.GetRow("2");
-			UnityEngine.Debug.LogError(a.ValueOrFailure().ImageKey);
 			
 			return result.Select(roomResult => 
 				new RoomViewData(
 					roomResult.Id,
 					roomResult.RoomName,
 					new GameSetting(roomResult.GameSetting),
-					roomResult.Players.Select(playerDataResult => new PlayerData(playerDataResult)).ToList()
+					roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
 				)).ToList();
 		}
 

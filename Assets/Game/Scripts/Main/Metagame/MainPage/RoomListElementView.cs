@@ -8,8 +8,9 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using Metagame.MainPage;
 using Data.Sheet;
+using Common.AssetSession;
 
-namespace Metagame
+namespace Metagame.MainPage
 {
 	public class RoomListElementView : SimpleEnhancedScrollerElement<RoomViewData>
 	{
@@ -22,6 +23,8 @@ namespace Metagame
 		
 		public Action OnJoinRoom;
 		
+		private IAssetSession _assetSession;
+		
 #region EnhancedScrollerElement
 		
 		protected override void _Update()
@@ -31,7 +34,7 @@ namespace Metagame
 		
 		protected override void _Resolve(DiContainer container)
 		{
-			
+			_assetSession = container.Resolve<IAssetSession>();
 		}
 		
 		protected override void _Display(RoomViewData viewData)
@@ -62,7 +65,14 @@ namespace Metagame
 		
 		protected override async UniTask _LoadAsset(RoomViewData viewData, CancellationTokenSource token)
 		{
-			await UniTask.Yield();
+			for (int i=0; i < _playerInfoViews.Count; i++)
+			{
+				if (i < viewData.Players.Count) 
+				{
+					await _playerInfoViews[i].LoadAsset(viewData.Players[i], _assetSession, token);
+				}
+			}
+			
 		}
 		
 		protected override void _Leave()

@@ -10,9 +10,9 @@ namespace Cathei.BakingSheet
 		public Option<T> GetRow(string id)
 		{
 			return
-				Contains(id) 
-					? this[id].Some()
-					: Option.None<T>();
+				string.IsNullOrEmpty(id) || !Contains(id) 
+					? Option.None<T>()
+					: this[id].Some();
 		}
 	}
 }
