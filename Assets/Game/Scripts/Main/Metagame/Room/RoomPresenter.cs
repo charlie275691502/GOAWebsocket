@@ -132,6 +132,11 @@ namespace Metagame.Room
 					Id = message.Id,
 					Content = message.Content,
 					NickName = message.Player.NickName,
+					AvatarImageKey =
+						_excelDataSheetLoader.Container.Avatars
+							.GetRow(message.Player.AvatarId)
+							.Map(avatar => avatar.ImageKey)
+							.ValueOr(string.Empty),
 				}).ToList()
 			);
 		}
@@ -181,6 +186,11 @@ namespace Metagame.Room
 							Id = result.Id,
 							Content = result.Content,
 							NickName = result.Player.NickName,
+							AvatarImageKey =
+								_excelDataSheetLoader.Container.Avatars
+									.GetRow(result.Player.AvatarId)
+									.Map(avatar => avatar.ImageKey)
+									.ValueOr(string.Empty),
 						})
 						.ToList()
 				}

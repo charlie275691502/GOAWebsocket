@@ -5,6 +5,8 @@ using Zenject;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using Metagame.Room;
+using Common;
+using Common.AssetSession;
 
 namespace Metagame
 {
@@ -16,9 +18,13 @@ namespace Metagame
 		private Text _contentText;
 		[SerializeField]
 		private Text _nickNameText;
-		
-#region EnhancedScrollerElement
-		
+		[SerializeField]
+		private SyncImage _avatarImage;
+
+		private IAssetSession _assetSession;
+
+		#region EnhancedScrollerElement
+
 		protected override void _Update()
 		{
 			
@@ -26,7 +32,7 @@ namespace Metagame
 		
 		protected override void _Resolve(DiContainer container)
 		{
-			
+			_assetSession = container.Resolve<IAssetSession>();
 		}
 		
 		protected override void _Display(MessageViewData viewData)
@@ -39,6 +45,7 @@ namespace Metagame
 		{
 			_contentText.text = string.Empty;
 			_nickNameText.text = string.Empty;
+			_avatarImage.Clear();
 		}
 		
 		protected override void _Refresh(MessageViewData viewData)
@@ -48,7 +55,7 @@ namespace Metagame
 
 		protected override async UniTask _LoadAsset(MessageViewData viewData, CancellationTokenSource token)
 		{
-			await UniTask.Yield();
+			await _avatarImage.LoadSprite(_assetSession.SyncLoad<Sprite>(AssetType.Avatar, viewData.AvatarImageKey));
 		}
 
 		protected override void _Leave()

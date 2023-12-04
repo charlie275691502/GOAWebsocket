@@ -9,6 +9,7 @@ namespace Metagame.Room
 		public int Id;
 		public string Content;
 		public string NickName;
+		public string AvatarImageKey;
 	}
 	
 	public record RoomWithMessagesViewData(

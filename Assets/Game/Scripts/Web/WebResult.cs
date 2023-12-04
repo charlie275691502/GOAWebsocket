@@ -19,7 +19,7 @@ namespace Web
 		public string NickName;
 		[JsonProperty("coin")]
 		public int Coin;
-		[JsonProperty("avatarId")]
+		[JsonProperty("avatar_id")]
 		public string AvatarId;
 	}
 	
@@ -56,6 +56,8 @@ namespace Web
 		public int Id;
 		[JsonProperty("nick_name")]
 		public string NickName;
+		[JsonProperty("avatar_id")]
+		public string AvatarId;
 	}
 	
 	public class MessageResult
