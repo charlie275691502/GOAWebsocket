@@ -113,7 +113,7 @@ namespace Web
 		
 		protected void _UnregisterOnReceiveMessage(string command)
 		{
-			_onReceiveMessageActionDic[command] = null;
+			_onReceiveMessageActionDic.Remove(command);
 		}
 
 		private void _OnWebSocketOpen(WebSocket webSocket)
