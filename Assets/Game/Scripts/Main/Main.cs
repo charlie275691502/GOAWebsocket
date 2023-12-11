@@ -2,9 +2,7 @@ using UnityEngine;
 using Authorization;
 using Metagame;
 using Cysharp.Threading.Tasks;
-using ExcelDataReader;
 using Data.Sheet;
-using Common.AssetSession;
 
 namespace Main
 {
