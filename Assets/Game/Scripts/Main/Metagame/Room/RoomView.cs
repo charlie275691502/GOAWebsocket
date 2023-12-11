@@ -151,6 +151,11 @@ namespace Metagame.Room
 		
 		private void _OnSendMessage()
 		{
+			if (string.IsNullOrEmpty(_messageInputField.text))
+			{
+				return;
+			}
+			
 			_onSendMessage?.Invoke(_messageInputField.text);
 			_messageInputField.text = string.Empty;
 		}
