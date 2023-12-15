@@ -10,6 +10,7 @@ using Authorization.Register;
 using Metagame.MainPage;
 using Metagame.MainPage.CreateRoom;
 using Metagame.Room;
+using Gameplay.TicTacToe;
 using Common.AssetSession;
 using Data.Sheet;
 
@@ -34,6 +35,9 @@ namespace Main
 		private RoomView _roomView;
 		[SerializeField]
 		private TopMenuView _topMenuView;
+
+		[SerializeField]
+		private TicTacToeGameplayView _ticTacToeGameplayView;
 
 		public override void InstallBindings()
 		{
@@ -149,6 +153,15 @@ namespace Main
 				.FromInstance(_topMenuView);
 
 			#endregion
+
+			Container
+				.Bind<ITicTacToeGameplayPresenter>()
+				.To<TicTacToeGameplayPresenter>()
+				.AsSingle();
+			Container
+				.Bind<ITicTacToeGameplayView>()
+				.To<TicTacToeGameplayView>()
+				.FromInstance(_ticTacToeGameplayView);
 		}
 	}
 }

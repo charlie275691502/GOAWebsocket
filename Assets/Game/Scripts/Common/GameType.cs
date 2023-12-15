@@ -8,8 +8,8 @@ namespace Common.Class
 	public enum GameType
 	{
 		None,
-		Tic_Tac_Toe,
-		Generation_Of_Authority,
+		TicTacToe,
+		GenerationOfAuthority,
 	};
 	
 	public class GameSetting
@@ -29,8 +29,8 @@ namespace Common.Class
 		private static Dictionary<GameType, string> _dic = new Dictionary<GameType, string>()
 		{
 			{GameType.None, "NON"},
-			{GameType.Tic_Tac_Toe, "TTT"},
-			{GameType.Generation_Of_Authority, "GOA"},
+			{GameType.TicTacToe, "TTT"},
+			{GameType.GenerationOfAuthority, "GOA"},
 		};
 		
 		public static GameType GetGameType(string abr)
