@@ -105,7 +105,12 @@ namespace Web
 
 			return ret;
 		}
-		
+
+		protected void _RegisterOnReceiveMessage(string command, Action action)
+		{
+			_onReceiveMessageActionDic[command] = (jtoken) => action?.Invoke();
+		}
+
 		protected void _RegisterOnReceiveMessage<T>(string command, Action<T> action)
 		{
 			_onReceiveMessageActionDic[command] = (jtoken) => action?.Invoke(jtoken.HasValues ? jtoken.ToObject<T>() : default(T));

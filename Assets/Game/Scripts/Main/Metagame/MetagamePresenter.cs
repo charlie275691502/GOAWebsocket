@@ -12,6 +12,7 @@ namespace Metagame
 	{
 		public record MainPage(): MetagameState;
 		public record Room(int RoomId): MetagameState;
+		public record Game(GameType GameType) : MetagameState;
 		public record Close() : MetagameState;
 	}
 

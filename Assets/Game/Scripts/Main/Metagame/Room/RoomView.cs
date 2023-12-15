@@ -9,7 +9,7 @@ namespace Metagame.Room
 {
 	public interface IRoomView
 	{
-		void RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage);
+		void RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage, Action onClickStartGame);
 		void Render(RoomProperty prop);
 	}
 	
@@ -25,7 +25,9 @@ namespace Metagame.Room
 		private Button _sendMessageButton;
 		[SerializeField]
 		private InputField _messageInputField;
-		
+		[SerializeField]
+		private Button _startGameButton;
+
 		[Header("MessageScroller")]
 		[SerializeField]
 		private EnhancedScrollerProxy _messageScroller;
@@ -57,7 +59,8 @@ namespace Metagame.Room
 		
 		private Action _onLeaveRoom;
 		private Action<string> _onSendMessage;
-		
+		private Action _onClickStartGame;
+
 		[Zenject.Inject]
 		public void Zenject(DiContainer container)
 		{
@@ -86,13 +89,15 @@ namespace Metagame.Room
 
 		private RoomProperty _prop;
 
-		void IRoomView.RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage)
+		void IRoomView.RegisterCallback(Action onLeaveRoom, Action<string> onSendMessage, Action onClickStartGame)
 		{
 			_onLeaveRoom = onLeaveRoom;
 			_onSendMessage = onSendMessage;
-			
+			_onClickStartGame = onClickStartGame;
+
 			_backButton.onClick.AddListener(_SwitchToMainPage);
 			_sendMessageButton.onClick.AddListener(_OnSendMessage);
+			_startGameButton.onClick.AddListener(_OnClickStartGame);
 		}
 
 		void IRoomView.Render(RoomProperty prop)
@@ -142,6 +147,7 @@ namespace Metagame.Room
 			_playerScrollerController.Display();
 			_messageDataModel.UpdateViewDatas(EnhancedScrollerUtility.GetViewDataList(prop.Room.Messages));
 			_messageScrollerController.Display(1);
+			_startGameButton.enabled = prop.Room.EnableStartGameButton;
 		}
 		
 		private void _SwitchToMainPage()
@@ -158,6 +164,11 @@ namespace Metagame.Room
 			
 			_onSendMessage?.Invoke(_messageInputField.text);
 			_messageInputField.text = string.Empty;
+		}
+
+		private void _OnClickStartGame()
+		{
+			_onClickStartGame?.Invoke();
 		}
 	}
 }

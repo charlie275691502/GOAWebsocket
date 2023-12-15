@@ -15,6 +15,8 @@ namespace Metagame.Room
 		public record Open() : RoomState;
 		public record Idle() : RoomState;
 		public record SendMessage(string Message) : RoomState;
+		public record SendStartGame() : RoomState;
+		public record StartGame() : RoomState;
 		public record Leave() : RoomState;
 		public record Close() : RoomState;
 	}
@@ -57,7 +59,9 @@ namespace Metagame.Room
 				() =>
 					_ChangeStateIfIdle(new RoomState.Leave()),
 				(message) =>
-					_ChangeStateIfIdle(new RoomState.SendMessage(message)));
+					_ChangeStateIfIdle(new RoomState.SendMessage(message)),
+				() =>
+					_ChangeStateIfIdle(new RoomState.SendStartGame()));
 		}
 
 		async UniTask<MetagameSubTabReturn> IRoomPresenter.Run(int roomId)
@@ -90,6 +94,23 @@ namespace Metagame.Room
 					case RoomState.SendMessage info:
 						_webSocketPresenter.SendMessage(info.Message);
 						_prop = _prop with { State = new RoomState.Idle() };
+						break;
+
+					case RoomState.SendStartGame:
+						_prop = _prop with { Room = _prop.Room with { EnableStartGameButton = false } };
+						_view.Render(_prop);
+						await
+						   _webSocketPresenter
+							   .SendStartGame()
+							   .RunAndHandleInternetError(_warningPresenter);
+						_prop = _prop with { State = new RoomState.Idle(), Room = _prop.Room with { EnableStartGameButton = true } };
+						_view.Render(_prop);
+						break;
+
+					case RoomState.StartGame:
+						await _LeaveRoom();
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(_prop.Room.GameSetting.GameType)) };
+						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
 					case RoomState.Leave:
@@ -137,7 +158,8 @@ namespace Metagame.Room
 							.GetRow(message.Player.AvatarId)
 							.Map(avatar => avatar.ImageKey)
 							.ValueOr(string.Empty),
-				}).ToList()
+				}).ToList(),
+				true
 			);
 		}
 
@@ -145,6 +167,7 @@ namespace Metagame.Room
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
+			_webSocketPresenter.RegisterOnReceiveStartGame(() => _actionQueue.Add(() => _StartGame()));
 
 			if (await
 				_webSocketPresenter
@@ -209,6 +232,11 @@ namespace Metagame.Room
 					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
 				}
 			};
+		}
+
+		private void _StartGame()
+		{
+			_prop = _prop with { State = new RoomState.StartGame() };
 		}
 	}
 }

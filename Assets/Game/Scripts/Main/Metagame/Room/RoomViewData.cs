@@ -17,7 +17,8 @@ namespace Metagame.Room
 		string RoomName,
 		GameSetting GameSetting,
 		List<PlayerViewData> Players,
-		List<MessageViewData> Messages) 
+		List<MessageViewData> Messages,
+		bool EnableStartGameButton) 
 			: RoomViewData(
 				Id,
 				RoomName,
