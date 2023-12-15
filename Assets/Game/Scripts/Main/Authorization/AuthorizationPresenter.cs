@@ -14,9 +14,9 @@ namespace Authorization
 
 	public record AuthorizationProperty(AuthorizationState State);
 
-	public interface IAuthorizationPresenter : IMainSubTabPresenter
+	public interface IAuthorizationPresenter
 	{
-
+		UniTask<MainSubTabReturn> Run();
 	}
 
 	public class AuthorizationPresenter : IAuthorizationPresenter
@@ -38,7 +38,7 @@ namespace Authorization
 			_registerPresenter = registerPresenter;
 		}
 		
-		async UniTask<MainSubTabReturn> IMainSubTabPresenter.Run()
+		async UniTask<MainSubTabReturn> IAuthorizationPresenter.Run()
 		{
 			var prop = new AuthorizationProperty(new AuthorizationState.Login());
 			while (prop.State is not AuthorizationState.Close)

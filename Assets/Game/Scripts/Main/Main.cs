@@ -45,7 +45,7 @@ namespace Main
 			var prop = new MainProperty(new MainState.Authorization());
 			while (prop.State is not MainState.Close)
 			{
-				var subTabReturn = await _GetCurrentSubTabPresenter(prop.State).Run();
+				var subTabReturn = await _GetCurrentSubTabUniTask(prop.State);
 
 				switch (subTabReturn.Type)
 				{
@@ -64,12 +64,16 @@ namespace Main
 			await _excelDataSheetLoader.Bake();
 		}
 
-		private IMainSubTabPresenter _GetCurrentSubTabPresenter(MainState type)
+		private UniTask<MainSubTabReturn> _GetCurrentSubTabUniTask(MainState type)
 			=> type switch
 			{
-				MainState.Authorization => _authorizationPresenter,
-				MainState.Metagame => _metagamePresenter,
-				_ => null
+				MainState.Authorization => _authorizationPresenter.Run(),
+				MainState.Metagame => _metagamePresenter.Run(),
+				MainState.Game info => info.GameType switch
+				{
+					_ => throw new System.NotImplementedException(),
+				},
+				_ => throw new System.NotImplementedException(),
 			};
 	}
 }

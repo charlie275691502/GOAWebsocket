@@ -9,9 +9,4 @@ namespace Main
 	}
 
 	public record MainSubTabReturn(MainSubTabReturnType Type);
-
-	public interface IMainSubTabPresenter
-	{
-		UniTask<MainSubTabReturn> Run();
-	}
 }

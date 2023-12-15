@@ -19,11 +19,11 @@ namespace Metagame
 
 	public record MetagameProperty(MetagameState State);
 	
-	public interface IMetagamePresenter : IMainSubTabPresenter
+	public interface IMetagamePresenter
 	{
-
+		UniTask<MainSubTabReturn> Run();
 	}
-	
+
 	public class MetagamePresenter : IMetagamePresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
@@ -52,7 +52,7 @@ namespace Metagame
 			_webSocketPresenter = webSocketPresenter;
 		}
 
-		async UniTask<MainSubTabReturn> IMainSubTabPresenter.Run()
+		async UniTask<MainSubTabReturn> IMetagamePresenter.Run()
 		{
 			await _hTTPPresenter.RefreshSelfPlayerData().RunAndHandleInternetError(_warningPresenter);
 			_topMenuView.Enter(_backendPlayerData);
