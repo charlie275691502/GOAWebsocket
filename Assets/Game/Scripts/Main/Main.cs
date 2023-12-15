@@ -3,6 +3,7 @@ using Authorization;
 using Metagame;
 using Cysharp.Threading.Tasks;
 using Data.Sheet;
+using Common.Class;
 
 namespace Main
 {
@@ -10,7 +11,7 @@ namespace Main
 	{
 		public record Authorization() : MainState;
 		public record Metagame() : MainState;
-		public record Game() : MainState;
+		public record Game(GameType GameType) : MainState;
 		public record Close() : MainState;
 	}
 

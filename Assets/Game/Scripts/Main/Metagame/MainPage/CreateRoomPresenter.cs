@@ -1,6 +1,7 @@
 using System;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
+using Common.Class;
 
 namespace Metagame.MainPage.CreateRoom
 {

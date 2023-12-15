@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Data.Sheet;
-using Optional.Unsafe;
+using Common.Class;
 using Web;
 
 namespace Metagame

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Common.Class;
 
 namespace Metagame.MainPage.CreateRoom
 {

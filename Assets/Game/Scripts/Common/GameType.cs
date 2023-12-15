@@ -3,7 +3,7 @@ using Optional.Collections;
 using Optional.Unsafe;
 using Web;
 
-namespace Metagame
+namespace Common.Class
 {
 	public enum GameType
 	{

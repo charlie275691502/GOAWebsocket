@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Metagame.MainPage;
 using Metagame.Room;
 using Main;
+using Common.Class;
 
 namespace Metagame
 {
@@ -57,13 +58,13 @@ namespace Metagame
 			_topMenuView.Enter(_backendPlayerData);
 
 			var prop = new MetagameProperty(new MetagameState.MainPage());
-			while (prop.State is not MetagameState.Close)
+			while (prop.State is not MetagameState.Close and not MetagameState.Game)
 			{
 				var subTabReturn = await (prop.State switch
                 {
                     MetagameState.MainPage => _mainPagePresneter.Run(),
                     MetagameState.Room info => _roomPresenter.Run(info.RoomId),
-                    _ => throw new System.NotImplementedException(),
+					_ => throw new System.NotImplementedException(),
                 });
 
 				switch (subTabReturn.Type)
@@ -80,7 +81,10 @@ namespace Metagame
 
 			_topMenuView.Leave();
 			_webSocketPresenter.Stop();
-			return new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game()));
+			return
+				prop.State is MetagameState.Game gameInfo
+					? new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game(gameInfo.GameType)))
+					: new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Close()));
 		}
 	}
 }

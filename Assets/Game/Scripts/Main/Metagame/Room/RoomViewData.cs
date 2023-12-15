@@ -1,6 +1,5 @@
-using Common;
-using Metagame.MainPage;
 using System.Collections.Generic;
+using Common.Class;
 
 namespace Metagame.Room
 {

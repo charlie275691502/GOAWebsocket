@@ -1,9 +1,9 @@
 using System;
-using Common;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using Common.Class;
 
 namespace Metagame.Room
 {

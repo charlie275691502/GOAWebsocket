@@ -6,9 +6,8 @@ using EnhancedUI.EnhancedScroller;
 using Zenject;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Metagame.MainPage;
-using Data.Sheet;
 using Common.AssetSession;
+using Common.Class;
 
 namespace Metagame.MainPage
 {
