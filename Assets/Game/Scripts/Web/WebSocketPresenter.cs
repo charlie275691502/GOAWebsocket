@@ -74,10 +74,11 @@ namespace Web
 			return default(None);
 		}
 
-		protected async UniTask<OneOf<T, UniTaskError>> _SendWaitTillReturn<T>(string command, Dictionary<string, object> body)
+		protected async UniTask<OneOf<T, UniTaskError>> _SendWaitTillReturn<T>(Dictionary<string, object> body)
 		{
-			string successCommand = command + "_success";
-			string failCommand = command + "_fail";
+			var command = body["command"];
+			var successCommand = command + "_success";
+			var failCommand = command + "_fail";
 			var leave = false;
 			var ret = new OneOf<T, UniTaskError>();
 

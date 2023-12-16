@@ -44,7 +44,6 @@ namespace Metagame
 		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.JoinRoom()
 			=>
 				_SendWaitTillReturn<None>(
-					"join_room", 
 					new Dictionary<string, object>()
 					{
 						{"command", "join_room"},
@@ -53,7 +52,6 @@ namespace Metagame
 		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.SendStartGame()
 			=>
 				_SendWaitTillReturn<None>(
-					"leave_room",
 					new Dictionary<string, object>()
 					{
 						{"command", "start_game"},
@@ -62,7 +60,6 @@ namespace Metagame
 		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.LeaveRoom()
 			=>
 				_SendWaitTillReturn<None>(
-					"leave_room", 
 					new Dictionary<string, object>()
 					{
 						{"command", "leave_room"},

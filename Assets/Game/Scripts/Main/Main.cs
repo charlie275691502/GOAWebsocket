@@ -4,6 +4,7 @@ using Metagame;
 using Cysharp.Threading.Tasks;
 using Data.Sheet;
 using Common.Class;
+using Gameplay;
 
 namespace Main
 {
@@ -22,16 +23,19 @@ namespace Main
 		private IExcelDataSheetLoader _excelDataSheetLoader;
 		private IAuthorizationPresenter _authorizationPresenter;
 		private IMetagamePresenter _metagamePresenter;
+		private IGameplayPresenter _gameplayPresenter;
 
 		[Zenject.Inject]
 		public void Zenject(
 			IExcelDataSheetLoader excelDataSheetLoader,
 			IAuthorizationPresenter authorizationPresenter,
-			IMetagamePresenter metagamePresenter)
+			IMetagamePresenter metagamePresenter,
+			IGameplayPresenter gameplayPresenter)
 		{
 			_excelDataSheetLoader = excelDataSheetLoader;
 			_authorizationPresenter = authorizationPresenter;
 			_metagamePresenter = metagamePresenter;
+			_gameplayPresenter = gameplayPresenter;
 		}
 
 		void Start()
@@ -69,11 +73,7 @@ namespace Main
 			{
 				MainState.Authorization => _authorizationPresenter.Run(),
 				MainState.Metagame => _metagamePresenter.Run(),
-				MainState.Game info => info.GameType switch
-				{
-					//GameType.Tic_Tac_Toe =>
-					_ => throw new System.NotImplementedException(),
-				},
+				MainState.Game info => _gameplayPresenter.Run(info.GameType),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

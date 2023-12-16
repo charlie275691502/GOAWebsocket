@@ -13,6 +13,7 @@ using Metagame.Room;
 using Gameplay.TicTacToe;
 using Common.AssetSession;
 using Data.Sheet;
+using Gameplay;
 
 namespace Main
 {
@@ -154,6 +155,13 @@ namespace Main
 
 			#endregion
 
+			#region
+			
+			Container
+				.Bind<IGameplayPresenter>()
+				.To<GameplayPresenter>()
+				.AsSingle();
+			
 			Container
 				.Bind<ITicTacToeGameplayPresenter>()
 				.To<TicTacToeGameplayPresenter>()
@@ -162,6 +170,8 @@ namespace Main
 				.Bind<ITicTacToeGameplayView>()
 				.To<TicTacToeGameplayView>()
 				.FromInstance(_ticTacToeGameplayView);
+				
+			#endregion
 		}
 	}
 }
