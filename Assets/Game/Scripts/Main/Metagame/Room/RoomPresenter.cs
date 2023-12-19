@@ -109,13 +109,13 @@ namespace Metagame.Room
 						break;
 
 					case RoomState.StartGame:
-						await _LeaveRoom();
+						_LeaveRoom();
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(_prop.Room.GameSetting.GameType)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
 					case RoomState.Leave:
-						await _LeaveRoom();
+						_LeaveRoom();
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.MainPage()) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
@@ -189,12 +189,8 @@ namespace Metagame.Room
 			}
 		}
 
-		private async UniTask _LeaveRoom()
+		private void _LeaveRoom()
 		{
-			await _webSocketPresenter
-				.LeaveRoom()
-				.RunAndHandleInternetError(_warningPresenter);
-
 			_webSocketPresenter.Stop();
 		}
 

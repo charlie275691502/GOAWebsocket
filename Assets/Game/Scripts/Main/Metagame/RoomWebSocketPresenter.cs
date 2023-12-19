@@ -15,7 +15,6 @@ namespace Metagame
 		void SendMessage(string message);
 		UniTask<OneOf<None, UniTaskError>> JoinRoom();
 		UniTask<OneOf<None, UniTaskError>> SendStartGame();
-		UniTask<OneOf<None, UniTaskError>> LeaveRoom();
 		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
 		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
 		void RegisterOnReceiveStartGame(Action onReceiveMessage);
@@ -55,14 +54,6 @@ namespace Metagame
 					new Dictionary<string, object>()
 					{
 						{"command", "start_game"},
-					});
-
-		UniTask<OneOf<None, UniTaskError>> IRoomWebSocketPresenter.LeaveRoom()
-			=>
-				_SendWaitTillReturn<None>(
-					new Dictionary<string, object>()
-					{
-						{"command", "leave_room"},
 					});
 
 		void IRoomWebSocketPresenter.RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage)
