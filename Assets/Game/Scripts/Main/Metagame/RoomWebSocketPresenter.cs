@@ -17,7 +17,7 @@ namespace Metagame
 		UniTask<OneOf<None, UniTaskError>> SendStartGame();
 		void RegisterOnReceiveAppendMessage(Action<MessageResult> onReceiveMessage);
 		void RegisterOnReceiveUpdateRoom(Action<RoomResult> onReceiveMessage);
-		void RegisterOnReceiveStartGame(Action onReceiveMessage);
+		void RegisterOnReceiveStartGame(Action<TicTacToeGameResult> onReceiveMessage);
 	}
 	
 	public class RoomWebSocketPresenter : WebSocketPresenter, IRoomWebSocketPresenter
@@ -66,7 +66,7 @@ namespace Metagame
 			_RegisterOnReceiveMessage("update_room", onReceiveMessage);
 		}
 
-		void IRoomWebSocketPresenter.RegisterOnReceiveStartGame(Action onReceiveMessage)
+		void IRoomWebSocketPresenter.RegisterOnReceiveStartGame(Action<TicTacToeGameResult> onReceiveMessage)
 		{
 			_RegisterOnReceiveMessage("start_game", onReceiveMessage);
 		}

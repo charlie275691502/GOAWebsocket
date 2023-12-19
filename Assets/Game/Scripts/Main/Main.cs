@@ -12,7 +12,7 @@ namespace Main
 	{
 		public record Authorization() : MainState;
 		public record Metagame() : MainState;
-		public record Game(GameType GameType) : MainState;
+		public record Game(GameType GameType, int GameId) : MainState;
 		public record Close() : MainState;
 	}
 
@@ -73,7 +73,7 @@ namespace Main
 			{
 				MainState.Authorization => _authorizationPresenter.Run(),
 				MainState.Metagame => _metagamePresenter.Run(),
-				MainState.Game info => _gameplayPresenter.Run(info.GameType),
+				MainState.Game info => _gameplayPresenter.Run(new GameplayParameter(info.GameType, info.GameId)),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

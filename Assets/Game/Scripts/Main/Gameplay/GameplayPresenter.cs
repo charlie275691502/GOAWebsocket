@@ -8,18 +8,11 @@ using Gameplay.TicTacToe;
 
 namespace Gameplay
 {
-	public record GameplayState
-	{
-		public record TicTacToe(): GameplayState;
-		public record GenerationOfAuthority(): GameplayState;
-		public record Close() : GameplayState;
-	}
-
-	public record GameplayProperty(GameplayState State);
+	public record GameplayParameter(GameType GameType, int GameId);
 
 	public interface IGameplayPresenter
 	{
-		UniTask<MainSubTabReturn> Run(GameType gameType);
+		UniTask<MainSubTabReturn> Run(GameplayParameter parameter);
 	}
 
 	public class GameplayPresenter : IGameplayPresenter
@@ -32,18 +25,18 @@ namespace Gameplay
 			_ticTacToeGameplayPresenter = ticTacToeGameplayPresenter;
 		}
 
-		async UniTask<MainSubTabReturn> IGameplayPresenter.Run(GameType gameType)
+		async UniTask<MainSubTabReturn> IGameplayPresenter.Run(GameplayParameter parameter)
 		{
 			// use UniTask.WhenAll() to combine gameplay and chat threads
 
-			await _GetCurrentSubTabUniTask(gameType);
+			await _GetCurrentSubTabUniTask(parameter);
 			return new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Metagame()));
 		}
 
-		private UniTask _GetCurrentSubTabUniTask(GameType gameType)
-			=> gameType switch
+		private UniTask _GetCurrentSubTabUniTask(GameplayParameter parameter)
+			=> parameter.GameType switch
 			{
-				GameType.TicTacToe => _ticTacToeGameplayPresenter.Run(),
+				GameType.TicTacToe => _ticTacToeGameplayPresenter.Run(parameter.GameId),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

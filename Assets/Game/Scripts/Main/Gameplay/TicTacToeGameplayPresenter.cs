@@ -16,7 +16,7 @@ namespace Gameplay.TicTacToe
 
 	public interface ITicTacToeGameplayPresenter
 	{
-		UniTask Run();
+		UniTask Run(int gameId);
 	}
 
 	public class TicTacToeGameplayPresenter : ITicTacToeGameplayPresenter
@@ -36,7 +36,7 @@ namespace Gameplay.TicTacToe
 			_view.RegisterCallback();
 		}
 
-		async UniTask ITicTacToeGameplayPresenter.Run()
+		async UniTask ITicTacToeGameplayPresenter.Run(int gameId)
 		{
 			_prop = new TicTacToeGameplayProperty(new TicTacToeGameplayState.Open());
 

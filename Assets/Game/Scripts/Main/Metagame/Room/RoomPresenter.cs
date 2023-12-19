@@ -17,7 +17,7 @@ namespace Metagame.Room
 		public record Idle() : RoomState;
 		public record SendMessage(string Message) : RoomState;
 		public record SendStartGame() : RoomState;
-		public record StartGame() : RoomState;
+		public record StartGame(int GameId) : RoomState;
 		public record Leave() : RoomState;
 		public record Close() : RoomState;
 	}
@@ -108,9 +108,9 @@ namespace Metagame.Room
 						_view.Render(_prop);
 						break;
 
-					case RoomState.StartGame:
+					case RoomState.StartGame info:
 						_LeaveRoom();
-						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(_prop.Room.GameSetting.GameType)) };
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(_prop.Room.GameSetting.GameType, info.GameId)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
@@ -168,7 +168,7 @@ namespace Metagame.Room
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
-			_webSocketPresenter.RegisterOnReceiveStartGame(() => _actionQueue.Add(() => _StartGame()));
+			_webSocketPresenter.RegisterOnReceiveStartGame(result => _actionQueue.Add(() => _StartGame(result)));
 
 			if (await
 				_webSocketPresenter
@@ -231,9 +231,9 @@ namespace Metagame.Room
 			};
 		}
 
-		private void _StartGame()
+		private void _StartGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame() };
+			_prop = _prop with { State = new RoomState.StartGame(result.Id) };
 		}
 	}
 }
