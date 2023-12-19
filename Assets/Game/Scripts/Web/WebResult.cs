@@ -75,4 +75,86 @@ namespace Web
 		[JsonProperty("messages")]
 		public List<MessageResult> Messages;
 	}
+
+	public class TicTacToeGameResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("board")]
+		public TicTacToeBoardResult Board;
+		[JsonProperty("players")]
+		public TicTacToePlayerResult[] Players;
+		[JsonProperty("setting")]
+		public TicTacToeSettingResult Setting;
+	}
+
+	public class TicTacToeRecordResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("init_board")]
+		public TicTacToeBoardResult InitBoard;
+		[JsonProperty("players")]
+		public TicTacToePlayerResult[] Players;
+		[JsonProperty("actions")]
+		public TicTacToeActionResult[] Actions;
+		[JsonProperty("setting")]
+		public TicTacToeSettingResult Setting;
+	}
+
+	public class TicTacToeBoardResult
+	{
+		[JsonProperty("positions")]
+		public int[] Positions;
+		[JsonProperty("turn")]
+		public int Turn;
+		[JsonProperty("turn_of_team")]
+		public int TurnOfTeam;
+	}
+
+	public class TicTacToeSettingResult
+	{
+		[JsonProperty("board_size")]
+		public int BoardSize;
+	}
+
+	public class TicTacToePlayerResult
+	{
+		[JsonProperty("team")]
+		public int Team;
+		[JsonProperty("player")]
+		public PlayerDataResult Player;
+		[JsonProperty("elo")]
+		public int Elo;
+		[JsonProperty("played_game_count")]
+		public int PlayedGameCount;
+		[JsonProperty("win_game_count")]
+		public int WinGameCount;
+	}
+
+	public class TicTacToeActionResult
+	{
+		[JsonProperty("player_id")]
+		public int PlayerId;
+		[JsonProperty("action_command_type")]
+		public string ActionCommandType;
+		[JsonProperty("action_command")]
+		public TicTacToeActionCommandResult ActionCommand;
+	}
+
+	public class TicTacToeActionCommandResult
+	{
+
+	}
+
+	public class TicTacToeChoosePositionActionCommandResult : TicTacToeActionCommandResult
+	{
+		[JsonProperty("position")]
+		public int Position;
+	}
+
+	public class TicTacToeResignActionCommandResult : TicTacToeActionCommandResult
+	{
+
+	}
 }
