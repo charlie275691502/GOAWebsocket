@@ -52,6 +52,10 @@ namespace Main
 				.Bind<IRoomWebSocketPresenter>()
 				.To<RoomWebSocketPresenter>()
 				.AsSingle();
+			Container
+				.Bind<ITicTacToeGameplayWebSocketPresenter>()
+				.To<TicTacToeGameplayWebSocketPresenter>()
+				.AsSingle();
 
 			Container
 				.Bind<BackendPlayerData>()
@@ -155,7 +159,7 @@ namespace Main
 
 			#endregion
 
-			#region
+			#region Gameplay
 			
 			Container
 				.Bind<IGameplayPresenter>()
