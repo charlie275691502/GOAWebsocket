@@ -7,7 +7,6 @@ using Common.Class;
 using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using Optional.Unsafe;
-using Data.Sheet;
 
 namespace Metagame.Room
 {
@@ -35,7 +34,6 @@ namespace Metagame.Room
 		private IWarningPresenter _warningPresenter;
 		private IRoomWebSocketPresenter _webSocketPresenter;
 		private IRoomView _view;
-		private IExcelDataSheetLoader _excelDataSheetLoader;
 
 		private ActionQueue _actionQueue;
 
@@ -45,14 +43,12 @@ namespace Metagame.Room
 			IHTTPPresenter hTTPPresenter,
 			IRoomWebSocketPresenter webSocketPresenter,
 			IWarningPresenter warningPresenter,
-			IRoomView view,
-			IExcelDataSheetLoader excelDataSheetLoader)
+			IRoomView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_webSocketPresenter = webSocketPresenter;
 			_warningPresenter = warningPresenter;
 			_view = view;
-			_excelDataSheetLoader = excelDataSheetLoader;
 
 			_actionQueue = new ActionQueue();
 			
@@ -148,17 +144,13 @@ namespace Metagame.Room
 				result.Id,
 				result.RoomName,
 				new GameSetting(result.GameSetting),
-				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList(),
+				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList(),
 				result.Messages.Select(message => new MessageViewData()
 				{
 					Id = message.Id,
 					Content = message.Content,
 					NickName = message.Player.NickName,
-					AvatarImageKey =
-						_excelDataSheetLoader.Container.Avatars
-							.GetRow(message.Player.AvatarId)
-							.Map(avatar => avatar.ImageKey)
-							.ValueOr(string.Empty),
+					AvatarImageKey = "Red",
 				}).ToList(),
 				true
 			);
@@ -206,11 +198,7 @@ namespace Metagame.Room
 							Id = result.Id,
 							Content = result.Content,
 							NickName = result.Player.NickName,
-							AvatarImageKey =
-								_excelDataSheetLoader.Container.Avatars
-									.GetRow(result.Player.AvatarId)
-									.Map(avatar => avatar.ImageKey)
-									.ValueOr(string.Empty),
+							AvatarImageKey = "Red",
 						})
 						.ToList()
 				}
@@ -226,7 +214,7 @@ namespace Metagame.Room
 					Id = result.Id,
 					RoomName = result.RoomName,
 					GameSetting = new GameSetting(result.GameSetting),
-					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
+					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
 				}
 			};
 		}

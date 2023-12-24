@@ -2,7 +2,6 @@ using System.Threading;
 using Common;
 using Common.AssetSession;
 using Cysharp.Threading.Tasks;
-using Data.Sheet;
 using UnityEngine;
 using UnityEngine.UI;
 

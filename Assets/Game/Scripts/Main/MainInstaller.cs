@@ -12,7 +12,6 @@ using Metagame.MainPage.CreateRoom;
 using Metagame.Room;
 using Gameplay.TicTacToe;
 using Common.AssetSession;
-using Data.Sheet;
 using Gameplay;
 
 namespace Main
@@ -72,10 +71,6 @@ namespace Main
 			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
-				.AsSingle();
-			Container
-				.Bind<IExcelDataSheetLoader>()
-				.To<ExcelDataSheetLoader>()
 				.AsSingle();
 			Container
 				.Bind<IWarningPresenter>()
