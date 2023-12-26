@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Web;
@@ -12,7 +13,11 @@ namespace Gameplay.TicTacToe
 		public record Close() : TicTacToeGameplayState;
 	}
 
-	public record TicTacToeGameplayProperty(TicTacToeGameplayState State);
+	public record TicTacToeGameplayProperty(
+		TicTacToeGameplayState State,
+		int Turn,
+		bool IsPlayerTurn,
+		TicTacToePositionElementView.Property[] PositionProperties);
 
 	public interface ITicTacToeGameplayPresenter
 	{
@@ -27,6 +32,8 @@ namespace Gameplay.TicTacToe
 
 		private TicTacToeGameplayProperty _prop;
 
+		public const int BOARD_SIZE = 3;
+
 		public TicTacToeGameplayPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ITicTacToeGameplayView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
@@ -38,7 +45,12 @@ namespace Gameplay.TicTacToe
 
 		async UniTask ITicTacToeGameplayPresenter.Run(int gameId)
 		{
-			_prop = new TicTacToeGameplayProperty(new TicTacToeGameplayState.Open());
+			_prop = new TicTacToeGameplayProperty(
+				new TicTacToeGameplayState.Open(),
+				0,
+				false,
+				Enumerable.Repeat(
+					new TicTacToePositionElementView.Property(new TicTacToePositionElementView.State.Empty()), BOARD_SIZE * BOARD_SIZE).ToArray());
 
 			while (_prop.State is not TicTacToeGameplayState.Close)
 			{

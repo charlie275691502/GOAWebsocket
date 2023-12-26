@@ -1,3 +1,4 @@
+using Common.LinqExtension;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,9 +16,20 @@ namespace Gameplay.TicTacToe
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private Button _button;
+		private Text _turnText;
+		[SerializeField]
+		private GameObject _playerTurnIndicatorGameObject;
+		[SerializeField]
+		private GameObject _enemyTurnIndicatorGameObject;
+		[SerializeField]
+		private TicTacToePositionElementView[] _positionElements;
+		[SerializeField]
+		private Button _confirmPositionButton;
+		[SerializeField]
+		private Button _resignButton;
 
-		private Action _onConfirm;
+		private Action _onClickConfirmPositionButton;
+		private Action _onClickResignButton;
 
 		private TicTacToeGameplayProperty _prop;
 
@@ -65,12 +77,17 @@ namespace Gameplay.TicTacToe
 
 		private void _Render(TicTacToeGameplayProperty prop)
 		{
-
+			_turnText.text = prop.Turn.ToString();
+			_playerTurnIndicatorGameObject.SetActive(prop.IsPlayerTurn);
+			_enemyTurnIndicatorGameObject.SetActive(!prop.IsPlayerTurn);
+			_positionElements.ZipForEach(
+				prop.PositionProperties,
+				(view, property) => view.Render(property));
 		}
 
 		private void _OnConfirm()
 		{
-			_onConfirm?.Invoke();
+			//_onConfirm?.Invoke();
 		}
 	}
 }
