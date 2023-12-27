@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
+using Optional;
+using Optional.Collections;
 using Web;
 
 namespace Gameplay.TicTacToe
@@ -12,6 +15,12 @@ namespace Gameplay.TicTacToe
 		public record Idle() : TicTacToeGameplayState;
 		public record Close() : TicTacToeGameplayState;
 	}
+
+	public record TicTacToeGameplayModel(
+		int SelfPlayerId,
+		int SelfPlayerTeam,
+		int[] Positions,
+		Option<int> GhostPosition);
 
 	public record TicTacToeGameplayProperty(
 		TicTacToeGameplayState State,
@@ -30,11 +39,15 @@ namespace Gameplay.TicTacToe
 		private IWarningPresenter _warningPresenter;
 		private ITicTacToeGameplayView _view;
 
+		private TicTacToeGameplayModel _model;
 		private TicTacToeGameplayProperty _prop;
 
 		public const int BOARD_SIZE = 3;
 
-		public TicTacToeGameplayPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ITicTacToeGameplayView view)
+		public TicTacToeGameplayPresenter(
+			IHTTPPresenter hTTPPresenter,
+			IWarningPresenter warningPresenter,
+			ITicTacToeGameplayView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
@@ -45,12 +58,17 @@ namespace Gameplay.TicTacToe
 
 		async UniTask ITicTacToeGameplayPresenter.Run(TicTacToeGameData gameData)
 		{
+			_model = new TicTacToeGameplayModel(
+				gameData.SelfPlayerId,
+				gameData.SelfPlayerTeam,
+				gameData.Board.Positions,
+				Option.None<int>());
+
 			_prop = new TicTacToeGameplayProperty(
 				new TicTacToeGameplayState.Open(),
-				0,
-				false,
-				Enumerable.Repeat(
-					new TicTacToePositionElementView.Property(new TicTacToePositionElementView.State.Empty()), BOARD_SIZE * BOARD_SIZE).ToArray());
+				gameData.Board.Turn,
+				gameData.SelfPlayerTeam == gameData.Board.TurnOfTeam,
+				_GetPositionsProperty(_model.Positions, _model.GhostPosition));
 
 			while (_prop.State is not TicTacToeGameplayState.Close)
 			{
@@ -84,5 +102,18 @@ namespace Gameplay.TicTacToe
 			onChangeStateSuccess?.Invoke();
 			_prop = _prop with { State = targetState };
 		}
+
+		private TicTacToePositionElementView.Property[] _GetPositionsProperty(int[] Positions, Option<int> GhostPosition)
+			=>
+				Positions
+					.Select(position => new TicTacToePositionElementView.Property(
+						position switch
+						{
+							0 => new TicTacToePositionElementView.State.Empty(),
+							1 => new TicTacToePositionElementView.State.Circle(GhostPosition.Contains(position)),
+							2 => new TicTacToePositionElementView.State.Cross(GhostPosition.Contains(position)),
+							_ => throw new System.NotImplementedException(),
+						}))
+					.ToArray();
 	}
 }

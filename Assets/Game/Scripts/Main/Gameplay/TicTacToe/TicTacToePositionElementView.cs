@@ -10,21 +10,21 @@ namespace Gameplay.TicTacToe
     {
         public abstract record State()
         {
-            public record Cross(bool IsGhost) : State;
             public record Circle(bool IsGhost) : State;
-            public record Empty() : State;
+            public record Cross(bool IsGhost) : State;
+			public record Empty() : State;
         }
 
         public record Property(State State);
 
 		[SerializeField]
-		private GameObject _crossGameObject;
-		[SerializeField]
-		private GameObject _crossGhostGameObject;
-		[SerializeField]
 		private GameObject _circleGameObject;
 		[SerializeField]
 		private GameObject _circleGhostGameObject;
+		[SerializeField]
+		private GameObject _crossGameObject;
+		[SerializeField]
+		private GameObject _crossGhostGameObject;
 		[SerializeField]
 		private Button _button;
 
@@ -43,25 +43,25 @@ namespace Gameplay.TicTacToe
 
 			switch (prop.State)
 			{
-				case State.Cross info:
-					_crossGameObject.SetActive(!info.IsGhost);
-					_crossGhostGameObject.SetActive(info.IsGhost);
-					_circleGameObject.SetActive(false);
-					_circleGhostGameObject.SetActive(false);
-					break;
-
 				case State.Circle info:
-					_crossGameObject.SetActive(false);
-					_crossGhostGameObject.SetActive(false);
 					_circleGameObject.SetActive(!info.IsGhost);
 					_circleGhostGameObject.SetActive(info.IsGhost);
+					_crossGameObject.SetActive(false);
+					_crossGhostGameObject.SetActive(false);
+					break;
+
+				case State.Cross info:
+					_circleGameObject.SetActive(false);
+					_circleGhostGameObject.SetActive(false);
+					_crossGameObject.SetActive(!info.IsGhost);
+					_crossGhostGameObject.SetActive(info.IsGhost);
 					break;
 
 				case State.Empty:
-					_crossGameObject.SetActive(false);
-					_crossGhostGameObject.SetActive(false);
 					_circleGameObject.SetActive(false);
 					_circleGhostGameObject.SetActive(false);
+					_crossGameObject.SetActive(false);
+					_crossGhostGameObject.SetActive(false);
 					break;
 
 				default:

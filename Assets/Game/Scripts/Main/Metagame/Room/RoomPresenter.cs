@@ -34,6 +34,7 @@ namespace Metagame.Room
 		private IHTTPPresenter _hTTPPresenter;
 		private IWarningPresenter _warningPresenter;
 		private IRoomWebSocketPresenter _webSocketPresenter;
+		private BackendPlayerData _backendPlayerData;
 		private IRoomView _view;
 
 		private ActionQueue _actionQueue;
@@ -44,11 +45,13 @@ namespace Metagame.Room
 			IHTTPPresenter hTTPPresenter,
 			IRoomWebSocketPresenter webSocketPresenter,
 			IWarningPresenter warningPresenter,
+			BackendPlayerData backendPlayerData,
 			IRoomView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_webSocketPresenter = webSocketPresenter;
 			_warningPresenter = warningPresenter;
+			_backendPlayerData = backendPlayerData;
 			_view = view;
 
 			_actionQueue = new ActionQueue();
@@ -222,7 +225,7 @@ namespace Metagame.Room
 
 		private void _StartGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result)) };
+			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id)) };
 		}
 	}
 }
