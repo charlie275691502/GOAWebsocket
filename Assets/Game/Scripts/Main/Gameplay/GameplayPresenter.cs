@@ -8,7 +8,7 @@ using Gameplay.TicTacToe;
 
 namespace Gameplay
 {
-	public record GameplayParameter(GameType GameType, int GameId);
+	public record GameplayParameter(IGameData GameData);
 
 	public interface IGameplayPresenter
 	{
@@ -34,9 +34,9 @@ namespace Gameplay
 		}
 
 		private UniTask _GetCurrentSubTabUniTask(GameplayParameter parameter)
-			=> parameter.GameType switch
+			=> parameter.GameData switch
 			{
-				GameType.TicTacToe => _ticTacToeGameplayPresenter.Run(parameter.GameId),
+				TicTacToeGameData => _ticTacToeGameplayPresenter.Run((TicTacToeGameData)parameter.GameData),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

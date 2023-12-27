@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 using Metagame.MainPage;
 using Metagame.Room;
 using Main;
-using Common.Class;
+using Gameplay;
 
 namespace Metagame
 {
@@ -13,7 +13,7 @@ namespace Metagame
 	{
 		public record MainPage(): MetagameState;
 		public record Room(int RoomId): MetagameState;
-		public record Game(GameType GameType, int GameId) : MetagameState;
+		public record Game(IGameData GameData) : MetagameState;
 		public record Close() : MetagameState;
 	}
 
@@ -83,7 +83,7 @@ namespace Metagame
 			_webSocketPresenter.Stop();
 			return
 				prop.State is MetagameState.Game gameInfo
-					? new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game(gameInfo.GameType, gameInfo.GameId)))
+					? new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Game(gameInfo.GameData)))
 					: new MainSubTabReturn(new MainSubTabReturnType.Switch(new MainState.Close()));
 		}
 	}

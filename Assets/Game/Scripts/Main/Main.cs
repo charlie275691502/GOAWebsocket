@@ -1,9 +1,8 @@
 using UnityEngine;
 using Authorization;
 using Metagame;
-using Cysharp.Threading.Tasks;
-using Common.Class;
 using Gameplay;
+using Cysharp.Threading.Tasks;
 
 namespace Main
 {
@@ -11,7 +10,7 @@ namespace Main
 	{
 		public record Authorization() : MainState;
 		public record Metagame() : MainState;
-		public record Game(GameType GameType, int GameId) : MainState;
+		public record Game(IGameData GameData) : MainState;
 		public record Close() : MainState;
 	}
 
@@ -63,7 +62,7 @@ namespace Main
 			{
 				MainState.Authorization => _authorizationPresenter.Run(),
 				MainState.Metagame => _metagamePresenter.Run(),
-				MainState.Game info => _gameplayPresenter.Run(new GameplayParameter(info.GameType, info.GameId)),
+				MainState.Game info => _gameplayPresenter.Run(new GameplayParameter(info.GameData)),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

@@ -7,6 +7,7 @@ using Common.Class;
 using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using Optional.Unsafe;
+using TicTacToeGameData = Gameplay.TicTacToe.TicTacToeGameData;
 
 namespace Metagame.Room
 {
@@ -16,7 +17,7 @@ namespace Metagame.Room
 		public record Idle() : RoomState;
 		public record SendMessage(string Message) : RoomState;
 		public record SendStartGame() : RoomState;
-		public record StartGame(int GameId) : RoomState;
+		public record StartGame(TicTacToeGameData GameData) : RoomState;
 		public record Leave() : RoomState;
 		public record Close() : RoomState;
 	}
@@ -106,7 +107,7 @@ namespace Metagame.Room
 
 					case RoomState.StartGame info:
 						_LeaveRoom();
-						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(_prop.Room.GameSetting.GameType, info.GameId)) };
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
@@ -221,7 +222,7 @@ namespace Metagame.Room
 
 		private void _StartGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame(result.Id) };
+			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result)) };
 		}
 	}
 }
