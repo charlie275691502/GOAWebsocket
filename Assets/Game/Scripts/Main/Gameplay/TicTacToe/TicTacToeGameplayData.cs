@@ -43,6 +43,7 @@ namespace Gameplay.TicTacToe
 	}
 
 	public record TicTacToeGameData(
+		int GameId,
 		int SelfPlayerId,
 		int SelfPlayerTeam,
 		TicTacToeBoardData Board,
@@ -50,6 +51,7 @@ namespace Gameplay.TicTacToe
 		TicTacToeSettingData Setting) : IGameData
 	{
 		public TicTacToeGameData(TicTacToeGameResult result, int selfPlayerId) : this(
+			result.Id,
 			selfPlayerId,
 			_GetSelfPlayerTeam(result.Players, selfPlayerId),
 			new TicTacToeBoardData(result.Board),

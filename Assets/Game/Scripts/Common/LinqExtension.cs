@@ -15,5 +15,13 @@ namespace Common.LinqExtension
                     return default(None);
                 })
                 .ToArray();
+
+        public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
+        {
+            source
+                .Select((obj, index) => (obj, index))
+                .ToList()
+                .ForEach(tuple => action?.Invoke(tuple.obj, tuple.index));
+        }
     }
 }

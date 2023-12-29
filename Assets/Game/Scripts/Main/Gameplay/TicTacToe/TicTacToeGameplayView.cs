@@ -1,5 +1,6 @@
 using Common.LinqExtension;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,7 +8,7 @@ namespace Gameplay.TicTacToe
 {
 	public interface ITicTacToeGameplayView
 	{
-		void RegisterCallback();
+		void RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton);
 		void Render(TicTacToeGameplayProperty prop);
 	}
 
@@ -24,20 +25,19 @@ namespace Gameplay.TicTacToe
 		[SerializeField]
 		private TicTacToePositionElementView[] _positionElements;
 		[SerializeField]
+		private GameObject _confirmPositionButtonGameObject;
+		[SerializeField]
 		private Button _confirmPositionButton;
 		[SerializeField]
 		private Button _resignButton;
 
-		private Action _onClickConfirmPositionButton;
-		private Action _onClickResignButton;
-
 		private TicTacToeGameplayProperty _prop;
 
-		void ITicTacToeGameplayView.RegisterCallback()
+		void ITicTacToeGameplayView.RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton)
 		{
-			//_onConfirm = onConfirm;
-
-			//_button.onClick.AddListener(_OnConfirm);
+			_confirmPositionButton.onClick.AddListener(() => onClickConfirmPositionButton?.Invoke());
+			_positionElements
+				.ForEach((view, index) => view.RegisterCallback(() => onClickClickPositionElement?.Invoke(index)));
 		}
 
 		void ITicTacToeGameplayView.Render(TicTacToeGameplayProperty prop)
@@ -83,11 +83,7 @@ namespace Gameplay.TicTacToe
 			_positionElements.ZipForEach(
 				prop.PositionProperties,
 				(view, property) => view.Render(property));
-		}
-
-		private void _OnConfirm()
-		{
-			//_onConfirm?.Invoke();
+			_confirmPositionButtonGameObject.SetActive(prop.ShowConfirmPositionButton);
 		}
 	}
 }
