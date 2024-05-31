@@ -151,6 +151,8 @@ namespace Web
 	{
 		[JsonProperty("position")]
 		public int Position;
+		[JsonProperty("value")]
+		public int Value;
 	}
 
 	public class TicTacToeResignActionCommandResult : TicTacToeActionCommandResult

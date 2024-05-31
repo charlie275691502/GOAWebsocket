@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Common.Observable;
 using Common.UniTaskExtension;
 using Common.Warning;
@@ -44,7 +45,7 @@ namespace Gameplay.TicTacToe
 
 		private Observable<Option<int>> _ghostPositionObs;
 		public Option<int> GhostPositionOpt
-        {
+		{
 			get => _ghostPositionObs.Value;
 			set => _ghostPositionObs.Value = value;
 		}
@@ -80,6 +81,8 @@ namespace Gameplay.TicTacToe
 		private TicTacToeGameData _gameData;
 		private TicTacToeGameplayModel _model;
 		private TicTacToeGameplayProperty _prop;
+		
+		private ActionQueue _actionQueue;
 
 		public const int BOARD_SIZE = 3;
 
@@ -91,6 +94,8 @@ namespace Gameplay.TicTacToe
 			_warningPresenter = warningPresenter;
 			_webSocketPresenter = webSocketPresenter;
 			_view = view;
+
+			_actionQueue = new ActionQueue();
 
 			_view.RegisterCallback(
 				(position) =>
@@ -119,6 +124,7 @@ namespace Gameplay.TicTacToe
 
 			while (_prop.State is not TicTacToeGameplayState.Close)
 			{
+				_actionQueue.RunAll();
 				_view.Render(_prop);
 				switch (_prop.State)
 				{
@@ -190,10 +196,9 @@ namespace Gameplay.TicTacToe
 		}
 
 		private async UniTask _JoinGame(int gameId)
-        {
-			/*
-			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _ChoosePositionAction(result)));
-			_webSocketPresenter.RegisterOnReceiveStartGame(result => _actionQueue.Add(() => _PlayersReady(result)));
+		{
+			_webSocketPresenter.RegisterOnReceiveChoosePositionAction(result => _actionQueue.Add(() => _ChoosePositionAction(result)));
+			_webSocketPresenter.RegisterOnReceiveGameOver(result => _actionQueue.Add(() => _GameOver(result)));
 
 			if (await
 				_webSocketPresenter
@@ -203,20 +208,10 @@ namespace Gameplay.TicTacToe
 			{
 				return;
 			}
-
-			if (await
-				_webSocketPresenter
-					.JoinGame()
-					.RunAndHandleInternetError(_warningPresenter)
-					.IsFail())
-			{
-				return;
-			}
-			*/
 		}
 
 		private void _UpdateModelAndProperty(TicTacToeGameData gameData)
-        {
+		{
 			_model = _model with
 			{
 				SelfPlayerId = gameData.SelfPlayerId,
@@ -256,10 +251,23 @@ namespace Gameplay.TicTacToe
 		}
 
 		private int[] _GetUpdatedPositionWithGhostArray(int[] positions, Option<int> ghostPositionOpt, int selfPlayerTeam)
-        {
+		{
 			var ret = positions.ToArray();
 			ghostPositionOpt.MatchSome(ghostPosition => ret[ghostPosition] = selfPlayerTeam);
 			return ret;
+		}
+
+		private void _ChoosePositionAction(TicTacToeChoosePositionActionCommandResult result)
+		{
+			_model = _model with
+			{
+				Positions = _GetUpdatedPositionWithGhostArray(_model.Positions, result.Position.Some(), result.Value)
+			};
+		}
+
+		private void _GameOver(TicTacToeGameResult result)
+		{
+			// tbd
 		}
 	}
 }
