@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Common;
+using Common.LinqExtension;
 using Common.Observable;
 using Common.UniTaskExtension;
 using Common.Warning;
@@ -136,12 +138,37 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionElement info:
+						UnityEngine.Debug.LogError(info.Position);
+						var updatedPosition = 
+							_model.GhostPositionOpt.Match(
+								previousGhostPosition =>
+									previousGhostPosition == info.Position 
+										? _GetUpdatedPosition(
+											_model.Positions,
+											new Dictionary<int, int>(){
+												{previousGhostPosition, 0}
+											})
+										: _GetUpdatedPosition(
+											_model.Positions,
+											new Dictionary<int, int>(){
+												{previousGhostPosition, 0},
+												{info.Position, _model.SelfPlayerTeam}
+											}),
+								() =>
+									_GetUpdatedPosition(
+										_model.Positions,
+										new Dictionary<int, int>(){
+											{info.Position, _model.SelfPlayerTeam},
+										})
+							);
+					
 						_model = _model with
 						{
+							Positions = updatedPosition,
 							GhostPositionOpt =
 								_model.GhostPositionOpt.Contains(info.Position)
 									? Option.None<int>()
-									: info.Position.Some()
+									: info.Position.Some(),
 						};
 						_prop = _prop with 
 						{ 
@@ -154,7 +181,6 @@ namespace Gameplay.TicTacToe
 						{
 							_model = _model with
 							{
-								Positions = _GetUpdatedPositionWithGhostArray(_model.Positions, _model.GhostPositionOpt, _model.SelfPlayerTeam),
 								GhostPositionOpt = Option.None<int>()
 							};
 							_prop = _prop with 
@@ -230,8 +256,8 @@ namespace Gameplay.TicTacToe
 		private TicTacToePositionElementView.Property[] _GetPositionsProperty(int[] positions, Option<int> ghostPositionOpt)
 			=>
 				positions
-					.Select(position => new TicTacToePositionElementView.Property(
-						position switch
+					.Select((value, position) => new TicTacToePositionElementView.Property(
+						value switch
 						{
 							0 => new TicTacToePositionElementView.State.Empty(),
 							1 => new TicTacToePositionElementView.State.Circle(ghostPositionOpt.Contains(position)),
@@ -250,10 +276,10 @@ namespace Gameplay.TicTacToe
 			_view.Render(_prop);
 		}
 
-		private int[] _GetUpdatedPositionWithGhostArray(int[] positions, Option<int> ghostPositionOpt, int selfPlayerTeam)
+		private int[] _GetUpdatedPosition(int[] positions, Dictionary<int, int> updateDic)
 		{
 			var ret = positions.ToArray();
-			ghostPositionOpt.MatchSome(ghostPosition => ret[ghostPosition] = selfPlayerTeam);
+			updateDic.ToList().ForEach(pair => ret[pair.Key] = pair.Value);
 			return ret;
 		}
 
@@ -261,7 +287,11 @@ namespace Gameplay.TicTacToe
 		{
 			_model = _model with
 			{
-				Positions = _GetUpdatedPositionWithGhostArray(_model.Positions, result.Position.Some(), result.Value)
+				Positions = _GetUpdatedPosition(
+					_model.Positions,
+					new Dictionary<int, int>(){
+						{result.Position, result.Value}
+					})
 			};
 		}
 
