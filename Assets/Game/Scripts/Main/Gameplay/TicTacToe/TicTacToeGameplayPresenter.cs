@@ -138,7 +138,6 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionElement info:
-						UnityEngine.Debug.LogError(info.Position);
 						var updatedPosition = 
 							_model.GhostPositionOpt.Match(
 								previousGhostPosition =>
@@ -179,6 +178,7 @@ namespace Gameplay.TicTacToe
 					case TicTacToeGameplayState.ClickPositionConfirmButton:
 						if (_model.GhostPositionOpt.HasValue)
 						{
+							var position = _model.GhostPositionOpt.ValueOrFailure();
 							_model = _model with
 							{
 								GhostPositionOpt = Option.None<int>()
@@ -188,16 +188,18 @@ namespace Gameplay.TicTacToe
 								ShowConfirmPositionButton = false
 							};
 							_view.Render(_prop);
+							
 
 							await _webSocketPresenter
-								.ChoosePosition(_model.GhostPositionOpt.ValueOrFailure())
+								.ChoosePosition(position)
 								.RunAndHandleInternetError(_warningPresenter);
-
-							_prop = _prop with
-							{
-								State = new TicTacToeGameplayState.Idle()
-							};
 						}
+
+						_prop = _prop with
+						{
+							State = new TicTacToeGameplayState.Idle()
+						};
+						
 						break;
 
 					case TicTacToeGameplayState.Close:
