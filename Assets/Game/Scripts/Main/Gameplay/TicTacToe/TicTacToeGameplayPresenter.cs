@@ -26,13 +26,15 @@ namespace Gameplay.TicTacToe
 
 	public record TicTacToeGameplayModel(
 		int SelfPlayerId,
-		int SelfPlayerTeam)
+		int SelfPlayerTeam,
+		bool IsPlayerTurn)
 	{
 		public TicTacToeGameplayModel(
 			Observable<int[]> positionsObs,
 			Observable<Option<int>> ghostPositionObs) : this(
 				0,
-				0)
+				0,
+				false)
 		{
 			_ghostPositionObs = ghostPositionObs;
 			_positionsObs = positionsObs;
@@ -138,37 +140,16 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionElement info:
-						var updatedPosition = 
-							_model.GhostPositionOpt.Match(
-								previousGhostPosition =>
-									previousGhostPosition == info.Position 
-										? _GetUpdatedPosition(
-											_model.Positions,
-											new Dictionary<int, int>(){
-												{previousGhostPosition, 0}
-											})
-										: _GetUpdatedPosition(
-											_model.Positions,
-											new Dictionary<int, int>(){
-												{previousGhostPosition, 0},
-												{info.Position, _model.SelfPlayerTeam}
-											}),
-								() =>
-									_GetUpdatedPosition(
-										_model.Positions,
-										new Dictionary<int, int>(){
-											{info.Position, _model.SelfPlayerTeam},
-										})
-							);
-					
-						_model = _model with
+						if (_model.IsPlayerTurn)
 						{
-							Positions = updatedPosition,
-							GhostPositionOpt =
-								_model.GhostPositionOpt.Contains(info.Position)
-									? Option.None<int>()
-									: info.Position.Some(),
-						};
+							_model = _model with
+							{
+								GhostPositionOpt =
+									_model.GhostPositionOpt.Contains(info.Position)
+										? Option.None<int>()
+										: info.Position.Some(),
+							};
+						}
 						_prop = _prop with 
 						{ 
 							State = new TicTacToeGameplayState.Idle(),
@@ -188,7 +169,6 @@ namespace Gameplay.TicTacToe
 								ShowConfirmPositionButton = false
 							};
 							_view.Render(_prop);
-							
 
 							await _webSocketPresenter
 								.ChoosePosition(position)
@@ -225,7 +205,7 @@ namespace Gameplay.TicTacToe
 
 		private async UniTask _JoinGame(int gameId)
 		{
-			_webSocketPresenter.RegisterOnReceiveChoosePositionAction(result => _actionQueue.Add(() => _ChoosePositionAction(result)));
+			_webSocketPresenter.RegisterOnUpdateGame(result => _actionQueue.Add(() => _UpdateGame(result)));
 			_webSocketPresenter.RegisterOnReceiveGameOver(result => _actionQueue.Add(() => _GameOver(result)));
 
 			if (await
@@ -244,6 +224,7 @@ namespace Gameplay.TicTacToe
 			{
 				SelfPlayerId = gameData.SelfPlayerId,
 				SelfPlayerTeam = gameData.SelfPlayerTeam,
+				IsPlayerTurn = gameData.SelfPlayerTeam == gameData.Board.TurnOfTeam,
 				Positions = gameData.Board.Positions,
 				GhostPositionOpt = Option.None<int>()
 			};
@@ -251,7 +232,7 @@ namespace Gameplay.TicTacToe
 			_prop = _prop with
 			{
 				Turn = gameData.Board.Turn,
-				IsPlayerTurn = gameData.SelfPlayerTeam == gameData.Board.TurnOfTeam,
+				IsPlayerTurn = _model.IsPlayerTurn,
 			};
 		}
 
@@ -259,13 +240,17 @@ namespace Gameplay.TicTacToe
 			=>
 				positions
 					.Select((value, position) => new TicTacToePositionElementView.Property(
-						value switch
-						{
-							0 => new TicTacToePositionElementView.State.Empty(),
-							1 => new TicTacToePositionElementView.State.Circle(ghostPositionOpt.Contains(position)),
-							2 => new TicTacToePositionElementView.State.Cross(ghostPositionOpt.Contains(position)),
-							_ => throw new System.NotImplementedException(),
-						}))
+						ghostPositionOpt.Contains(position)
+							? _model.SelfPlayerTeam == 1
+								? new TicTacToePositionElementView.State.Circle(true)
+								: new TicTacToePositionElementView.State.Cross(true)
+							: value switch
+							{
+								0 => new TicTacToePositionElementView.State.Empty(),
+								1 => new TicTacToePositionElementView.State.Circle(false),
+								2 => new TicTacToePositionElementView.State.Cross(false),
+								_ => throw new System.NotImplementedException(),
+							}))
 					.ToArray();
 
 		private void _UpdatePropertyPositions(int[] positions, Option<int> ghostPositionOpt)
@@ -278,23 +263,9 @@ namespace Gameplay.TicTacToe
 			_view.Render(_prop);
 		}
 
-		private int[] _GetUpdatedPosition(int[] positions, Dictionary<int, int> updateDic)
+		private void _UpdateGame(TicTacToeGameResult result)
 		{
-			var ret = positions.ToArray();
-			updateDic.ToList().ForEach(pair => ret[pair.Key] = pair.Value);
-			return ret;
-		}
-
-		private void _ChoosePositionAction(TicTacToeChoosePositionActionCommandResult result)
-		{
-			_model = _model with
-			{
-				Positions = _GetUpdatedPosition(
-					_model.Positions,
-					new Dictionary<int, int>(){
-						{result.Position, result.Value}
-					})
-			};
+			_UpdateModelAndProperty(new TicTacToeGameData(result, _model.SelfPlayerId));
 		}
 
 		private void _GameOver(TicTacToeGameResult result)

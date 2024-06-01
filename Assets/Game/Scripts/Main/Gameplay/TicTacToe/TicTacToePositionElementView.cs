@@ -6,16 +6,16 @@ using UnityEngine.UI;
 
 namespace Gameplay.TicTacToe
 {
-    public class TicTacToePositionElementView : MonoBehaviour
-    {
-        public abstract record State()
-        {
-            public record Circle(bool IsGhost) : State;
-            public record Cross(bool IsGhost) : State;
+	public class TicTacToePositionElementView : MonoBehaviour
+	{
+		public abstract record State()
+		{
+			public record Circle(bool IsGhost) : State;
+			public record Cross(bool IsGhost) : State;
 			public record Empty() : State;
-        }
+		}
 
-        public record Property(State State);
+		public record Property(State State);
 
 		[SerializeField]
 		private GameObject _circleGameObject;
@@ -40,7 +40,7 @@ namespace Gameplay.TicTacToe
 			if (_prop == prop)
 				return;
 			_prop = prop;
-
+			
 			switch (prop.State)
 			{
 				case State.Circle info:

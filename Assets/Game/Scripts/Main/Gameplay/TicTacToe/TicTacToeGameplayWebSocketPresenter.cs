@@ -13,7 +13,7 @@ namespace Gameplay.TicTacToe
 	{
 		UniTask<OneOf<None, UniTaskError>> Start(int roomId);
 		UniTask<OneOf<None, UniTaskError>> ChoosePosition(int position);
-		void RegisterOnReceiveChoosePositionAction(Action<TicTacToeChoosePositionActionCommandResult> onReceiveMessage);
+		void RegisterOnUpdateGame(Action<TicTacToeGameResult> onReceiveMessage);
 		void RegisterOnReceiveGameOver(Action<TicTacToeGameResult> onReceiveMessage);
 	}
 	
@@ -37,9 +37,9 @@ namespace Gameplay.TicTacToe
 						{"position", position},
 					});
 
-		void ITicTacToeGameplayWebSocketPresenter.RegisterOnReceiveChoosePositionAction(Action<TicTacToeChoosePositionActionCommandResult> onReceiveMessage)
+		void ITicTacToeGameplayWebSocketPresenter.RegisterOnUpdateGame(Action<TicTacToeGameResult> onReceiveMessage)
 		{
-			_RegisterOnReceiveMessage("choose_position_action", onReceiveMessage);
+			_RegisterOnReceiveMessage("update_game", onReceiveMessage);
 		}
 		
 		void ITicTacToeGameplayWebSocketPresenter.RegisterOnReceiveGameOver(Action<TicTacToeGameResult> onReceiveMessage)
