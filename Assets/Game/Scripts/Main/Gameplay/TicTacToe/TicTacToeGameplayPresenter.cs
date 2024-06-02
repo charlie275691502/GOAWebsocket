@@ -21,19 +21,22 @@ namespace Gameplay.TicTacToe
 		public record Idle() : TicTacToeGameplayState;
 		public record ClickPositionElement(int Position) : TicTacToeGameplayState;
 		public record ClickPositionConfirmButton() : TicTacToeGameplayState;
+		public record ClickReturnHome() : TicTacToeGameplayState;
 		public record Close() : TicTacToeGameplayState;
 	}
 
 	public record TicTacToeGameplayModel(
 		int SelfPlayerId,
 		int SelfPlayerTeam,
-		bool IsPlayerTurn)
+		bool IsPlayerTurn,
+		bool IsGameEnd)
 	{
 		public TicTacToeGameplayModel(
 			Observable<int[]> positionsObs,
 			Observable<Option<int>> ghostPositionObs) : this(
 				0,
 				0,
+				false,
 				false)
 		{
 			_ghostPositionObs = ghostPositionObs;
@@ -60,7 +63,10 @@ namespace Gameplay.TicTacToe
 		int Turn,
 		bool IsPlayerTurn,
 		TicTacToePositionElementView.Property[] PositionProperties,
-		bool ShowConfirmPositionButton)
+		bool ShowConfirmPositionButton,
+		bool IsGameEnd,
+		string WinnerName,
+		int SummaryTurns)
 	{
 		public TicTacToeGameplayProperty(
 			TicTacToeGameplayState state) : this(
@@ -68,7 +74,10 @@ namespace Gameplay.TicTacToe
 				0,
 				false,
 				new TicTacToePositionElementView.Property[0],
-				false) { }
+				false,
+				false,
+				string.Empty,
+				0) { }
 	}
 
 	public interface ITicTacToeGameplayPresenter
@@ -105,7 +114,9 @@ namespace Gameplay.TicTacToe
 				(position) =>
 					_ChangeStateIfIdle(new TicTacToeGameplayState.ClickPositionElement(position)),
 				() =>
-					_ChangeStateIfIdle(new TicTacToeGameplayState.ClickPositionConfirmButton()));
+					_ChangeStateIfIdle(new TicTacToeGameplayState.ClickPositionConfirmButton()),
+				() =>
+					_ChangeStateIfIdle(new TicTacToeGameplayState.ClickReturnHome()));
 		}
 
 		async UniTask ITicTacToeGameplayPresenter.Run(TicTacToeGameData gameData)
@@ -140,7 +151,10 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionElement info:
-						if (_model.IsPlayerTurn && _model.Positions[info.Position] == 0)
+						if (
+							!_model.IsGameEnd &&
+							_model.IsPlayerTurn &&
+							_model.Positions[info.Position] == 0)
 						{
 							_model = _model with
 							{
@@ -157,7 +171,9 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionConfirmButton:
-						if (_model.GhostPositionOpt.HasValue)
+						if (
+							!_model.IsGameEnd &&
+							_model.GhostPositionOpt.HasValue)
 						{
 							var position = _model.GhostPositionOpt.ValueOrFailure();
 							_model = _model with
@@ -178,6 +194,15 @@ namespace Gameplay.TicTacToe
 						_prop = _prop with
 						{
 							State = new TicTacToeGameplayState.Idle()
+						};
+						
+						break;
+						
+					case TicTacToeGameplayState.ClickReturnHome:
+
+						_prop = _prop with
+						{
+							State = new TicTacToeGameplayState.Close()
 						};
 						
 						break;
@@ -206,7 +231,7 @@ namespace Gameplay.TicTacToe
 		private async UniTask _JoinGame(int gameId)
 		{
 			_webSocketPresenter.RegisterOnUpdateGame(result => _actionQueue.Add(() => _UpdateGame(result)));
-			_webSocketPresenter.RegisterOnReceiveGameOver(result => _actionQueue.Add(() => _GameOver(result)));
+			_webSocketPresenter.RegisterOnReceiveSummary(result => _actionQueue.Add(() => _ReceiveSummary(result)));
 
 			if (await
 				_webSocketPresenter
@@ -268,9 +293,21 @@ namespace Gameplay.TicTacToe
 			_UpdateModelAndProperty(new TicTacToeGameData(result, _model.SelfPlayerId));
 		}
 
-		private void _GameOver(TicTacToeGameResult result)
+		private void _ReceiveSummary(TicTacToeSummaryResult result)
 		{
-			// tbd
+			_model = _model with 
+			{
+				IsGameEnd = true,
+			};
+
+			_prop = _prop with
+			{
+				IsGameEnd = true,
+				WinnerName = result.Winner.Player.NickName,
+				SummaryTurns = result.Turns,
+			};
+			
+			_view.Render(_prop);
 		}
 	}
 }

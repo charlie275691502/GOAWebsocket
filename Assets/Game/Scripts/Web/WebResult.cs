@@ -88,6 +88,14 @@ namespace Web
 		public TicTacToeSettingResult Setting;
 	}
 
+	public class TicTacToeSummaryResult
+	{
+		[JsonProperty("winner")]
+		public TicTacToePlayerResult Winner;
+		[JsonProperty("turns")]
+		public int Turns;
+	}
+
 	public class TicTacToeRecordResult
 	{
 		[JsonProperty("id")]
@@ -100,6 +108,8 @@ namespace Web
 		public TicTacToeActionResult[] Actions;
 		[JsonProperty("setting")]
 		public TicTacToeSettingResult Setting;
+		[JsonProperty("summary")]
+		public TicTacToeSummaryResult Summary;
 	}
 
 	public class TicTacToeBoardResult

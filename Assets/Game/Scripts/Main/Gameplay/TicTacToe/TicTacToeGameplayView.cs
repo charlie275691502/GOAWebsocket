@@ -8,7 +8,7 @@ namespace Gameplay.TicTacToe
 {
 	public interface ITicTacToeGameplayView
 	{
-		void RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton);
+		void RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton, Action onClickReturnHomeButton);
 		void Render(TicTacToeGameplayProperty prop);
 	}
 
@@ -30,12 +30,22 @@ namespace Gameplay.TicTacToe
 		private Button _confirmPositionButton;
 		[SerializeField]
 		private Button _resignButton;
+		[SerializeField]
+		private GameObject _summaryPanel;
+		[SerializeField]
+		private Text _winnerNameText;
+		[SerializeField]
+		private Text _summaryTurnsText;
+		[SerializeField]
+		private Button _summaryReturnHomeButton;
 
 		private TicTacToeGameplayProperty _prop;
 
-		void ITicTacToeGameplayView.RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton)
+		void ITicTacToeGameplayView.RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton, Action onClickReturnHomeButton)
 		{
 			_confirmPositionButton.onClick.AddListener(() => onClickConfirmPositionButton?.Invoke());
+			_summaryReturnHomeButton.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
+			
 			_positionElements
 				.ForEach((view, index) => view.RegisterCallback(() => onClickClickPositionElement?.Invoke(index)));
 		}
@@ -53,6 +63,9 @@ namespace Gameplay.TicTacToe
 					break;
 
 				case TicTacToeGameplayState.Idle:
+				case TicTacToeGameplayState.ClickPositionElement:
+				case TicTacToeGameplayState.ClickPositionConfirmButton:
+				case TicTacToeGameplayState.ClickReturnHome:
 					_Render(prop);
 					break;
 
@@ -84,6 +97,12 @@ namespace Gameplay.TicTacToe
 				prop.PositionProperties,
 				(view, property) => view.Render(property));
 			_confirmPositionButtonGameObject.SetActive(prop.ShowConfirmPositionButton);
+			_summaryPanel.SetActive(prop.IsGameEnd);
+			if (prop.IsGameEnd)
+			{
+				_winnerNameText.text = prop.WinnerName;
+				_summaryTurnsText.text = prop.SummaryTurns.ToString();
+			}
 		}
 	}
 }
