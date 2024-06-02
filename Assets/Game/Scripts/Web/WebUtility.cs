@@ -9,7 +9,7 @@ namespace Web
 	public static class WebUtility
 	{
 		public static bool RequestDebugMode = true;
-		public static string Host = "10.22.45.22";
+		public static string Host = "192.168.180.108";
 		public static string Port = "9000";
 		
 		public static async UniTask<Option<T>> RunAndHandleInternetError<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, IWarningPresenter warningPresenter)
