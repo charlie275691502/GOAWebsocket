@@ -140,7 +140,7 @@ namespace Gameplay.TicTacToe
 						break;
 
 					case TicTacToeGameplayState.ClickPositionElement info:
-						if (_model.IsPlayerTurn)
+						if (_model.IsPlayerTurn && _model.Positions[info.Position] == 0)
 						{
 							_model = _model with
 							{

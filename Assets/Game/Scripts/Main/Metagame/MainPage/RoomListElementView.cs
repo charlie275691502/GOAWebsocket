@@ -44,9 +44,12 @@ namespace Metagame.MainPage
 				if (i < viewData.Players.Count) 
 				{
 					_playerInfoViews[i].Enter(viewData.Players[i]);
-				} else 
+				} else if (i < viewData.GameSetting.PlayerPlot)
 				{
 					_playerInfoViews[i].EnterEmpty();
+				} else 
+				{
+					_playerInfoViews[i].Leave();
 				}
 			}
 		}
