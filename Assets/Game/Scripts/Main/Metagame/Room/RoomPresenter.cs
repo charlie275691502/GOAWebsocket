@@ -109,13 +109,11 @@ namespace Metagame.Room
 						break;
 
 					case RoomState.StartGame info:
-						_LeaveRoom();
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
 
 					case RoomState.Leave:
-						_LeaveRoom();
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.MainPage()) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
@@ -129,6 +127,7 @@ namespace Metagame.Room
 				await UniTask.Yield();
 			}
 
+			_LeaveRoom();
 			_view.Render(_prop);
 			return ret;
 		}

@@ -216,6 +216,7 @@ namespace Gameplay.TicTacToe
 				await UniTask.Yield();
 			}
 
+			_LeaveGame();
 			_view.Render(_prop);
 		}
 
@@ -241,6 +242,11 @@ namespace Gameplay.TicTacToe
 			{
 				return;
 			}
+		}
+
+		private void _LeaveGame()
+		{
+			_webSocketPresenter.Stop();
 		}
 
 		private void _UpdateModelAndProperty(TicTacToeGameData gameData)
