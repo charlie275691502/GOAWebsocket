@@ -14159,7 +14159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _requestDebugMode: 1
-  _environment: 0
+  _environment: 1
 --- !u!1 &1668026250
 GameObject:
   m_ObjectHideFlags: 0
