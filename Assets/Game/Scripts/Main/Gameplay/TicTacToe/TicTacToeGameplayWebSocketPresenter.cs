@@ -19,7 +19,7 @@ namespace Gameplay.TicTacToe
 	
 	public class TicTacToeGameplayWebSocketPresenter : WebSocketPresenter, ITicTacToeGameplayWebSocketPresenter
 	{
-		public TicTacToeGameplayWebSocketPresenter(BackendPlayerData backendPlayerData) : base(backendPlayerData)
+		public TicTacToeGameplayWebSocketPresenter(ISetting setting, BackendPlayerData backendPlayerData) : base(setting, backendPlayerData)
 		{
 		}
 

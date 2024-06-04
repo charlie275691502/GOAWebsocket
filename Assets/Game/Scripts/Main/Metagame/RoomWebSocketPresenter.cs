@@ -22,7 +22,7 @@ namespace Metagame
 	
 	public class RoomWebSocketPresenter : WebSocketPresenter, IRoomWebSocketPresenter
 	{
-		public RoomWebSocketPresenter(BackendPlayerData backendPlayerData) : base(backendPlayerData)
+		public RoomWebSocketPresenter(ISetting setting, BackendPlayerData backendPlayerData) : base(setting, backendPlayerData)
 		{
 		}
 

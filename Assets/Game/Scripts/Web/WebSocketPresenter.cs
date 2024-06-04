@@ -19,6 +19,7 @@ namespace Web
 	
 	public abstract class WebSocketPresenter : IWebSocketPresenter
 	{
+		private ISetting _setting;
 		private BackendPlayerData _backendPlayerData;
 		
 		private string _error = string.Empty;
@@ -27,8 +28,9 @@ namespace Web
 		
 		protected string _path = string.Empty;
 		
-		public WebSocketPresenter(BackendPlayerData backendPlayerData)
+		public WebSocketPresenter(ISetting setting, BackendPlayerData backendPlayerData)
 		{
+			_setting = setting;
 			_backendPlayerData = backendPlayerData;
 		}
 
@@ -49,8 +51,8 @@ namespace Web
 			}
 			
 			_webSocket = new WebSocket(
-				new Uri(string.Format("ws://{0}/ws/{1}", WebUtility.Domain, _path)),
-				string.Format("http://{0}/", WebUtility.Domain),
+				new Uri(string.Format("ws://{0}/ws/{1}", _setting.Domain, _path)),
+				string.Format("http://{0}/", _setting.Domain),
 				string.Empty);
 				
 			_webSocket.OnInternalRequestCreated += (ws, req) => req.AddHeader("authorization", _backendPlayerData.AccessKey);
@@ -124,7 +126,7 @@ namespace Web
 
 		private void _OnWebSocketOpen(WebSocket webSocket)
 		{
-			if(WebUtility.RequestDebugMode)
+			if(_setting.RequestDebugMode)
 			{
 				Debug.LogFormat("WebSocket open on path : {0}", _path);
 			}
@@ -132,7 +134,7 @@ namespace Web
 		
 		private void _OnMessageReceived(WebSocket webSocket, string message)
 		{
-			if(WebUtility.RequestDebugMode)
+			if(_setting.RequestDebugMode)
 			{
 				Debug.LogFormat("Text Message received from path : {0}\nmessage : {1}", _path, message);
 			}
@@ -149,7 +151,7 @@ namespace Web
 		
 		private void _OnBinaryMessageReceived(WebSocket webSocket, byte[] message)
 		{
-			if(WebUtility.RequestDebugMode)
+			if(_setting.RequestDebugMode)
 			{
 				Debug.LogFormat("Binary Message received from path : {0}\nLength: ", _path, message.Length);
 			}
@@ -157,7 +159,7 @@ namespace Web
 		
 		private void _OnWebSocketClosed(WebSocket webSocket, UInt16 code, string message)
 		{
-			if(WebUtility.RequestDebugMode)
+			if(_setting.RequestDebugMode)
 			{
 				Debug.LogFormat("WebSocket is now Closed from path : {0}\nstatus code : {1}\nmessage : {2}", _path, code, message);
 			}
@@ -165,7 +167,7 @@ namespace Web
 		
 		private void _OnError(WebSocket webSocket, string error)
 		{
-			if(WebUtility.RequestDebugMode)
+			if(_setting.RequestDebugMode)
 			{
 				Debug.LogErrorFormat("Receive Error from path : {0}\nError : {1}", _path, error);
 			}

@@ -19,6 +19,9 @@ namespace Main
 	public class MainInstaller : MonoInstaller
 	{
 		[SerializeField]
+		private Setting _setting;
+		
+		[SerializeField]
 		private WarningView _warningView;
 		[SerializeField]
 		private LoadingView _loadingView;
@@ -68,6 +71,10 @@ namespace Main
 
 			#region Common
 
+			Container
+				.Bind<ISetting>()
+				.To<Setting>()
+				.AsSingle();
 			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
