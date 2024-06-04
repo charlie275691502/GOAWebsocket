@@ -74,7 +74,7 @@ namespace Main
 			Container
 				.Bind<ISetting>()
 				.To<Setting>()
-				.AsSingle();
+				.FromInstance(_setting);
 			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
