@@ -5,6 +5,7 @@ namespace Common
 	public interface ISetting
 	{
 		bool RequestDebugMode { get; }
+		bool SavePassword { get; }
 		string Domain { get; }
 	}
 	
@@ -16,13 +17,14 @@ namespace Common
 			Prod,
 		}
 		
+		[SerializeField]
+		private Environment _environment;
 		
 		[SerializeField]
 		private bool _requestDebugMode = true;
-		public bool RequestDebugMode { get{ return _requestDebugMode;} }
+		public bool RequestDebugMode { get => _requestDebugMode; }
 		
-		[SerializeField]
-		private Environment _environment;
+		public bool SavePassword { get => _environment != Environment.Prod; }
 		
 		private static string _devDomain = "192.168.180.108:9000";
 		private static string _prodDomain = "52.62.163.1:8000";

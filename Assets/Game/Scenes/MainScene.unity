@@ -1834,7 +1834,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: player3
+  m_Text: 
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -2085,13 +2085,13 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 230427837}
   m_TextComponent: {fileID: 1155376056}
   m_Placeholder: {fileID: 1474713650}
-  m_ContentType: 0
+  m_ContentType: 6
   m_InputType: 0
   m_AsteriskChar: 42
-  m_KeyboardType: 0
+  m_KeyboardType: 7
   m_LineType: 0
   m_HideMobileInput: 0
-  m_CharacterValidation: 0
+  m_CharacterValidation: 5
   m_CharacterLimit: 0
   m_OnSubmit:
     m_PersistentCalls:
@@ -5666,8 +5666,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 610655124}
   m_TextComponent: {fileID: 732933615}
   m_Placeholder: {fileID: 1359087838}
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
@@ -8959,8 +8959,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1061677516}
   m_TextComponent: {fileID: 789789521}
   m_Placeholder: {fileID: 1857207969}
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0
@@ -8979,7 +8979,7 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: asd860221
+  m_Text: 
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
@@ -14158,8 +14158,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8f6742e4d1347c46808b87ebb67af02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _requestDebugMode: 1
   _environment: 1
+  _requestDebugMode: 1
 --- !u!1 &1668026250
 GameObject:
   m_ObjectHideFlags: 0
@@ -14369,8 +14369,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1691884003}
   m_TextComponent: {fileID: 2033590759}
   m_Placeholder: {fileID: 1826162268}
-  m_ContentType: 0
-  m_InputType: 0
+  m_ContentType: 7
+  m_InputType: 2
   m_AsteriskChar: 42
   m_KeyboardType: 0
   m_LineType: 0

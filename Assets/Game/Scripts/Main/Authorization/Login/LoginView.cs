@@ -46,7 +46,7 @@ namespace Authorization.Login
 			switch (prop.State)
 			{
 				case LoginState.Open:
-					_Open();
+					_Open(prop);
 					break;
 
 				case LoginState.Idle:
@@ -64,9 +64,11 @@ namespace Authorization.Login
 			}
 		}
 
-		private void _Open()
+		private void _Open(LoginProperty prop)
 		{
 			_panel.SetActive(true);
+			_usernameInputField.text = prop.DefaultUsername;
+			_passwordInputField.text = prop.DefaultPassword;
 		}
 
 		private void _Close()

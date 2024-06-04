@@ -76,6 +76,10 @@ namespace Main
 				.To<Setting>()
 				.FromInstance(_setting);
 			Container
+				.Bind<ILocalStorage>()
+				.To<LocalStorage>()
+				.AsSingle();
+			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
 				.AsSingle();

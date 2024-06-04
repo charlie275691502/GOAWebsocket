@@ -1,4 +1,5 @@
 using System;
+using Common;
 using Common.UniTaskExtension;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
@@ -25,14 +26,18 @@ namespace Authorization.Register
 	public class RegisterPresenter : IRegisterPresenter
 	{
 		private IHTTPPresenter _hTTPPresenter;
+		private ISetting _setting;
+		private ILocalStorage _localStorage;
 		private IWarningPresenter _warningPresenter;
 		private IRegisterView _view;
 		
 		private RegisterProperty _prop;
 		
-		public RegisterPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, IRegisterView view)
+		public RegisterPresenter(IHTTPPresenter hTTPPresenter, ISetting setting, ILocalStorage localStorage, IWarningPresenter warningPresenter, IRegisterView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
+			_setting = setting;
+			_localStorage = localStorage;
 			_warningPresenter = warningPresenter;
 			_view = view;
 			
@@ -64,6 +69,11 @@ namespace Authorization.Register
 						var success = await _Register(info.Username, info.Password, info.ConfirmPassword, info.Email);
 						if (success)
 						{
+							_localStorage.Username = info.Username;
+							if (_setting.SavePassword)
+							{
+								_localStorage.Password = info.Password;
+							}
 							_prop = _prop with { State = new RegisterState.Close() };
 							ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 						} else 
