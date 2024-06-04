@@ -145,7 +145,7 @@ namespace Web
 			_loadingView.Enter();
 			
 			HTTPRequest request = new HTTPRequest(
-				new Uri(string.Format("http://{0}:{1}/{2}", WebUtility.Host, WebUtility.Port, path)),
+				new Uri(string.Format("http://{0}/{1}", WebUtility.Domain, path)),
 				method,
 				onRequestFinished);
 			request.RawData = System.Text.Encoding.UTF8.GetBytes(json);

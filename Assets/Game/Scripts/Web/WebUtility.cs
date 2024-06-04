@@ -11,6 +11,7 @@ namespace Web
 		public static bool RequestDebugMode = true;
 		public static string Host = "192.168.180.108";
 		public static string Port = "9000";
+		public static string Domain = string.IsNullOrEmpty(Port) ? string.Format("{0}", Host) : string.Format("{0}:{1}", Host, Port);
 		
 		public static async UniTask<Option<T>> RunAndHandleInternetError<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, IWarningPresenter warningPresenter)
 		{

@@ -49,8 +49,8 @@ namespace Web
 			}
 			
 			_webSocket = new WebSocket(
-				new Uri(string.Format("ws://{0}:{1}/ws/{2}", WebUtility.Host, WebUtility.Port, _path)),
-				string.Format("http://{0}:{1}/", WebUtility.Host, WebUtility.Port),
+				new Uri(string.Format("ws://{0}/ws/{1}", WebUtility.Domain, _path)),
+				string.Format("http://{0}/", WebUtility.Domain),
 				string.Empty);
 				
 			_webSocket.OnInternalRequestCreated += (ws, req) => req.AddHeader("authorization", _backendPlayerData.AccessKey);
