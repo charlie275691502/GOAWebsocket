@@ -1,4 +1,6 @@
 using System;
+using Common;
+using Common.UniTaskExtension;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Web;
@@ -19,19 +21,23 @@ namespace Authorization.Login
 		public record Close() : LoginState;
 	}
 
-	public record LoginProperty(LoginState State);
+	public record LoginProperty(LoginState State, string DefaultUsername, string DefaultPassword);
 
 	public class LoginPresenter : ILoginPresneter
 	{
 		private IHTTPPresenter _hTTPPresenter;
+		private ISetting _setting;
+		private ILocalStorage _localStorage;
 		private IWarningPresenter _warningPresenter;
 		private ILoginView _view;
 
 		private LoginProperty _prop;
 
-		public LoginPresenter(IHTTPPresenter hTTPPresenter, IWarningPresenter warningPresenter, ILoginView view)
+		public LoginPresenter(IHTTPPresenter hTTPPresenter, ISetting setting, ILocalStorage localStorage, IWarningPresenter warningPresenter, ILoginView view)
 		{
 			_hTTPPresenter = hTTPPresenter;
+			_setting = setting;
+			_localStorage = localStorage;
 			_warningPresenter = warningPresenter;
 			_view = view;
 
@@ -44,7 +50,7 @@ namespace Authorization.Login
 		
 		async UniTask<AuthorizationSubTabReturn> IAuthorizationSubTabPresenter.Run()
 		{
-			_prop = new LoginProperty(new LoginState.Open());
+			_prop = new LoginProperty(new LoginState.Open(), _localStorage.Username, _localStorage.Password);
 			var ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
 
 			while (_prop.State is not LoginState.Close)
@@ -60,9 +66,22 @@ namespace Authorization.Login
 						break;
 
 					case LoginState.Login info:
-						await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);
-						_prop = _prop with { State = new LoginState.Close() };
-						ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
+						var success = await _Login(info.Username, info.Password);
+						if (success)
+						{
+							await _hTTPPresenter.Login(info.Username, info.Password).RunAndHandleInternetError(_warningPresenter);
+							_localStorage.Username = info.Username;
+							if (_setting.SavePassword)
+							{
+								_localStorage.Password = info.Password;
+							}
+							_prop = _prop with { State = new LoginState.Close() };
+							ret = new AuthorizationSubTabReturn(new AuthorizationSubTabReturnType.Close());
+						} else 
+						{
+							_prop = _prop with { State = new LoginState.Idle() };
+						}
+						
 						break;
 
 					case LoginState.SwitchToRegister:
@@ -91,5 +110,10 @@ namespace Authorization.Login
 			onChangeStateSuccess?.Invoke();
 			_prop = _prop with { State = targetState };
 		}
+
+		private async UniTask<bool> _Login(string username, string password)
+			=> await _hTTPPresenter.Login(username, password)
+				.RunAndHandleInternetError(_warningPresenter)
+				.IsSuccess();
 	}
 }

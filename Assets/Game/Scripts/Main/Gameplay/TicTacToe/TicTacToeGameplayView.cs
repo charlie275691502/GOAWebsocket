@@ -1,14 +1,18 @@
 using Common.LinqExtension;
+using EnhancedUI.EnhancedScroller;
+using Metagame;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Gameplay.TicTacToe
 {
 	public interface ITicTacToeGameplayView
 	{
-		void RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton, Action onClickReturnHomeButton);
+		void RegisterCallback(DiContainer container, Action<int> onClickClickPositionElement, Action onClickReturnHomeButton);
 		void Render(TicTacToeGameplayProperty prop);
 	}
 
@@ -25,11 +29,7 @@ namespace Gameplay.TicTacToe
 		[SerializeField]
 		private TicTacToePositionElementView[] _positionElements;
 		[SerializeField]
-		private GameObject _confirmPositionButtonGameObject;
-		[SerializeField]
-		private Button _confirmPositionButton;
-		[SerializeField]
-		private Button _resignButton;
+		private List<PlayerListElementView> _players;
 		[SerializeField]
 		private GameObject _summaryPanel;
 		[SerializeField]
@@ -41,9 +41,10 @@ namespace Gameplay.TicTacToe
 
 		private TicTacToeGameplayProperty _prop;
 
-		void ITicTacToeGameplayView.RegisterCallback(Action<int> onClickClickPositionElement, Action onClickConfirmPositionButton, Action onClickReturnHomeButton)
+		void ITicTacToeGameplayView.RegisterCallback(DiContainer container, Action<int> onClickClickPositionElement, Action onClickReturnHomeButton)
 		{
-			_confirmPositionButton.onClick.AddListener(() => onClickConfirmPositionButton?.Invoke());
+			_players.ForEach(player => player.Resolve(container));
+			
 			_summaryReturnHomeButton.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
 			
 			_positionElements
@@ -64,7 +65,6 @@ namespace Gameplay.TicTacToe
 
 				case TicTacToeGameplayState.Idle:
 				case TicTacToeGameplayState.ClickPositionElement:
-				case TicTacToeGameplayState.ClickPositionConfirmButton:
 				case TicTacToeGameplayState.ClickReturnHome:
 					_Render(prop);
 					break;
@@ -96,7 +96,10 @@ namespace Gameplay.TicTacToe
 			_positionElements.ZipForEach(
 				prop.PositionProperties,
 				(view, property) => view.Render(property));
-			_confirmPositionButtonGameObject.SetActive(prop.ShowConfirmPositionButton);
+			_players.ZipForEach(
+				prop.PlayerViewDatas,
+				(view, viewData) => view.Display(new EnhancedScrollerElementViewData<PlayerViewData>(viewData)));
+			
 			_summaryPanel.SetActive(prop.IsGameEnd);
 			if (prop.IsGameEnd)
 			{

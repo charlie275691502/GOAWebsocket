@@ -23,12 +23,14 @@ namespace Web
 	}
 	public class HTTPPresenter : IHTTPPresenter
 	{
+		private ISetting _setting;
 		private ILoadingView _loadingView;
 		private IBackendPlayerPresenter _backendPlayerPresenter;
 		private BackendPlayerData _backendPlayerData;
 		
-		public HTTPPresenter(ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
+		public HTTPPresenter(ISetting setting, ILoadingView loadingView, IBackendPlayerPresenter backendPlayerPresenter, BackendPlayerData backendPlayerData)
 		{
+			_setting = setting;
 			_loadingView = loadingView;
 			_backendPlayerPresenter = backendPlayerPresenter;
 			_backendPlayerData = backendPlayerData;
@@ -145,7 +147,7 @@ namespace Web
 			_loadingView.Enter();
 			
 			HTTPRequest request = new HTTPRequest(
-				new Uri(string.Format("http://{0}/{1}", WebUtility.Domain, path)),
+				new Uri(string.Format("http://{0}/{1}", _setting.Domain, path)),
 				method,
 				onRequestFinished);
 			request.RawData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -176,14 +178,14 @@ namespace Web
 			
 			if(!string.IsNullOrEmpty(error))
 			{
-				if(WebUtility.RequestDebugMode)
+				if(_setting.RequestDebugMode)
 				{
 					Debug.LogError(error);
 				}
 				return new UniTaskError(error);
 			} else 
 			{
-				if(WebUtility.RequestDebugMode)
+				if(_setting.RequestDebugMode)
 				{
 					Debug.Log(result);
 				}

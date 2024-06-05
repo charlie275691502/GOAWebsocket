@@ -19,10 +19,15 @@ namespace Main
 	public class MainInstaller : MonoInstaller
 	{
 		[SerializeField]
+		private Setting _setting;
+		
+		[SerializeField]
 		private WarningView _warningView;
 		[SerializeField]
 		private LoadingView _loadingView;
 
+		[SerializeField]
+		private AuthorizationView _authorizationView;
 		[SerializeField]
 		private LoginView _loginView;
 		[SerializeField]
@@ -69,6 +74,14 @@ namespace Main
 			#region Common
 
 			Container
+				.Bind<ISetting>()
+				.To<Setting>()
+				.FromInstance(_setting);
+			Container
+				.Bind<ILocalStorage>()
+				.To<LocalStorage>()
+				.AsSingle();
+			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
 				.AsSingle();
@@ -98,6 +111,10 @@ namespace Main
 				.Bind<IAuthorizationPresenter>()
 				.To<AuthorizationPresenter>()
 				.AsSingle();
+			Container
+				.Bind<IAuthorizationView>()
+				.To<AuthorizationView>()
+				.FromInstance(_authorizationView);
 			Container
 				.Bind<ILoginPresneter>()
 				.To<LoginPresenter>()

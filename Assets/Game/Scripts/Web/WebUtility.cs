@@ -8,11 +8,6 @@ namespace Web
 {
 	public static class WebUtility
 	{
-		public static bool RequestDebugMode = true;
-		public static string Host = "52.62.163.1";
-		public static string Port = "8000";
-		public static string Domain = string.IsNullOrEmpty(Port) ? string.Format("{0}", Host) : string.Format("{0}:{1}", Host, Port);
-		
 		public static async UniTask<Option<T>> RunAndHandleInternetError<T>(this UniTask<OneOf<T, UniTaskError>> uniTask, IWarningPresenter warningPresenter)
 		{
 			var resultOneOf = await uniTask;
