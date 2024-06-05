@@ -27,6 +27,8 @@ namespace Main
 		private LoadingView _loadingView;
 
 		[SerializeField]
+		private AuthorizationView _authorizationView;
+		[SerializeField]
 		private LoginView _loginView;
 		[SerializeField]
 		private RegisterView _registerView;
@@ -109,6 +111,10 @@ namespace Main
 				.Bind<IAuthorizationPresenter>()
 				.To<AuthorizationPresenter>()
 				.AsSingle();
+			Container
+				.Bind<IAuthorizationView>()
+				.To<AuthorizationView>()
+				.FromInstance(_authorizationView);
 			Container
 				.Bind<ILoginPresneter>()
 				.To<LoginPresenter>()
