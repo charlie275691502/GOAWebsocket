@@ -12,8 +12,6 @@ namespace Metagame
 	public class PlayerListElementView : SimpleEnhancedScrollerElement<PlayerViewData>
 	{
 		[SerializeField]
-		private GameObject _panel;
-		[SerializeField]
 		private Text _nickNameText;
 		[SerializeField]
 		private SyncImage _avatarImage;
