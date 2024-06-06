@@ -15,7 +15,7 @@ namespace Gameplay.GOA
 	public class GOAPublicCardView : MonoBehaviour
 	{
 		[SerializeField]
-		private SyncImage _image;
+		private AsyncImage _image;
 		[SerializeField]
 		private Button _button;
 

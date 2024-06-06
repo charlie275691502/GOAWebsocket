@@ -15,7 +15,7 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private SyncImage _image;
+		private AsyncImage _image;
 		[SerializeField]
 		private Button _useButton;
 
