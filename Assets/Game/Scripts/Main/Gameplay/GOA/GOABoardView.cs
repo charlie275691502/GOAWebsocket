@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Common;
 using Common.AssetSession;
 using Common.LinqExtension;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace Gameplay.GOA
 	public record GOABoardViewData(
 		int DrawCardCount,
 		int GraveCardCount,
-		GOAPublicCardViewData[] PublicCards
+		GOACardViewData[] Cards
 	);
 	
 	public class GOABoardView : MonoBehaviour
@@ -30,13 +31,13 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _gravePileEmptyGameObject;
 		[SerializeField]
-		private GOAPublicCardView _publicCardPrefab;
+		private GameObjectPool _cardPool;
 		[SerializeField]
-		private Transform _publicCardsFolder;
+		private Transform _cardsFolder;
 		
 		private IAssetSession _assetSession;
 		private Action<int> _onClickCard;
-		private List<GOAPublicCardView> _publicCards = new List<GOAPublicCardView>();
+		private List<GOACardView> _cards = new List<GOACardView>();
 
 		public void RegisterCallback(IAssetSession assetSession, Action<int> onClickCard)
 		{
@@ -46,13 +47,13 @@ namespace Gameplay.GOA
 
 		public void Render(GOABoardViewData viewData)
 		{
-			if(viewData.PublicCards.Count() != _publicCards.Count())
+			if(viewData.Cards.Count() != _cards.Count())
 			{
-				_InstantiatePublicCards(viewData.PublicCards.Count());
+				_InstantiateCards(viewData.Cards.Count());
 			}
 			
-			_publicCards.ZipForEach(
-				viewData.PublicCards,
+			_cards.ZipForEach(
+				viewData.Cards,
 				(publicCard, viewData) => publicCard.Render(viewData)
 			);
 			
@@ -64,15 +65,17 @@ namespace Gameplay.GOA
 			_gravePileEmptyGameObject.SetActive(viewData.GraveCardCount == 0);
 		}
 		
-		private void _InstantiatePublicCards(int count)
+		private void _InstantiateCards(int count)
 		{
-			_publicCards.ForEach(publicCard => Destroy(publicCard.gameObject));
+			_cards.ForEach(publicCard =>_cardPool.ReturnGameObject(publicCard.gameObject));
 			for(int i=0; i<count; i++)
 			{
 				var index = i;
-				var publicCard = Instantiate(_publicCardPrefab, _publicCardsFolder);
-				publicCard.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
-				_publicCards.Add(publicCard);
+				var publicCard = _cardPool.GetGameObject();
+				publicCard.transform.parent = _cardsFolder;
+				var publicCardView = publicCard.GetComponent<GOACardView>();
+				publicCardView.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
+				_cards.Add(publicCardView);
 			}
 		}
 	}
