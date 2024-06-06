@@ -21,13 +21,13 @@ namespace Common.AssetSession
                 ? string.Empty
                 : Path.Combine(folderPath, assetName);
 
-        void IAssetSession.AsyncLoad<T>(AssetType assetType, string assetName, Action<T> onComplete)
+        void IAssetSession.AsyncLoad<T>(AssetType assetType, string assetName, Action<Option<T>> onComplete)
         {
             var path = GetPath(assetType, assetName);
             UniTask.Void(async () => 
             {
                 var resultOpt = await _LoadAsync<T>(path);
-                resultOpt.MatchSome(result => onComplete?.Invoke(result));
+                onComplete?.Invoke(resultOpt);
             });
         }
 

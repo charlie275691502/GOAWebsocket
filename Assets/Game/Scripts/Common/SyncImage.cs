@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Common.AssetSession;
 using Cysharp.Threading.Tasks;
 using Optional;
 using UnityEngine;
@@ -14,6 +15,17 @@ namespace Common
 		private Image _image;
 		
 		private Option<UniTask<Option<Sprite>>> _cacheLoader = Option.None<UniTask<Option<Sprite>>>();
+		private IAssetSession _assetSession;
+		
+		public void Initialize(IAssetSession assetSession)
+		{
+			_assetSession = assetSession;
+		}
+		
+		public async UniTask LoadSprite(AssetType assetType, string assetName)
+		{
+			await LoadSprite(_assetSession.SyncLoad<Sprite>(assetType, assetName));
+		}
 		
 		public async UniTask LoadSprite(UniTask<Option<Sprite>> loader)
 		{

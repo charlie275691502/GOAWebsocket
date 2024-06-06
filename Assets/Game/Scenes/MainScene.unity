@@ -2849,8 +2849,8 @@ GameObject:
   m_Component:
   - component: {fileID: 212192953}
   - component: {fileID: 212192956}
-  - component: {fileID: 212192955}
   - component: {fileID: 212192954}
+  - component: {fileID: 212192955}
   m_Layer: 5
   m_Name: Player3
   m_TagString: Untagged
@@ -2903,7 +2903,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _takingTurnIndicatorGameObject: {fileID: 1196427963}
   _notTakingTurnIndicatorGameObject: {fileID: 1275310317}
-  _avatar: {fileID: 280075431}
+  _avatarImage: {fileID: 280075431}
   _botIndicatorGameObject: {fileID: 518695579}
   _playerIndicatorGameObject: {fileID: 54592317}
   _nickNameText: {fileID: 753799178}
@@ -3768,7 +3768,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 280075427}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 280075429}
@@ -5860,8 +5860,8 @@ GameObject:
   m_Component:
   - component: {fileID: 469863946}
   - component: {fileID: 469863949}
-  - component: {fileID: 469863948}
   - component: {fileID: 469863947}
+  - component: {fileID: 469863948}
   m_Layer: 5
   m_Name: Player2
   m_TagString: Untagged
@@ -5914,7 +5914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _takingTurnIndicatorGameObject: {fileID: 1871241259}
   _notTakingTurnIndicatorGameObject: {fileID: 478751657}
-  _avatar: {fileID: 1263015569}
+  _avatarImage: {fileID: 1263015569}
   _botIndicatorGameObject: {fileID: 1437915610}
   _playerIndicatorGameObject: {fileID: 1214735033}
   _nickNameText: {fileID: 1572948737}
@@ -15095,7 +15095,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1263015565}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 1263015567}
@@ -17231,8 +17231,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1489444219}
   - component: {fileID: 1489444222}
-  - component: {fileID: 1489444221}
   - component: {fileID: 1489444220}
+  - component: {fileID: 1489444221}
   m_Layer: 5
   m_Name: Player4
   m_TagString: Untagged
@@ -17285,7 +17285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _takingTurnIndicatorGameObject: {fileID: 1781044491}
   _notTakingTurnIndicatorGameObject: {fileID: 9136852}
-  _avatar: {fileID: 1950237269}
+  _avatarImage: {fileID: 1950237269}
   _botIndicatorGameObject: {fileID: 1738193132}
   _playerIndicatorGameObject: {fileID: 494860024}
   _nickNameText: {fileID: 46059495}
@@ -21916,7 +21916,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1950237265}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 1950237267}
@@ -25143,7 +25143,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5777551931861394702}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 5777551931861394696}
@@ -25523,7 +25523,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5777551931963722810}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 5777551931963722788}
@@ -26164,7 +26164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _takingTurnIndicatorGameObject: {fileID: 5777551931821349158}
   _notTakingTurnIndicatorGameObject: {fileID: 267734802}
-  _avatar: {fileID: 5777551931963722811}
+  _avatarImage: {fileID: 5777551931963722811}
   _botIndicatorGameObject: {fileID: 698295870}
   _playerIndicatorGameObject: {fileID: 121272728}
   _nickNameText: {fileID: 5777551933045756755}
@@ -27846,7 +27846,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5777551932660875617}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ecae21e43e3353d458a7054f80e0c0e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 686a4966f9372e84baef3069a3f1c941, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _image: {fileID: 5777551932660875619}
@@ -28855,8 +28855,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5777551932918920382}
   - component: {fileID: 5777551932918920379}
-  - component: {fileID: 5777551932918920385}
   - component: {fileID: 5777551932918920384}
+  - component: {fileID: 5777551932918920385}
   m_Layer: 5
   m_Name: Player1
   m_TagString: Untagged
@@ -28878,7 +28878,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _takingTurnIndicatorGameObject: {fileID: 5777551933610898662}
   _notTakingTurnIndicatorGameObject: {fileID: 393613178}
-  _avatar: {fileID: 5777551932660875620}
+  _avatarImage: {fileID: 5777551932660875620}
   _botIndicatorGameObject: {fileID: 5777551933456254913}
   _playerIndicatorGameObject: {fileID: 5777551932564982733}
   _nickNameText: {fileID: 5777551931851471110}
