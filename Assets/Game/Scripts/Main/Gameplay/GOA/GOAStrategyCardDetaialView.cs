@@ -22,11 +22,9 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private Button _useButton;
 		
-		private IAssetSession _assetSession;
-
 		public void RegisterCallback(IAssetSession assetSession, Action onClickUseButton)
 		{
-			_assetSession = assetSession;
+			_image.Initialize(assetSession);
 			_useButton.onClick.AddListener(() => onClickUseButton?.Invoke());
 		}
 
