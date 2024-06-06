@@ -31,7 +31,9 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GOACharacterDetailView _characterDetail;
 		[SerializeField]
-		private GOACardDetaialView _cardDetail;
+		private GOAPublicCardDetaialView _publicCardDetail;
+		[SerializeField]
+		private GOAStrategyCardDetaialView _strategyCardDetail;
 		
 		
 		[SerializeField]
@@ -92,7 +94,8 @@ namespace Gameplay.GOA
 			_board.Render(prop.Board);
 			_handCards.Render(prop.HandPublicCards);
 			_characterDetail.Render(prop.CharacterDetailOpt);
-			_cardDetail.Render(prop.CardDetailOpt);
+			_publicCardDetail.Render(prop.PublicCardDetailOpt);
+			_strategyCardDetail.Render(prop.StrategyCardDetailOpt);
 		}
 	}
 }

@@ -8,7 +8,11 @@ using UnityEngine.UI;
 
 namespace Gameplay.GOA
 {
-	public record GOACharacterDetailViewData();
+	public record GOACharacterDetailViewData(
+		string CharacterName,
+		string SkillName,
+		string SkillDescription
+	);
 	
 	public class GOACharacterDetailView : MonoBehaviour
 	{
@@ -32,6 +36,9 @@ namespace Gameplay.GOA
 				viewData => 
 				{
 					_panel.SetActive(true);
+					_characterNameText.text = viewData.CharacterName;
+					_skillNameText.text = viewData.SkillName;
+					_skillDescriptionText.text = viewData.SkillDescription;
 				},
 				() => _panel.SetActive(false)
 			);

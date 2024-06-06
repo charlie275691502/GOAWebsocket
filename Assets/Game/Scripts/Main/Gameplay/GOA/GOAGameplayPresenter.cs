@@ -65,7 +65,8 @@ namespace Gameplay.GOA
 		GOABoardViewData Board,
 		GOAHandCardsViewData HandPublicCards,
 		Option<GOACharacterDetailViewData> CharacterDetailOpt,
-		Option<GOACardDetaialViewData> CardDetailOpt)
+		Option<GOAPublicCardDetaialViewData> PublicCardDetailOpt,
+		Option<GOAStrategyCardDetaialViewData> StrategyCardDetailOpt)
 	{
 		// public GOAGameplayProperty(
 		// 	GOAGameplayState state, PlayerViewData[] playerViewDatas) : this(
