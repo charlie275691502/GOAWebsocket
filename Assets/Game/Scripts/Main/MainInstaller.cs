@@ -13,6 +13,7 @@ using Metagame.Room;
 using Gameplay.TicTacToe;
 using Common.AssetSession;
 using Gameplay;
+using Gameplay.GOA;
 
 namespace Main
 {
@@ -43,6 +44,8 @@ namespace Main
 
 		[SerializeField]
 		private TicTacToeGameplayView _ticTacToeGameplayView;
+		[SerializeField]
+		private GOAGameplayView _gOAGameplayView;
 
 		public override void InstallBindings()
 		{
@@ -186,6 +189,15 @@ namespace Main
 				.Bind<ITicTacToeGameplayView>()
 				.To<TicTacToeGameplayView>()
 				.FromInstance(_ticTacToeGameplayView);
+			
+			Container
+				.Bind<IGOAGameplayPresenter>()
+				.To<GOAGameplayPresenter>()
+				.AsSingle();
+			Container
+				.Bind<IGOAGameplayView>()
+				.To<GOAGameplayView>()
+				.FromInstance(_gOAGameplayView);
 				
 			#endregion
 		}
