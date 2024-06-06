@@ -146,13 +146,16 @@ namespace Metagame.MainPage
 		}
 		
 		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
-			=> result.Select(roomResult => 
-				new RoomViewData(
-					roomResult.Id,
-					roomResult.RoomName,
-					new GameSetting(roomResult.GameSetting),
-					roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
-				)).ToList();
+			=> result
+				.Where(roomResult => roomResult.Players.Count > 0)
+				.Select(roomResult => 
+					new RoomViewData(
+						roomResult.Id,
+						roomResult.RoomName,
+						new GameSetting(roomResult.GameSetting),
+						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
+					))
+				.ToList();
 
 		private async UniTask<Option<int>> _CreateRoom()
 		{
