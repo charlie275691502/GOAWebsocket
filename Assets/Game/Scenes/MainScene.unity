@@ -19495,7 +19495,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1708390066
@@ -20484,14 +20484,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _panel: {fileID: 1115138654}
-  _turnText: {fileID: 0}
-  _playerTurnIndicatorGameObject: {fileID: 0}
-  _enemyTurnIndicatorGameObject: {fileID: 0}
-  _players: []
-  _summaryPanel: {fileID: 0}
-  _winnerNameText: {fileID: 0}
-  _summaryTurnsText: {fileID: 0}
-  _summaryReturnHomeButton: {fileID: 0}
+  _selfPlayer: {fileID: 5777551932144863049}
+  _enemyPlayers:
+  - {fileID: 5777551932918920384}
+  - {fileID: 469863947}
+  - {fileID: 212192954}
+  - {fileID: 1489444220}
+  _board: {fileID: 5777551932667874171}
+  _handCards: {fileID: 5777551933286605582}
+  _characterDetail: {fileID: 3675650918033561888}
+  _cardDetail: {fileID: 5777551932561988792}
+  _turnText: {fileID: 5777551932040023661}
+  _button: {fileID: 5777551933285629092}
 --- !u!222 &1784058758
 CanvasRenderer:
   m_ObjectHideFlags: 0

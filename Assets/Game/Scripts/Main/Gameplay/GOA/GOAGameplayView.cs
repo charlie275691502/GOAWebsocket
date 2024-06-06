@@ -12,7 +12,7 @@ namespace Gameplay.GOA
 {
 	public interface IGOAGameplayView
 	{
-		void RegisterCallback(DiContainer container, Action<int> onClickClickPositionElement, Action onClickReturnHomeButton);
+		void RegisterCallback();
 		void Render(GOAGameplayProperty prop);
 	}
 
@@ -21,29 +21,31 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
+		private GOAPlayerView _selfPlayer;
+		[SerializeField]
+		private List<GOAPlayerView> _enemyPlayers;
+		[SerializeField]
+		private GOABoardView _board;
+		[SerializeField]
+		private GOAHandCardsView _handCards;
+		[SerializeField]
+		private GOACharacterDetailView _characterDetail;
+		[SerializeField]
+		private GOACardDetaialView _cardDetail;
+		
+		
+		[SerializeField]
 		private Text _turnText;
+		
+		
 		[SerializeField]
-		private GameObject _playerTurnIndicatorGameObject;
-		[SerializeField]
-		private GameObject _enemyTurnIndicatorGameObject;
-		[SerializeField]
-		private List<PlayerListElementView> _players;
-		[SerializeField]
-		private GameObject _summaryPanel;
-		[SerializeField]
-		private Text _winnerNameText;
-		[SerializeField]
-		private Text _summaryTurnsText;
-		[SerializeField]
-		private Button _summaryReturnHomeButton;
+		private Button _button;
 
 		private GOAGameplayProperty _prop;
 
-		void IGOAGameplayView.RegisterCallback(DiContainer container, Action<int> onClickClickPositionElement, Action onClickReturnHomeButton)
+		void IGOAGameplayView.RegisterCallback()
 		{
-			_players.ForEach(player => player.Resolve(container));
-			
-			_summaryReturnHomeButton.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
+			// _button.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
 		}
 
 		void IGOAGameplayView.Render(GOAGameplayProperty prop)
@@ -59,8 +61,6 @@ namespace Gameplay.GOA
 					break;
 
 				case GOAGameplayState.Idle:
-				case GOAGameplayState.ClickPositionElement:
-				case GOAGameplayState.ClickReturnHome:
 					_Render(prop);
 					break;
 
@@ -85,19 +85,14 @@ namespace Gameplay.GOA
 
 		private void _Render(GOAGameplayProperty prop)
 		{
-			_turnText.text = prop.Turn.ToString();
-			_playerTurnIndicatorGameObject.SetActive(prop.IsPlayerTurn);
-			_enemyTurnIndicatorGameObject.SetActive(!prop.IsPlayerTurn);
-			_players.ZipForEach(
-				prop.PlayerViewDatas,
-				(view, viewData) => view.Display(new EnhancedScrollerElementViewData<PlayerViewData>(viewData)));
-			
-			_summaryPanel.SetActive(prop.IsGameEnd);
-			if (prop.IsGameEnd)
-			{
-				_winnerNameText.text = prop.WinnerName;
-				_summaryTurnsText.text = prop.SummaryTurns.ToString();
-			}
+			_selfPlayer.Render(prop.SelfPlayer);
+			_enemyPlayers.ZipForEach(
+				prop.EnemyPlayers,
+				(enemyPlayer, viewData) => enemyPlayer.Render(viewData));
+			_board.Render(prop.Board);
+			_handCards.Render(prop.HandPublicCards);
+			_characterDetail.Render(prop.CharacterDetailOpt);
+			_cardDetail.Render(prop.CardDetailOpt);
 		}
 	}
 }

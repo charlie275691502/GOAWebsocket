@@ -7,10 +7,7 @@ using UnityEngine.UI;
 
 namespace Gameplay.GOA
 {
-	public class GOAPlayerViewData
-	{
-		
-	}
+	public record GOAPlayerViewData();
 	
 	public class GOAPlayerView : MonoBehaviour
 	{

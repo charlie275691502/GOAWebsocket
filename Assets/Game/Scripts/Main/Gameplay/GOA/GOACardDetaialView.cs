@@ -2,15 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Common;
+using Optional;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Gameplay.GOA
 {
-	public class GOACardDetaialViewData
-	{
-		
-	}
+	public record GOACardDetaialViewData();
 	
 	public class GOACardDetaialView : MonoBehaviour
 	{
@@ -26,14 +24,15 @@ namespace Gameplay.GOA
 			_useButton.onClick.AddListener(() => onClickUseButton?.Invoke());
 		}
 
-		public void Open(GOACardDetaialViewData viewData)
+		public void Render(Option<GOACardDetaialViewData> viewDataOpt)
 		{
-			_panel.SetActive(true);
-		}
-
-		public void Close()
-		{
-			_panel.SetActive(false);
+			viewDataOpt.Match(
+				viewData => 
+				{
+					_panel.SetActive(true);
+				},
+				() => _panel.SetActive(false)
+			);
 		}
 	}
 }

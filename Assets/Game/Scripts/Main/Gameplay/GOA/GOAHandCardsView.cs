@@ -6,10 +6,9 @@ using UnityEngine.UI;
 
 namespace Gameplay.GOA
 {
-	public class GOAHandCardsViewData
-	{
-		
-	}
+	public record GOAHandCardsViewData(
+		GOAPublicCardViewData[] PublicCards
+	);
 	
 	public class GOAHandCardsView : MonoBehaviour
 	{
@@ -20,7 +19,7 @@ namespace Gameplay.GOA
 		{
 		}
 
-		public void Render(GOABoardViewData viewData)
+		public void Render(GOAHandCardsViewData viewData)
 		{
 			
 		}

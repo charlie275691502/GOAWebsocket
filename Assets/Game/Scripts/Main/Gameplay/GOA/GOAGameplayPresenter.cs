@@ -21,8 +21,6 @@ namespace Gameplay.GOA
 	{
 		public record Open() : GOAGameplayState;
 		public record Idle() : GOAGameplayState;
-		public record ClickPositionElement(int Position) : GOAGameplayState;
-		public record ClickReturnHome() : GOAGameplayState;
 		public record Close() : GOAGameplayState;
 	}
 
@@ -62,23 +60,23 @@ namespace Gameplay.GOA
 	public record GOAGameplayProperty(
 		GOAGameplayState State,
 		int Turn,
-		bool IsPlayerTurn,
-		PlayerViewData[] PlayerViewDatas,
-		bool ShowConfirmPositionButton,
-		bool IsGameEnd,
-		string WinnerName,
-		int SummaryTurns)
+		GOAPlayerViewData SelfPlayer,
+		GOAPlayerViewData[] EnemyPlayers,
+		GOABoardViewData Board,
+		GOAHandCardsViewData HandPublicCards,
+		Option<GOACharacterDetailViewData> CharacterDetailOpt,
+		Option<GOACardDetaialViewData> CardDetailOpt)
 	{
-		public GOAGameplayProperty(
-			GOAGameplayState state, PlayerViewData[] playerViewDatas) : this(
-				state,
-				0,
-				false,
-				playerViewDatas,
-				false,
-				false,
-				string.Empty,
-				0) { }
+		// public GOAGameplayProperty(
+		// 	GOAGameplayState state, PlayerViewData[] playerViewDatas) : this(
+		// 		state,
+		// 		0,
+		// 		false,
+		// 		playerViewDatas,
+		// 		false,
+		// 		false,
+		// 		string.Empty,
+		// 		0) { }
 	}
 
 	public interface IGOAGameplayPresenter
@@ -112,12 +110,7 @@ namespace Gameplay.GOA
 
 			_actionQueue = new ActionQueue();
 
-			_view.RegisterCallback(
-				container,
-				(position) =>
-					_ChangeStateIfIdle(new GOAGameplayState.ClickPositionElement(position)),
-				() =>
-					_ChangeStateIfIdle(new GOAGameplayState.ClickReturnHome()));
+			_view.RegisterCallback();
 		}
 
 		async UniTask IGOAGameplayPresenter.Run(GOAGameData gameData)
@@ -132,9 +125,9 @@ namespace Gameplay.GOA
 					Option.None<int>(),
 					(ghostPositionOpt) => _UpdatePropertyPositions(_model.Positions, ghostPositionOpt)));
 
-			_prop = new GOAGameplayProperty(
-				new GOAGameplayState.Open(),
-				_gameData.Players.Select(player => player.Player).ToArray());
+			// _prop = new GOAGameplayProperty(
+			// 	new GOAGameplayState.Open(),
+			// 	_gameData.Players.Select(player => player.Player).ToArray());
 
 			_UpdateModelAndProperty(_gameData);
 			await _JoinGame(_gameData.GameId);
@@ -150,62 +143,6 @@ namespace Gameplay.GOA
 						break;
 
 					case GOAGameplayState.Idle:
-						break;
-
-					case GOAGameplayState.ClickPositionElement info:
-						if (
-							!_model.IsGameEnd &&
-							_model.IsPlayerTurn &&
-							_model.Positions[info.Position] == 0)
-						{
-							if (_model.GhostPositionOpt.Contains(info.Position))
-							{
-								if (
-									!_model.IsGameEnd &&
-									_model.GhostPositionOpt.HasValue)
-								{
-									var position = _model.GhostPositionOpt.ValueOrFailure();
-									_model = _model with
-									{
-										GhostPositionOpt = Option.None<int>()
-									};
-									_prop = _prop with 
-									{ 
-										ShowConfirmPositionButton = false
-									};
-									_view.Render(_prop);
-
-									await _webSocketPresenter
-										.ChoosePosition(position)
-										.RunAndHandleInternetError(_warningPresenter);
-								} else 
-								{
-									_model = _model with
-									{
-										GhostPositionOpt = Option.None<int>()
-									};
-								}
-							} else 
-							{
-								_model = _model with
-								{
-									GhostPositionOpt = info.Position.Some()
-								};
-							}
-						}
-						_prop = _prop with 
-						{ 
-							State = new GOAGameplayState.Idle(),
-						};
-						break;
-						
-					case GOAGameplayState.ClickReturnHome:
-
-						_prop = _prop with
-						{
-							State = new GOAGameplayState.Close()
-						};
-						
 						break;
 
 					case GOAGameplayState.Close:
@@ -233,7 +170,6 @@ namespace Gameplay.GOA
 		private async UniTask _JoinGame(int gameId)
 		{
 			_webSocketPresenter.RegisterOnUpdateGame(result => _actionQueue.Add(() => _UpdateGame(result)));
-			_webSocketPresenter.RegisterOnReceiveSummary(result => _actionQueue.Add(() => _ReceiveSummary(result)));
 
 			if (await
 				_webSocketPresenter
@@ -264,7 +200,6 @@ namespace Gameplay.GOA
 			_prop = _prop with
 			{
 				Turn = gameData.Board.Turn,
-				IsPlayerTurn = _model.IsPlayerTurn,
 			};
 		}
 
@@ -272,7 +207,6 @@ namespace Gameplay.GOA
 		{
 			_prop = _prop with
 			{
-				ShowConfirmPositionButton = ghostPositionOpt.HasValue
 			};
 			_view.Render(_prop);
 		}
@@ -280,23 +214,6 @@ namespace Gameplay.GOA
 		private void _UpdateGame(GOAGameResult result)
 		{
 			_UpdateModelAndProperty(new GOAGameData(result, _model.SelfPlayerId));
-		}
-
-		private void _ReceiveSummary(GOASummaryResult result)
-		{
-			_model = _model with 
-			{
-				IsGameEnd = true,
-			};
-
-			_prop = _prop with
-			{
-				IsGameEnd = true,
-				WinnerName = result.Winner.Player.NickName,
-				SummaryTurns = result.Turns,
-			};
-			
-			_view.Render(_prop);
 		}
 	}
 }

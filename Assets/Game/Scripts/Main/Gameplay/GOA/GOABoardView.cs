@@ -6,10 +6,7 @@ using UnityEngine.UI;
 
 namespace Gameplay.GOA
 {
-	public class GOABoardViewData
-	{
-		
-	}
+	public record GOABoardViewData();
 	
 	public class GOABoardView : MonoBehaviour
 	{
