@@ -16,7 +16,7 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private Transform _handCardsFolder;
 
-		public void RegisterCallback(Action onClickButton)
+		public void RegisterCallback()
 		{
 		}
 

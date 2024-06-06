@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +19,7 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _notTakingTurnIndicatorGameObject;
 		[SerializeField]
-		private Image _avatar;
+		private SyncImage _avatar;
 		[SerializeField]
 		private GameObject _botIndicatorGameObject;
 		[SerializeField]

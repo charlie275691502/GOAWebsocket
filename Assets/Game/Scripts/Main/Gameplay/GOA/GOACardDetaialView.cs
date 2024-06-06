@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Common;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,7 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private Image _image;
+		private SyncImage _image;
 		[SerializeField]
 		private Button _useButton;
 
