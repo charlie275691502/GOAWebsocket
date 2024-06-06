@@ -1,0 +1,142 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f0b0c553be8edd4682e9180fdd13e37, type: 3}
+  m_Name: I2Languages
+  m_EditorClassIdentifier: 
+  mSource:
+    UserAgreesToHaveItOnTheScene: 0
+    UserAgreesToHaveItInsideThePluginsFolder: 0
+    GoogleLiveSyncIsUptoDate: 1
+    mTerms:
+    - Term: UI/App_Name
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6B0A\u529B\u4E16\u4EE3"
+      - Generation of Authorisation
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/CLICK_TO_START
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u958B\u59CB\u904A\u6232"
+      - Click to Start
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/LOGIN_TITLE
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165"
+      - LOGIN
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/LOGIN_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165"
+      - Login
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/REGISTER_TITLE
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A"
+      - REGISTER
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/REGISTER_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A"
+      - Register
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/SWITCH_TO_LOGIN_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165\u65E2\u6709\u5E33\u865F"
+      - Already have an account?
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/SWITCH_TO_REGISTER_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A\u65B0\u5E33\u865F"
+      - Don't have an account?
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/USERNAME
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5E33\u865F"
+      - username
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/PASSWORD
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5BC6\u78BC"
+      - password
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/CONFIRM_PASSWORD
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u78BA\u8A8D\u5BC6\u78BC"
+      - confirm password
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/EMAIL
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4FE1\u7BB1"
+      - email
+      Flags: 0000
+      Languages_Touch: []
+    CaseInsensitiveTerms: 0
+    OnMissingTranslation: 3
+    mTerm_AppName: 
+    mLanguages:
+    - Name: Chinese (Traditional)
+      Code: zh-TW
+      Flags: 0
+    - Name: English
+      Code: en
+      Flags: 0
+    IgnoreDeviceLanguage: 0
+    _AllowUnloadingLanguages: 0
+    Google_WebServiceURL: https://script.google.com/macros/s/AKfycbxOIZtPip0GIFdgoMyvesdl9NSdiOdvnUiSvhq0Zb79CYLVOlAzG9EFSOQxP4V-iTU7/exec
+    Google_SpreadsheetKey: 1XIqG2QEWoVEATFDl0pVODiXrIqLnFjs716V_JdqzsuM
+    Google_SpreadsheetName: I2Loc GOAWebsocket Localization
+    Google_LastUpdatedVersion: 1717641786482
+    Google_Password: 
+    GoogleUpdateFrequency: 0
+    GoogleInEditorCheckFrequency: 0
+    GoogleUpdateSynchronization: 1
+    GoogleUpdateDelay: 0
+    Assets: []
+    Spreadsheet_LocalFileName: 
+    Spreadsheet_LocalCSVSeparator: ','
+    Spreadsheet_LocalCSVEncoding: utf-8
+    Spreadsheet_SpecializationAsRows: 1
+    Spreadsheet_SortRows: 1
