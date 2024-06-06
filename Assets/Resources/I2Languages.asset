@@ -15,7 +15,7 @@ MonoBehaviour:
   mSource:
     UserAgreesToHaveItOnTheScene: 0
     UserAgreesToHaveItInsideThePluginsFolder: 0
-    GoogleLiveSyncIsUptoDate: 1
+    GoogleLiveSyncIsUptoDate: 0
     mTerms:
     - Term: UI/App_Name
       TermType: 0
@@ -123,7 +123,7 @@ MonoBehaviour:
     - Name: English
       Code: en
       Flags: 0
-    IgnoreDeviceLanguage: 0
+    IgnoreDeviceLanguage: 1
     _AllowUnloadingLanguages: 0
     Google_WebServiceURL: https://script.google.com/macros/s/AKfycbxOIZtPip0GIFdgoMyvesdl9NSdiOdvnUiSvhq0Zb79CYLVOlAzG9EFSOQxP4V-iTU7/exec
     Google_SpreadsheetKey: 1XIqG2QEWoVEATFDl0pVODiXrIqLnFjs716V_JdqzsuM

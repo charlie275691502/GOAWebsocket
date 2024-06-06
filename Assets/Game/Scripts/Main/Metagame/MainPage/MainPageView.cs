@@ -8,7 +8,7 @@ namespace Metagame.MainPage
 {
 	public interface IMainPageView
 	{
-		void RegisterCallback(Action<int> onJoinRoom, Action onCreateRoom);
+		void RegisterCallback(Action onRefreshRoomList, Action<int> onJoinRoom, Action onCreateRoom);
 		void Render(MainPageProperty prop);
 	}
 	
@@ -16,6 +16,8 @@ namespace Metagame.MainPage
 	{
 		[SerializeField]
 		private GameObject _panel;
+		[SerializeField]
+		private Button _refreshRoomListButton;
 		[SerializeField]
 		private Button _createRoomButton;
 		
@@ -34,6 +36,7 @@ namespace Metagame.MainPage
 		private SimpleEnhancedScrollerController _scrollerController;
 		private EnhancedScrollerDataModel<RoomListElementView, EnhancedScrollerElementViewData<RoomViewData>> _dataModel;
 		
+		private Action _onRefreshRoomList;
 		private Action<int> _onJoinRoom;
 		private Action _onCreateRoom;
 		private MainPageProperty _prop;
@@ -55,11 +58,13 @@ namespace Metagame.MainPage
 				container);
 		}
 
-		void IMainPageView.RegisterCallback(Action<int> onJoinRoom, Action onCreateRoom)
+		void IMainPageView.RegisterCallback(Action onRefreshRoomList, Action<int> onJoinRoom, Action onCreateRoom)
 		{
+			_onRefreshRoomList = onRefreshRoomList;
 			_onJoinRoom = onJoinRoom;
 			_onCreateRoom = onCreateRoom;
 
+			_refreshRoomListButton.onClick.AddListener(_OnRefreshRoomList);
 			_createRoomButton.onClick.AddListener(_OnCreateRoom);
 		}
 
@@ -76,6 +81,7 @@ namespace Metagame.MainPage
 					break;
 
 				case MainPageState.Idle:
+				case MainPageState.RefreshRoomList:
 				case MainPageState.JoinRoom:
 				case MainPageState.CreateRoom:
 					_Render(prop);
@@ -110,6 +116,11 @@ namespace Metagame.MainPage
 		private void _OnInstantiateCell(RoomListElementView view, EnhancedScrollerElementViewData<RoomViewData> viewData, int dataIndex)
 		{
 			view.OnJoinRoom += () => _OnJoinRoom(viewData.Data.Id);
+		}
+		
+		private void _OnRefreshRoomList()
+		{
+			_onRefreshRoomList?.Invoke();
 		}
 		
 		private void _OnJoinRoom(int roomId)
