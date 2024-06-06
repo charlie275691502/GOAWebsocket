@@ -10,11 +10,18 @@ namespace Common.AssetSession
 	{
 		Avatar,
 		DataSheet,
+		GOACharacterMid,
+		GOACharacterSmall,
+		GOAPublicCardNormal,
+		GOAPublicCardChosen,
+		GOAPublicCardDetail,
+		GOAStrategyCardNormal,
+		GOAStrategyCardDetail,
 	}
 
 	public interface IAssetSession
 	{
-        string GetPath(AssetType assetType, string assetName);
+		string GetPath(AssetType assetType, string assetName);
 		void AsyncLoad<T>(AssetType assetType, string assetName, Action<Option<T>> onComplete) where T : Object;
 		UniTask<Option<T>> SyncLoad<T>(AssetType assetType, string assetName) where T : Object;
 		Option<T> SyncBlockLoad<T>(AssetType assetType, string assetName) where T : Object;
