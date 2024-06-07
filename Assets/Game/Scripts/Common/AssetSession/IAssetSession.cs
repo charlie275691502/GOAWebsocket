@@ -9,7 +9,6 @@ namespace Common.AssetSession
 	public enum AssetType
 	{
 		Avatar,
-		DataSheet,
 		GOACharacterMid,
 		GOACharacterSmall,
 		GOAPublicCardNormal,

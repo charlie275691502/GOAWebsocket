@@ -26,9 +26,9 @@ namespace Gameplay.TicTacToe
 		bool IsSelfPlayer,
 		bool IsSelfTeam)
 	{
-		public TicTacToePlayerData(TicTacToePlayerResult result, bool isSelfPlayer, bool isSelfTeam, IExcelDataSheetLoader excelDataSheetLoader) : this(
+		public TicTacToePlayerData(TicTacToePlayerResult result, bool isSelfPlayer, bool isSelfTeam, IGoogleSheetLoader googleSheetLoader) : this(
 			result.Team,
-			new PlayerViewData(result.Player, excelDataSheetLoader),
+			new PlayerViewData(result.Player, googleSheetLoader),
 			result.Elo,
 			result.PlayedGameCount,
 			result.WinGameCount,
@@ -51,15 +51,15 @@ namespace Gameplay.TicTacToe
 		TicTacToePlayerData[] Players,
 		TicTacToeSettingData Setting) : IGameData
 	{
-		public TicTacToeGameData(TicTacToeGameResult result, int selfPlayerId, IExcelDataSheetLoader excelDataSheetLoader) : this(
+		public TicTacToeGameData(TicTacToeGameResult result, int selfPlayerId, IGoogleSheetLoader googleSheetLoader) : this(
 			result.Id,
 			selfPlayerId,
 			_GetSelfPlayerTeam(result.Players, selfPlayerId),
 			new TicTacToeBoardData(result.Board),
-			_GetTicTacToePlayerDatas(result.Players, selfPlayerId, excelDataSheetLoader),
+			_GetTicTacToePlayerDatas(result.Players, selfPlayerId, googleSheetLoader),
 			new TicTacToeSettingData(result.Setting)) { }
 
-		public static TicTacToePlayerData[] _GetTicTacToePlayerDatas(TicTacToePlayerResult[] players, int selfPlayerId, IExcelDataSheetLoader excelDataSheetLoader)
+		public static TicTacToePlayerData[] _GetTicTacToePlayerDatas(TicTacToePlayerResult[] players, int selfPlayerId, IGoogleSheetLoader googleSheetLoader)
 		{
 			var selfPlayerTeam = _GetSelfPlayerTeam(players, selfPlayerId);
 			return players
@@ -67,7 +67,7 @@ namespace Gameplay.TicTacToe
 					player,
 					selfPlayerId == player.Player.Id,
 					selfPlayerTeam == player.Team,
-					excelDataSheetLoader))
+					googleSheetLoader))
 				.ToArray();
 		}
 

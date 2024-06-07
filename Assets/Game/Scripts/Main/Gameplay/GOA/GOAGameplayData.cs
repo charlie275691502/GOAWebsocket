@@ -51,7 +51,7 @@ namespace Gameplay.GOA
 		int PlayedGameCount,
 		int WinGameCount)
 	{
-		public GOAPlayerData(GOAPlayerResult result, IExcelDataSheetLoader excelDataSheetLoader) : this(
+		public GOAPlayerData(GOAPlayerResult result, IGoogleSheetLoader googleSheetLoader) : this(
 			result.Order,
 			result.IsBot,
 			result.CharacterId,
@@ -61,7 +61,7 @@ namespace Gameplay.GOA
 			result.StrategyCardCount,
 			result.Power,
 			result.PowerLimit,
-			new PlayerViewData(result.Player, excelDataSheetLoader),
+			new PlayerViewData(result.Player, googleSheetLoader),
 			result.Elo,
 			result.PlayedGameCount,
 			result.WinGameCount) { }
@@ -81,16 +81,16 @@ namespace Gameplay.GOA
 		GOAPlayerData[] Players,
 		GOASettingData Setting) : IGameData
 	{
-		public GOAGameData(GOAGameResult result, int selfPlayerId, IExcelDataSheetLoader excelDataSheetLoader) : this(
+		public GOAGameData(GOAGameResult result, int selfPlayerId, IGoogleSheetLoader googleSheetLoader) : this(
 			result.Id,
 			selfPlayerId,
 			new GOABoardData(result.Board),
-			_GetGOAPlayerDatas(result.Players, excelDataSheetLoader),
+			_GetGOAPlayerDatas(result.Players, googleSheetLoader),
 			new GOASettingData(result.Setting)) { }
 
-		public static GOAPlayerData[] _GetGOAPlayerDatas(GOAPlayerResult[] players, IExcelDataSheetLoader excelDataSheetLoader)
+		public static GOAPlayerData[] _GetGOAPlayerDatas(GOAPlayerResult[] players, IGoogleSheetLoader googleSheetLoader)
 			=> players
-				.Select(player => new GOAPlayerData(player, excelDataSheetLoader))
+				.Select(player => new GOAPlayerData(player, googleSheetLoader))
 				.ToArray();
 	}
 }

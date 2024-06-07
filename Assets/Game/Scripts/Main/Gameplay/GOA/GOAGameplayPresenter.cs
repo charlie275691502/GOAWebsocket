@@ -56,7 +56,7 @@ namespace Gameplay.GOA
 	{
 		private IWarningPresenter _warningPresenter;
 		private IGOAGameplayWebSocketPresenter _webSocketPresenter;
-		private IExcelDataSheetLoader _excelDataSheetLoader;
+		private IGoogleSheetLoader _googleSheetLoader;
 		private IGOAGameplayView _view;
 
 		private GOAGameData _gameData;
@@ -71,12 +71,12 @@ namespace Gameplay.GOA
 			IAssetSession assetSession,
 			IWarningPresenter warningPresenter,
 			IGOAGameplayWebSocketPresenter webSocketPresenter,
-			IExcelDataSheetLoader excelDataSheetLoader,
+			IGoogleSheetLoader googleSheetLoader,
 			IGOAGameplayView view)
 		{
 			_warningPresenter = warningPresenter;
 			_webSocketPresenter = webSocketPresenter;
-			_excelDataSheetLoader = excelDataSheetLoader;
+			_googleSheetLoader = googleSheetLoader;
 			_view = view;
 
 			_actionQueue = new ActionQueue();
@@ -249,7 +249,7 @@ namespace Gameplay.GOA
 
 		private void _UpdateGame(GOAGameResult result)
 		{
-			_UpdateModel(new GOAGameData(result, _model.SelfPlayerId, _excelDataSheetLoader));
+			_UpdateModel(new GOAGameData(result, _model.SelfPlayerId, _googleSheetLoader));
 			_UpdatePropertyThenRender();
 		}
 	}

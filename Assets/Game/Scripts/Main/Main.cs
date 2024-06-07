@@ -21,19 +21,19 @@ namespace Main
 
 	public class Main : MonoBehaviour
 	{
-		private IExcelDataSheetLoader _excelDataSheetLoader;
+		private IGoogleSheetLoader _googleSheetLoader;
 		private IAuthorizationPresenter _authorizationPresenter;
 		private IMetagamePresenter _metagamePresenter;
 		private IGameplayPresenter _gameplayPresenter;
 
 		[Zenject.Inject]
 		public void Zenject(
-			IExcelDataSheetLoader excelDataSheetLoader,
+			IGoogleSheetLoader googleSheetLoader,
 			IAuthorizationPresenter authorizationPresenter,
 			IMetagamePresenter metagamePresenter,
 			IGameplayPresenter gameplayPresenter)
 		{
-			_excelDataSheetLoader = excelDataSheetLoader;
+			_googleSheetLoader = googleSheetLoader;
 			_authorizationPresenter = authorizationPresenter;
 			_metagamePresenter = metagamePresenter;
 			_gameplayPresenter = gameplayPresenter;
@@ -66,7 +66,7 @@ namespace Main
 		
 		private async UniTask _LoadExcelData()
 		{
-			await _excelDataSheetLoader.Bake();
+			await _googleSheetLoader.Bake();
 		}
 
 		private UniTask<MainSubTabReturn> _GetCurrentSubTabUniTask(MainState type)

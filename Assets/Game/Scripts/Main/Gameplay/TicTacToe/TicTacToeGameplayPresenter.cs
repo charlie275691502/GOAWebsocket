@@ -93,7 +93,7 @@ namespace Gameplay.TicTacToe
 	{
 		private IWarningPresenter _warningPresenter;
 		private ITicTacToeGameplayWebSocketPresenter _webSocketPresenter;
-		private IExcelDataSheetLoader _excelDataSheetLoader;
+		private IGoogleSheetLoader _googleSheetLoader;
 		private ITicTacToeGameplayView _view;
 
 		private TicTacToeGameData _gameData;
@@ -108,12 +108,12 @@ namespace Gameplay.TicTacToe
 			DiContainer container,
 			IWarningPresenter warningPresenter,
 			ITicTacToeGameplayWebSocketPresenter webSocketPresenter,
-			IExcelDataSheetLoader excelDataSheetLoader,
+			IGoogleSheetLoader googleSheetLoader,
 			ITicTacToeGameplayView view)
 		{
 			_warningPresenter = warningPresenter;
 			_webSocketPresenter = webSocketPresenter;
-			_excelDataSheetLoader = excelDataSheetLoader;
+			_googleSheetLoader = googleSheetLoader;
 			_view = view;
 
 			_actionQueue = new ActionQueue();
@@ -303,7 +303,7 @@ namespace Gameplay.TicTacToe
 
 		private void _UpdateGame(TicTacToeGameResult result)
 		{
-			_UpdateModelAndProperty(new TicTacToeGameData(result, _model.SelfPlayerId, _excelDataSheetLoader));
+			_UpdateModelAndProperty(new TicTacToeGameData(result, _model.SelfPlayerId, _googleSheetLoader));
 		}
 
 		private void _ReceiveSummary(TicTacToeSummaryResult result)

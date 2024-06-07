@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using Optional.Unsafe;
 using Data.Sheet;
 using TicTacToeGameData = Gameplay.TicTacToe.TicTacToeGameData;
+using System.Diagnostics;
 
 namespace Metagame.Room
 {
@@ -37,7 +38,7 @@ namespace Metagame.Room
 		private IRoomWebSocketPresenter _webSocketPresenter;
 		private BackendPlayerData _backendPlayerData;
 		private IRoomView _view;
-		private IExcelDataSheetLoader _excelDataSheetLoader;
+		private IGoogleSheetLoader _googleSheetLoader;
 
 		private ActionQueue _actionQueue;
 
@@ -47,7 +48,7 @@ namespace Metagame.Room
 			IHTTPPresenter hTTPPresenter,
 			IRoomWebSocketPresenter webSocketPresenter,
 			IWarningPresenter warningPresenter,
-			IExcelDataSheetLoader excelDataSheetLoader,
+			IGoogleSheetLoader googleSheetLoader,
 			BackendPlayerData backendPlayerData,
 			IRoomView view)
 		{
@@ -56,7 +57,7 @@ namespace Metagame.Room
 			_warningPresenter = warningPresenter;
 			_backendPlayerData = backendPlayerData;
 			_view = view;
-			_excelDataSheetLoader = excelDataSheetLoader;
+			_googleSheetLoader = googleSheetLoader;
 
 			_actionQueue = new ActionQueue();
 			
@@ -151,14 +152,14 @@ namespace Metagame.Room
 				result.Id,
 				result.RoomName,
 				new GameSetting(result.GameSetting),
-				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList(),
+				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList(),
 				result.Messages.Select(message => new MessageViewData()
 				{
 					Id = message.Id,
 					Content = message.Content,
 					NickName = message.Player.NickName,
 					AvatarImageKey =
-						_excelDataSheetLoader.Container.Avatars
+						_googleSheetLoader.Container.Avatars
 							.GetRow(message.Player.AvatarId)
 							.Map(avatar => avatar.ImageKey)
 							.ValueOr(string.Empty),
@@ -210,7 +211,7 @@ namespace Metagame.Room
 							Content = result.Content,
 							NickName = result.Player.NickName,
 							AvatarImageKey =
-								_excelDataSheetLoader.Container.Avatars
+								_googleSheetLoader.Container.Avatars
 									.GetRow(result.Player.AvatarId)
 									.Map(avatar => avatar.ImageKey)
 									.ValueOr(string.Empty),
@@ -229,14 +230,14 @@ namespace Metagame.Room
 					Id = result.Id,
 					RoomName = result.RoomName,
 					GameSetting = new GameSetting(result.GameSetting),
-					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
+					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList()
 				}
 			};
 		}
 
 		private void _StartGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id, _excelDataSheetLoader)) };
+			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
 		}
 	}
 }

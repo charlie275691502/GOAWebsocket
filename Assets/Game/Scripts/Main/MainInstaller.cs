@@ -90,8 +90,8 @@ namespace Main
 				.To<ResourceLoader>()
 				.AsSingle();
 			Container
-				.Bind<IExcelDataSheetLoader>()
-				.To<ExcelDataSheetLoader>()
+				.Bind<IGoogleSheetLoader>()
+				.To<GoogleSheetLoader>()
 				.AsSingle();
 			Container
 				.Bind<IWarningPresenter>()

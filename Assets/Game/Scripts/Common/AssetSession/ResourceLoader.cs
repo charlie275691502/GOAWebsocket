@@ -13,7 +13,6 @@ namespace Common.AssetSession
 		public static Dictionary<AssetType, string> _assetPath = new Dictionary<AssetType, string>()
 		{
 			{ AssetType.Avatar, "Avatars"},
-			{ AssetType.DataSheet, "DataSheets"},
 			{ AssetType.GOACharacterMid, Path.Join("Characters", "Mid")},
 			{ AssetType.GOACharacterSmall, Path.Join("Characters", "Small")},
 			{ AssetType.GOAPublicCardNormal, Path.Join("Cards", "PublicCards", "Normal")},

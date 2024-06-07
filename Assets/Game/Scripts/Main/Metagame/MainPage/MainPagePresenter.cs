@@ -36,7 +36,7 @@ namespace Metagame.MainPage
 		private IWarningPresenter _warningPresenter;
 		private ICreateRoomPresenter _createRoomPresenter;
 		private IMainPageView _view;
-		private IExcelDataSheetLoader _excelDataSheetLoader;
+		private IGoogleSheetLoader _googleSheetLoader;
 		
 		private MainPageProperty _prop;
 
@@ -45,13 +45,13 @@ namespace Metagame.MainPage
 			IWarningPresenter warningPresenter,
 			ICreateRoomPresenter createRoomPresenter,
 			IMainPageView view,
-			IExcelDataSheetLoader excelDataSheetLoader)
+			IGoogleSheetLoader googleSheetLoader)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_createRoomPresenter = createRoomPresenter;
 			_view = view;
-			_excelDataSheetLoader = excelDataSheetLoader;
+			_googleSheetLoader = googleSheetLoader;
 
 			_view.RegisterCallback(
 				() =>
@@ -157,7 +157,7 @@ namespace Metagame.MainPage
 						roomResult.Id,
 						roomResult.RoomName,
 						new GameSetting(roomResult.GameSetting),
-						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
+						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList()
 					))
 				.ToList();
 
