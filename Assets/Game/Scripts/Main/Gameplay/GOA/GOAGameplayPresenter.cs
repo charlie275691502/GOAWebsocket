@@ -9,6 +9,7 @@ using Common.Observable;
 using Common.UniTaskExtension;
 using Common.Warning;
 using Cysharp.Threading.Tasks;
+using Data.Sheet;
 using Metagame;
 using Optional;
 using Optional.Collections;
@@ -55,6 +56,7 @@ namespace Gameplay.GOA
 	{
 		private IWarningPresenter _warningPresenter;
 		private IGOAGameplayWebSocketPresenter _webSocketPresenter;
+		private IExcelDataSheetLoader _excelDataSheetLoader;
 		private IGOAGameplayView _view;
 
 		private GOAGameData _gameData;
@@ -69,10 +71,12 @@ namespace Gameplay.GOA
 			IAssetSession assetSession,
 			IWarningPresenter warningPresenter,
 			IGOAGameplayWebSocketPresenter webSocketPresenter,
+			IExcelDataSheetLoader excelDataSheetLoader,
 			IGOAGameplayView view)
 		{
 			_warningPresenter = warningPresenter;
 			_webSocketPresenter = webSocketPresenter;
+			_excelDataSheetLoader = excelDataSheetLoader;
 			_view = view;
 
 			_actionQueue = new ActionQueue();
@@ -245,7 +249,7 @@ namespace Gameplay.GOA
 
 		private void _UpdateGame(GOAGameResult result)
 		{
-			_UpdateModel(new GOAGameData(result, _model.SelfPlayerId));
+			_UpdateModel(new GOAGameData(result, _model.SelfPlayerId, _excelDataSheetLoader));
 			_UpdatePropertyThenRender();
 		}
 	}

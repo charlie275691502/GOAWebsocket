@@ -802,7 +802,7 @@ PlayerSettings:
     PS4: TextMeshPro
     PS5: TextMeshPro
     QNX: TextMeshPro
-    Standalone: TextMeshPro
+    Standalone: TextMeshPro;BAKINGSHEET_RUNTIME_CSVCONVERTER
     VisionOS: TextMeshPro
     WebGL: TextMeshPro
     XboxOne: TextMeshPro

@@ -9,6 +9,7 @@ using Optional;
 using Optional.Unsafe;
 using Web;
 using Metagame.MainPage.CreateRoom;
+using Data.Sheet;
 
 namespace Metagame.MainPage
 {
@@ -35,6 +36,7 @@ namespace Metagame.MainPage
 		private IWarningPresenter _warningPresenter;
 		private ICreateRoomPresenter _createRoomPresenter;
 		private IMainPageView _view;
+		private IExcelDataSheetLoader _excelDataSheetLoader;
 		
 		private MainPageProperty _prop;
 
@@ -42,12 +44,14 @@ namespace Metagame.MainPage
 			IHTTPPresenter hTTPPresenter,
 			IWarningPresenter warningPresenter,
 			ICreateRoomPresenter createRoomPresenter,
-			IMainPageView view)
+			IMainPageView view,
+			IExcelDataSheetLoader excelDataSheetLoader)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_createRoomPresenter = createRoomPresenter;
 			_view = view;
+			_excelDataSheetLoader = excelDataSheetLoader;
 
 			_view.RegisterCallback(
 				() =>
@@ -153,7 +157,7 @@ namespace Metagame.MainPage
 						roomResult.Id,
 						roomResult.RoomName,
 						new GameSetting(roomResult.GameSetting),
-						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
+						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _excelDataSheetLoader)).ToList()
 					))
 				.ToList();
 
