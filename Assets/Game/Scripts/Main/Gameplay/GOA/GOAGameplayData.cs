@@ -39,7 +39,7 @@ namespace Gameplay.GOA
 	public record GOAPlayerData(
 		int Order,
 		bool IsBot,
-		int CharacterId,
+		string CharacterId,
 		string[] PublicCardIds,
 		int PublicCardCount,
 		string[] StrategyCardIds,

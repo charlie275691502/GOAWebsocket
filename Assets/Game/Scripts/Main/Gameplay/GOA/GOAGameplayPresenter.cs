@@ -174,14 +174,16 @@ namespace Gameplay.GOA
 			=> new GOAPlayerViewData(
 				_model.SelfPlayer,
 				true,
-				_model.Board.TakingTurnPlayerId);
+				_model.Board.TakingTurnPlayerId,
+					_googleSheetLoader);
 
 		private GOAPlayerViewData[] _GetEnemyPlayersViewData()
 			=> _model.EnemyPlayers
 				.Select(enemyPlayer => new GOAPlayerViewData(
 					enemyPlayer,
 					false,
-					_model.Board.TakingTurnPlayerId))
+					_model.Board.TakingTurnPlayerId,
+					_googleSheetLoader))
 				.ToArray();
 		private GOABoardViewData _GetBoardViewData()
 			=> new GOABoardViewData(
@@ -192,7 +194,13 @@ namespace Gameplay.GOA
 					{
 						CardDataState.Empty => new CardViewDataState.Empty(),
 						CardDataState.Covered => new CardViewDataState.Covered(false),
-						CardDataState.Open Info => new CardViewDataState.Open(false, false, string.Empty),
+						CardDataState.Open Info => new CardViewDataState.Open(
+							false,
+							false,
+							_googleSheetLoader.Container.GOACards
+								.GetRow(Info.Id)
+								.Map(card => card.ImageKey)
+								.ValueOr(string.Empty)),
 						_ => throw new NotImplementedException(),
 					})
 					.Select(state => new GOACardViewData(state))
@@ -200,7 +208,13 @@ namespace Gameplay.GOA
 		private GOAHandCardsViewData _GetHandCardsViewData()
 			=> new GOAHandCardsViewData(
 				_model.SelfPlayer.PublicCardIds
-					.Select(cardId => new GOACardViewData(new CardViewDataState.Open(false, false, cardId)))
+					.Select(cardId => new GOACardViewData(new CardViewDataState.Open(
+						false,
+						false,
+						_googleSheetLoader.Container.GOACards
+							.GetRow(cardId)
+							.Map(card => card.ImageKey)
+							.ValueOr(string.Empty))))
 					.ToArray());
 					
 		private void _UpdateModel(GOAGameData gameData)

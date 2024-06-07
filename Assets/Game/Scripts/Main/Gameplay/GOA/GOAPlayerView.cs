@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Common;
 using Common.AssetSession;
+using Data.Sheet;
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,21 +24,23 @@ namespace Gameplay.GOA
 		int PowerLimit
 	)
 	{
-		public GOAPlayerViewData(GOAPlayerData data, bool isSelf, int takingTurnPlayerId) : this(
+		public GOAPlayerViewData(GOAPlayerData data, bool isSelf, int takingTurnPlayerId, IGoogleSheetLoader googleSheetLoader) : this(
 			isSelf,
 			takingTurnPlayerId == data.Player.Id,
-			
-			// _model.SelfPlayer.CharacterImageKey,
-			string.Empty,
-			
+			googleSheetLoader.Container.GOACharacters
+				.GetRow(data.CharacterId)
+				.Map(character => character.ImageKey)
+				.ValueOr(string.Empty),
 			data.IsBot,
 			data.Player.NickName,
-			
-			// _model.SelfPlayer.CharacterName,
-			string.Empty,
-			// _model.SelfPlayer.SkillDescription,
-			string.Empty,
-			
+			googleSheetLoader.Container.GOACharacters
+				.GetRow(data.CharacterId)
+				.Map(character => character.NameKey)
+				.ValueOr(string.Empty),
+			googleSheetLoader.Container.GOACharacters
+				.GetRow(data.CharacterId)
+				.Map(character => character.SkillDescriptionKey)
+				.ValueOr(string.Empty),
 			data.PublicCardCount,
 			data.StrategyCardCount,
 			data.Power,

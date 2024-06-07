@@ -233,7 +233,7 @@ namespace Web
 		[JsonProperty("isBot")]
 		public bool IsBot;
 		[JsonProperty("characterId")]
-		public int CharacterId;
+		public string CharacterId;
 		[JsonProperty("publicCardIds")]
 		public string[] PublicCardIds;
 		[JsonProperty("publicCardCount")]

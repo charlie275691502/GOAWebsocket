@@ -6,6 +6,8 @@ namespace Data.Sheet.Container
 	public class GoogleSheetContainer : SheetContainerBase
 	{
 		public GoogleSheetContainer(Microsoft.Extensions.Logging.ILogger logger) : base(logger) {}
-		public AvatarSheet Avatars { get; private set; }
+		public AvatarsSheet Avatars { get; private set; }
+		public GOACharactersSheet GOACharacters {get; private set;}
+		public GOACardsSheet GOACards {get; private set;}
 	}
 }

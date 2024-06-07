@@ -2,7 +2,7 @@ using Cathei.BakingSheet;
 
 namespace Data.Sheet.Container.Sheets
 {
-	public class AvatarSheet : SheetExtend<AvatarSheet.AvatarRow>
+	public class AvatarsSheet : SheetExtend<AvatarsSheet.AvatarRow>
     {
         public class AvatarRow : SheetRow
         {
