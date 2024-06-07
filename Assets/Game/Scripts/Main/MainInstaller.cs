@@ -64,6 +64,10 @@ namespace Main
 				.Bind<ITicTacToeGameplayWebSocketPresenter>()
 				.To<TicTacToeGameplayWebSocketPresenter>()
 				.AsSingle();
+			Container
+				.Bind<IGOAGameplayWebSocketPresenter>()
+				.To<GOAGameplayWebSocketPresenter>()
+				.AsSingle();
 
 			Container
 				.Bind<BackendPlayerData>()
