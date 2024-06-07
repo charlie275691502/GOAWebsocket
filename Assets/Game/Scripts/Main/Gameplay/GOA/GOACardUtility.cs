@@ -2,6 +2,8 @@ namespace Gameplay.GOA
 {
 	public static class GOACardUtility
     {
-    	public static string COVERED_CARD_IMAGE_KEY = "Covered";
+    	public const string EMPTY_CARD_ID = "Empty";
+    	public const string COVERED_CARD_ID = "Covered";
+    	public const string COVERED_CARD_IMAGE_KEY = "Covered";
     }
 }

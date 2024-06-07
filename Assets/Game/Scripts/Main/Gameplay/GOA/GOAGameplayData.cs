@@ -1,38 +1,69 @@
 using Optional.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Web;
 using PlayerViewData = Metagame.PlayerViewData;
 
 namespace Gameplay.GOA
 {
+	public record CardDataState()
+	{
+		public record Empty() : CardDataState;
+		public record Covered() : CardDataState;
+		public record Open(string Id) : CardDataState;
+	}
+	
 	public record GOABoardData(
-		int[] Positions,
+		int DrawCardCount,
+		int GraveCardCount,
+		CardDataState[] Cards,
 		int Turn,
-		int TurnOfTeam)
-    {
+		int TakingTurnPlayerId)
+	{
 		public GOABoardData(GOABoardResult result) : this(
-			result.Positions,
+			result.DrawCardCount,
+			result.GraveCardCount,
+			result.Cards
+				.Select<string, CardDataState>(card => card switch
+				{
+					GOACardUtility.EMPTY_CARD_ID => new CardDataState.Empty(),
+					GOACardUtility.COVERED_CARD_ID => new CardDataState.Covered(),
+					_ => new CardDataState.Open(card),
+				})
+				.ToArray(),
 			result.Turn,
-			result.TurnOfTeam) { }
+			result.TakingTurnPlayerId) { }
 	}
 
 	public record GOAPlayerData(
-		int Team,
-        PlayerViewData Player,
+		int Order,
+		bool IsBot,
+		int CharacterId,
+		string[] PublicCardIds,
+		int PublicCardCount,
+		string[] StrategyCardIds,
+		int StrategyCardCount,
+		int Power,
+		int PowerLimit,
+		PlayerViewData Player,
 		int Elo,
 		int PlayedGameCount,
-		int WinGameCount,
-		bool IsSelfPlayer,
-		bool IsSelfTeam)
+		int WinGameCount)
 	{
-		public GOAPlayerData(GOAPlayerResult result, bool isSelfPlayer, bool isSelfTeam) : this(
-			result.Team,
+		public GOAPlayerData(GOAPlayerResult result) : this(
+			result.Order,
+			result.IsBot,
+			result.CharacterId,
+			result.PublicCardIds,
+			result.PublicCardCount,
+			result.StrategyCardIds,
+			result.StrategyCardCount,
+			result.Power,
+			result.PowerLimit,
 			new PlayerViewData(result.Player),
 			result.Elo,
 			result.PlayedGameCount,
-			result.WinGameCount,
-			isSelfPlayer,
-			isSelfTeam) { }
+			result.WinGameCount) { }
 	}
 
 	public record GOASettingData(
@@ -45,7 +76,6 @@ namespace Gameplay.GOA
 	public record GOAGameData(
 		int GameId,
 		int SelfPlayerId,
-		int SelfPlayerTeam,
 		GOABoardData Board,
 		GOAPlayerData[] Players,
 		GOASettingData Setting) : IGameData
@@ -53,26 +83,13 @@ namespace Gameplay.GOA
 		public GOAGameData(GOAGameResult result, int selfPlayerId) : this(
 			result.Id,
 			selfPlayerId,
-			_GetSelfPlayerTeam(result.Players, selfPlayerId),
 			new GOABoardData(result.Board),
-			_GetGOAPlayerDatas(result.Players, selfPlayerId),
+			_GetGOAPlayerDatas(result.Players),
 			new GOASettingData(result.Setting)) { }
 
-		public static GOAPlayerData[] _GetGOAPlayerDatas(GOAPlayerResult[] players, int selfPlayerId)
-        {
-			var selfPlayerTeam = _GetSelfPlayerTeam(players, selfPlayerId);
-			return players
-				.Select(player => new GOAPlayerData(
-					player,
-					selfPlayerId == player.Player.Id,
-					selfPlayerTeam == player.Team))
-				.ToArray();
-		}
-
-		public static int _GetSelfPlayerTeam(GOAPlayerResult[] players, int selfPlayerId)
+		public static GOAPlayerData[] _GetGOAPlayerDatas(GOAPlayerResult[] players)
 			=> players
-				.FirstOrNone(player => player.Player.Id == selfPlayerId)
-				.Map(player => player.Team)
-				.ValueOr(0);
+				.Select(player => new GOAPlayerData(player))
+				.ToArray();
 	}
 }

@@ -12,7 +12,7 @@ namespace Gameplay.GOA
 	public record GOAPlayerViewData(
 		bool IsSelf,
 		bool IsTurn,
-		string AvatarImageKey,
+		string CharacterImageKey,
 		bool IsBot,
 		string NickName,
 		string CharacterName,
@@ -21,7 +21,29 @@ namespace Gameplay.GOA
 		int StrategyCardCount,
 		int Power,
 		int PowerLimit
-	);
+	)
+	{
+		public GOAPlayerViewData(GOAPlayerData data, bool isSelf, int takingTurnPlayerId) : this(
+			isSelf,
+			takingTurnPlayerId == data.Player.Id,
+			
+			// _model.SelfPlayer.CharacterImageKey,
+			string.Empty,
+			
+			data.IsBot,
+			data.Player.NickName,
+			
+			// _model.SelfPlayer.CharacterName,
+			string.Empty,
+			// _model.SelfPlayer.SkillDescription,
+			string.Empty,
+			
+			data.PublicCardCount,
+			data.StrategyCardCount,
+			data.Power,
+			data.PowerLimit
+		){}
+	}
 	
 	public class GOAPlayerView : MonoBehaviour
 	{
@@ -30,7 +52,7 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _notTakingTurnIndicatorGameObject;
 		[SerializeField]
-		private AsyncImage _avatarImage;
+		private AsyncImage _characterImage;
 		[SerializeField]
 		private GameObject _botIndicatorGameObject;
 		[SerializeField]
@@ -57,7 +79,7 @@ namespace Gameplay.GOA
 		public void RegisterCallback(IAssetSession assetSession, Action onClickButton)
 		{
 			_button.onClick.AddListener(() => onClickButton?.Invoke());
-			_avatarImage.Initialize(assetSession);
+			_characterImage.Initialize(assetSession);
 		}
 
 		public void Render(GOAPlayerViewData viewData)
@@ -65,11 +87,11 @@ namespace Gameplay.GOA
 			_takingTurnIndicatorGameObject.SetActive(viewData.IsTurn);
 			_notTakingTurnIndicatorGameObject.SetActive(!viewData.IsTurn);
 			
-			_avatarImage.LoadSprite(
+			_characterImage.LoadSprite(
 				viewData.IsSelf 
 					? AssetType.GOACharacterMid
 					: AssetType.GOACharacterSmall,
-				viewData.AvatarImageKey);
+				viewData.CharacterImageKey);
 			
 			_botIndicatorGameObject.SetActive(viewData.IsBot);
 			_playerIndicatorGameObject.SetActive(!viewData.IsBot);

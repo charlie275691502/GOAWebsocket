@@ -1,3 +1,4 @@
+using Common.AssetSession;
 using Common.LinqExtension;
 using EnhancedUI.EnhancedScroller;
 using Metagame;
@@ -12,7 +13,7 @@ namespace Gameplay.GOA
 {
 	public interface IGOAGameplayView
 	{
-		void RegisterCallback();
+		void RegisterCallback(IAssetSession assetSession);
 		void Render(GOAGameplayProperty prop);
 	}
 
@@ -45,9 +46,29 @@ namespace Gameplay.GOA
 
 		private GOAGameplayProperty _prop;
 
-		void IGOAGameplayView.RegisterCallback()
+		void IGOAGameplayView.RegisterCallback(IAssetSession assetSession)
 		{
 			// _button.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
+			_selfPlayer.RegisterCallback(
+				assetSession,
+				() => {} );
+			_enemyPlayers
+				.ForEach(enemyPlayer => enemyPlayer.RegisterCallback(
+					assetSession,
+					() => {} ));
+			_board.RegisterCallback(
+				assetSession,
+				(index) => {} );
+			_handCards.RegisterCallback(
+				assetSession,
+				(index) => {} );
+			_characterDetail.RegisterCallback();
+			_publicCardDetail.RegisterCallback(
+				assetSession,
+				() => {} );
+			_strategyCardDetail.RegisterCallback(
+				assetSession,
+				() => {} );
 		}
 
 		void IGOAGameplayView.Render(GOAGameplayProperty prop)

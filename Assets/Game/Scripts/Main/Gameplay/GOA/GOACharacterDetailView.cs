@@ -43,9 +43,5 @@ namespace Gameplay.GOA
 				() => _panel.SetActive(false)
 			);
 		}
-
-		public void Close()
-		{
-		}
 	}
 }

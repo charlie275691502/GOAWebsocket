@@ -11,7 +11,7 @@ namespace Gameplay.GOA
 	public record CardViewDataState()
 	{
 		public record Empty() : CardViewDataState;
-		public record Covered(bool IsPublicCard, bool IsChosen) : CardViewDataState;
+		public record Covered(bool IsChosen) : CardViewDataState;
 		public record Open(bool IsPublicCard, bool IsChosen, string ImageKey) : CardViewDataState;
 	}
 	
@@ -44,11 +44,9 @@ namespace Gameplay.GOA
 				case CardViewDataState.Covered Info:
 					_panel.SetActive(true);
 					_image.LoadSprite(
-						Info.IsPublicCard
-							? Info.IsChosen
-								? AssetType.GOAPublicCardChosen
-								: AssetType.GOAPublicCardNormal
-							: AssetType.GOAStrategyCardNormal,
+						Info.IsChosen
+							? AssetType.GOAPublicCardChosen
+							: AssetType.GOAPublicCardNormal,
 						GOACardUtility.COVERED_CARD_IMAGE_KEY);
 					break;
 					

@@ -208,12 +208,16 @@ namespace Web
 
 	public class GOABoardResult
 	{
-		[JsonProperty("positions")]
-		public int[] Positions;
+		[JsonProperty("drawCardCount")]
+		public int DrawCardCount;
+		[JsonProperty("graveCardCount")]
+		public int GraveCardCount;
+		[JsonProperty("cards")]
+		public string[] Cards;
 		[JsonProperty("turn")]
 		public int Turn;
-		[JsonProperty("turn_of_team")]
-		public int TurnOfTeam;
+		[JsonProperty("taking_turn_player_id")]
+		public int TakingTurnPlayerId;
 	}
 
 	public class GOASettingResult
@@ -224,8 +228,24 @@ namespace Web
 
 	public class GOAPlayerResult
 	{
-		[JsonProperty("team")]
-		public int Team;
+		[JsonProperty("order")]
+		public int Order;
+		[JsonProperty("isBot")]
+		public bool IsBot;
+		[JsonProperty("characterId")]
+		public int CharacterId;
+		[JsonProperty("publicCardIds")]
+		public string[] PublicCardIds;
+		[JsonProperty("publicCardCount")]
+		public int PublicCardCount;
+		[JsonProperty("strategyCardIds")]
+		public string[] StrategyCardIds;
+		[JsonProperty("strategyCardCount")]
+		public int StrategyCardCount;
+		[JsonProperty("power")]
+		public int Power;
+		[JsonProperty("powerLimit")]
+		public int PowerLimit;
 		[JsonProperty("player")]
 		public PlayerDataResult Player;
 		[JsonProperty("elo")]
