@@ -67,11 +67,10 @@ namespace Gameplay.GOA
 			result.WinGameCount) { }
 	}
 
-	public record GOASettingData(
-		int BoardSize)
+	public record GOASettingData()
 	{
 		public GOASettingData(GOASettingResult result) : this(
-			result.BoardSize) { }
+			) { }
 	}
 
 	public record GOAGameData(

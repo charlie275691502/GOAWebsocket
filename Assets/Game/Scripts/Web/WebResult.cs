@@ -228,8 +228,7 @@ namespace Web
 
 	public class GOASettingResult
 	{
-		[JsonProperty("board_size")]
-		public int BoardSize;
+		
 	}
 
 	public class GOAPlayerResult
