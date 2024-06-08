@@ -75,6 +75,8 @@ namespace Web
 		[JsonProperty("messages")]
 		public List<MessageResult> Messages;
 	}
+	
+#region TTT
 
 	public class TicTacToeGameResult
 	{
@@ -170,6 +172,10 @@ namespace Web
 
 	}
 	
+#endregion
+
+#region TTT
+
 	public class GOAGameResult
 	{
 		[JsonProperty("id")]
@@ -212,8 +218,8 @@ namespace Web
 		public int DrawCardCount;
 		[JsonProperty("graveCardCount")]
 		public int GraveCardCount;
-		[JsonProperty("cards")]
-		public string[] Cards;
+		[JsonProperty("cardNumbers")]
+		public int[] CardNumbers;
 		[JsonProperty("turn")]
 		public int Turn;
 		[JsonProperty("taking_turn_player_id")]
@@ -234,12 +240,12 @@ namespace Web
 		public bool IsBot;
 		[JsonProperty("characterId")]
 		public string CharacterId;
-		[JsonProperty("publicCardIds")]
-		public string[] PublicCardIds;
+		[JsonProperty("publicCardNumbers")]
+		public int[] PublicCardNumbers;
 		[JsonProperty("publicCardCount")]
 		public int PublicCardCount;
-		[JsonProperty("strategyCardIds")]
-		public string[] StrategyCardIds;
+		[JsonProperty("strategyCardNumbers")]
+		public int[] StrategyCardNumbers;
 		[JsonProperty("strategyCardCount")]
 		public int StrategyCardCount;
 		[JsonProperty("power")]
@@ -284,3 +290,5 @@ namespace Web
 
 	}
 }
+
+#endregion

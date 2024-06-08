@@ -11,7 +11,7 @@ namespace Gameplay.GOA
 	{
 		public record Empty() : CardDataState;
 		public record Covered() : CardDataState;
-		public record Open(string Id) : CardDataState;
+		public record Open(int Number) : CardDataState;
 	}
 	
 	public record GOABoardData(
@@ -24,11 +24,11 @@ namespace Gameplay.GOA
 		public GOABoardData(GOABoardResult result) : this(
 			result.DrawCardCount,
 			result.GraveCardCount,
-			result.Cards
-				.Select<string, CardDataState>(card => card switch
+			result.CardNumbers
+				.Select<int, CardDataState>(card => card switch
 				{
-					GOACardUtility.EMPTY_CARD_ID => new CardDataState.Empty(),
-					GOACardUtility.COVERED_CARD_ID => new CardDataState.Covered(),
+					GOACardUtility.EMPTY_CARD_NUMBER => new CardDataState.Empty(),
+					GOACardUtility.COVERED_CARD_NUMBER => new CardDataState.Covered(),
 					_ => new CardDataState.Open(card),
 				})
 				.ToArray(),
@@ -40,9 +40,9 @@ namespace Gameplay.GOA
 		int Order,
 		bool IsBot,
 		string CharacterId,
-		string[] PublicCardIds,
+		int[] PublicCardNumbers,
 		int PublicCardCount,
-		string[] StrategyCardIds,
+		int[] StrategyCardNumbers,
 		int StrategyCardCount,
 		int Power,
 		int PowerLimit,
@@ -55,9 +55,9 @@ namespace Gameplay.GOA
 			result.Order,
 			result.IsBot,
 			result.CharacterId,
-			result.PublicCardIds,
+			result.PublicCardNumbers,
 			result.PublicCardCount,
-			result.StrategyCardIds,
+			result.StrategyCardNumbers,
 			result.StrategyCardCount,
 			result.Power,
 			result.PowerLimit,
