@@ -14,7 +14,7 @@ namespace Metagame
 				playerDataResult.NickName,
 				playerDataResult.Coin,
 				googleSheetLoader.Container.Avatars
-					.GetRow(playerDataResult.AvatarId)
+					.GetRow(playerDataResult.AvatarKey)
 					.Map(avatar => avatar.ImageKey)
 					.ValueOr(string.Empty)) { }
 	}

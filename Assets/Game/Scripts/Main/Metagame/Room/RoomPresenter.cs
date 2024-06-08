@@ -160,7 +160,7 @@ namespace Metagame.Room
 					NickName = message.Player.NickName,
 					AvatarImageKey =
 						_googleSheetLoader.Container.Avatars
-							.GetRow(message.Player.AvatarId)
+							.GetRow(message.Player.AvatarKey)
 							.Map(avatar => avatar.ImageKey)
 							.ValueOr(string.Empty),
 				}).ToList(),
@@ -212,7 +212,7 @@ namespace Metagame.Room
 							NickName = result.Player.NickName,
 							AvatarImageKey =
 								_googleSheetLoader.Container.Avatars
-									.GetRow(result.Player.AvatarId)
+									.GetRow(result.Player.AvatarKey)
 									.Map(avatar => avatar.ImageKey)
 									.ValueOr(string.Empty),
 						})

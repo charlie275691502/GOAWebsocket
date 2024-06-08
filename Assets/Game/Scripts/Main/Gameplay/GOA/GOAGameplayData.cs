@@ -39,7 +39,7 @@ namespace Gameplay.GOA
 	public record GOAPlayerData(
 		int Order,
 		bool IsBot,
-		string CharacterId,
+		string CharacterKey,
 		int[] PublicCardNumbers,
 		int PublicCardCount,
 		int[] StrategyCardNumbers,
@@ -54,7 +54,7 @@ namespace Gameplay.GOA
 		public GOAPlayerData(GOAPlayerResult result, IGoogleSheetLoader googleSheetLoader) : this(
 			result.Order,
 			result.IsBot,
-			result.CharacterId,
+			result.CharacterKey,
 			result.PublicCardNumbers,
 			result.PublicCardCount,
 			result.StrategyCardNumbers,

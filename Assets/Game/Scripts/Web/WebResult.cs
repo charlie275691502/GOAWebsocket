@@ -19,8 +19,8 @@ namespace Web
 		public string NickName;
 		[JsonProperty("coin")]
 		public int Coin;
-		[JsonProperty("avatar_id")]
-		public string AvatarId;
+		[JsonProperty("avatar_key")]
+		public string AvatarKey;
 	}
 	
 	public class GameSettingResult
@@ -56,8 +56,8 @@ namespace Web
 		public int Id;
 		[JsonProperty("nick_name")]
 		public string NickName;
-		[JsonProperty("avatar_id")]
-		public string AvatarId;
+		[JsonProperty("avatar_key")]
+		public string AvatarKey;
 	}
 	
 	public class MessageResult
@@ -174,7 +174,7 @@ namespace Web
 	
 #endregion
 
-#region TTT
+#region GOA
 
 	public class GOAGameResult
 	{
@@ -214,11 +214,11 @@ namespace Web
 
 	public class GOABoardResult
 	{
-		[JsonProperty("drawCardCount")]
+		[JsonProperty("draw_card_count")]
 		public int DrawCardCount;
-		[JsonProperty("graveCardCount")]
+		[JsonProperty("grave_card_count")]
 		public int GraveCardCount;
-		[JsonProperty("cardNumbers")]
+		[JsonProperty("card_numbers")]
 		public int[] CardNumbers;
 		[JsonProperty("turn")]
 		public int Turn;
@@ -236,21 +236,21 @@ namespace Web
 	{
 		[JsonProperty("order")]
 		public int Order;
-		[JsonProperty("isBot")]
+		[JsonProperty("is_bot")]
 		public bool IsBot;
-		[JsonProperty("characterId")]
-		public string CharacterId;
-		[JsonProperty("publicCardNumbers")]
+		[JsonProperty("character_id")]
+		public string CharacterKey;
+		[JsonProperty("public_card_numbers")]
 		public int[] PublicCardNumbers;
-		[JsonProperty("publicCardCount")]
+		[JsonProperty("public_card_count")]
 		public int PublicCardCount;
-		[JsonProperty("strategyCardNumbers")]
+		[JsonProperty("strategy_card_numbers")]
 		public int[] StrategyCardNumbers;
-		[JsonProperty("strategyCardCount")]
+		[JsonProperty("strategy_card_count")]
 		public int StrategyCardCount;
 		[JsonProperty("power")]
 		public int Power;
-		[JsonProperty("powerLimit")]
+		[JsonProperty("power_limit")]
 		public int PowerLimit;
 		[JsonProperty("player")]
 		public PlayerDataResult Player;

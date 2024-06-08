@@ -37,7 +37,7 @@ namespace Common
 		public int Id {get; private set;}
 		public string NickName {get; private set;}
 		public int Coin {get; private set;}
-		public string AvatarId {get; private set;}
+		public string AvatarKey {get; private set;}
 		
 		public PlayerData()
 		{
@@ -49,7 +49,7 @@ namespace Common
 			Id = result.Id;
 			NickName = result.NickName;
 			Coin = result.Coin;
-			AvatarId = result.AvatarId;
+			AvatarKey = result.AvatarKey;
 		}
 		
 		public void Accept(PlayerDataResult result)
@@ -57,7 +57,7 @@ namespace Common
 			Id = result.Id;
 			NickName = result.NickName;
 			Coin = result.Coin;
-			AvatarId = result.AvatarId;
+			AvatarKey = result.AvatarKey;
 		}
 		
 		public void AcceptNickName(string nickName)

@@ -28,17 +28,17 @@ namespace Gameplay.GOA
 			isSelf,
 			takingTurnPlayerId == data.Player.Id,
 			googleSheetLoader.Container.GOACharacters
-				.GetRow(data.CharacterId)
+				.GetRow(data.CharacterKey)
 				.Map(character => character.ImageKey)
 				.ValueOr(string.Empty),
 			data.IsBot,
 			data.Player.NickName,
 			googleSheetLoader.Container.GOACharacters
-				.GetRow(data.CharacterId)
+				.GetRow(data.CharacterKey)
 				.Map(character => character.NameKey)
 				.ValueOr(string.Empty),
 			googleSheetLoader.Container.GOACharacters
-				.GetRow(data.CharacterId)
+				.GetRow(data.CharacterKey)
 				.Map(character => character.SkillDescriptionKey)
 				.ValueOr(string.Empty),
 			data.PublicCardCount,
