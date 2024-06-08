@@ -218,8 +218,8 @@ namespace Web
 		public int DrawCardCount;
 		[JsonProperty("grave_card_count")]
 		public int GraveCardCount;
-		[JsonProperty("card_numbers")]
-		public int[] CardNumbers;
+		[JsonProperty("cards")]
+		public int[] Cards;
 		[JsonProperty("turn")]
 		public int Turn;
 		[JsonProperty("taking_turn_player_id")]
@@ -240,12 +240,12 @@ namespace Web
 		public bool IsBot;
 		[JsonProperty("character_id")]
 		public string CharacterKey;
-		[JsonProperty("public_card_numbers")]
-		public int[] PublicCardNumbers;
+		[JsonProperty("public_cards")]
+		public int[] PublicCards;
 		[JsonProperty("public_card_count")]
 		public int PublicCardCount;
-		[JsonProperty("strategy_card_numbers")]
-		public int[] StrategyCardNumbers;
+		[JsonProperty("strategy_cards")]
+		public int[] StrategyCards;
 		[JsonProperty("strategy_card_count")]
 		public int StrategyCardCount;
 		[JsonProperty("power")]

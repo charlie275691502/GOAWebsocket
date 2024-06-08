@@ -198,7 +198,7 @@ namespace Gameplay.GOA
 							false,
 							false,
 							_googleSheetLoader.Container.GOACards
-								.GetRow(Info.Number)
+								.GetRow(Info.Key)
 								.Map(card => card.ImageKey)
 								.ValueOr(string.Empty)),
 						_ => throw new NotImplementedException(),
@@ -207,14 +207,23 @@ namespace Gameplay.GOA
 					.ToArray());
 		private GOAHandCardsViewData _GetHandCardsViewData()
 			=> new GOAHandCardsViewData(
-				_model.SelfPlayer.PublicCardNumbers
-					.Select(cardNumber => new GOACardViewData(new CardViewDataState.Open(
+				_model.SelfPlayer.PublicCards
+					.Select(cardKey => new GOACardViewData(new CardViewDataState.Open(
 						false,
 						false,
 						_googleSheetLoader.Container.GOACards
-							.GetRow(cardNumber)
+							.GetRow(cardKey)
 							.Map(card => card.ImageKey)
 							.ValueOr(string.Empty))))
+					.Concat(
+						_model.SelfPlayer.StrategyCards
+							.Select(cardKey => new GOACardViewData(new CardViewDataState.Open(
+								false,
+								false,
+								_googleSheetLoader.Container.GOACards
+									.GetRow(cardKey)
+									.Map(card => card.ImageKey)
+									.ValueOr(string.Empty)))))
 					.ToArray());
 					
 		private void _UpdateModel(GOAGameData gameData)
