@@ -1,10 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Codice.Client.BaseCommands.Merge;
 using Common;
 using Common.AssetSession;
 using Data.Sheet;
 using JetBrains.Annotations;
+using Optional;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -51,6 +53,8 @@ namespace Gameplay.GOA
 	public class GOAPlayerView : MonoBehaviour
 	{
 		[SerializeField]
+		private GameObject _panel;
+		[SerializeField]
 		private GameObject _takingTurnIndicatorGameObject;
 		[SerializeField]
 		private GameObject _notTakingTurnIndicatorGameObject;
@@ -85,28 +89,35 @@ namespace Gameplay.GOA
 			_characterImage.Initialize(assetSession);
 		}
 
-		public void Render(GOAPlayerViewData viewData)
+		public void Render(Option<GOAPlayerViewData> viewDataOpt)
 		{
-			_takingTurnIndicatorGameObject.SetActive(viewData.IsTurn);
-			_notTakingTurnIndicatorGameObject.SetActive(!viewData.IsTurn);
-			
-			_characterImage.LoadSprite(
-				viewData.IsSelf 
-					? AssetType.GOACharacterMid
-					: AssetType.GOACharacterSmall,
-				viewData.CharacterImageKey);
-			
-			_botIndicatorGameObject.SetActive(viewData.IsBot);
-			_playerIndicatorGameObject.SetActive(!viewData.IsBot);
-			
-			_nickNameText.text = viewData.NickName;
-			_characterNameText.text = viewData.CharacterName;
-			_skillDescriptionText.text = viewData.SkillDescription;
-			
-			_publicCardCountText.text = viewData.PublicCardCount.ToString();
-			_strategyCardCountText.text = viewData.StrategyCardCount.ToString();
-			_powerText.text = viewData.Power.ToString();
-			_powerLimitText.text = viewData.PowerLimit.ToString();
+			viewDataOpt.Match(
+				viewData =>
+				{
+					_panel.SetActive(true);
+					_takingTurnIndicatorGameObject.SetActive(viewData.IsTurn);
+					_notTakingTurnIndicatorGameObject.SetActive(!viewData.IsTurn);
+					
+					_characterImage.LoadSprite(
+						viewData.IsSelf 
+							? AssetType.GOACharacterMid
+							: AssetType.GOACharacterSmall,
+						viewData.CharacterImageKey);
+					
+					_botIndicatorGameObject.SetActive(viewData.IsBot);
+					_playerIndicatorGameObject.SetActive(!viewData.IsBot);
+					
+					_nickNameText.text = viewData.NickName;
+					_characterNameText.text = viewData.CharacterName;
+					_skillDescriptionText.text = viewData.SkillDescription;
+					
+					_publicCardCountText.text = viewData.PublicCardCount.ToString();
+					_strategyCardCountText.text = viewData.StrategyCardCount.ToString();
+					_powerText.text = viewData.Power.ToString();
+					_powerLimitText.text = viewData.PowerLimit.ToString();
+				},
+				() => _panel.SetActive(false)
+			);
 		}
 	}
 }

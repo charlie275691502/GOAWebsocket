@@ -195,7 +195,7 @@ namespace Gameplay.GOA
 						CardDataState.Empty => new CardViewDataState.Empty(),
 						CardDataState.Covered => new CardViewDataState.Covered(false),
 						CardDataState.Open Info => new CardViewDataState.Open(
-							false,
+							true,
 							false,
 							_googleSheetLoader.Container.GOACards
 								.GetRow(Info.Key)
@@ -209,7 +209,7 @@ namespace Gameplay.GOA
 			=> new GOAHandCardsViewData(
 				_model.SelfPlayer.PublicCards
 					.Select(cardKey => new GOACardViewData(new CardViewDataState.Open(
-						false,
+						true,
 						false,
 						_googleSheetLoader.Container.GOACards
 							.GetRow(cardKey)

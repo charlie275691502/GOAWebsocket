@@ -10,6 +10,7 @@ using Optional.Unsafe;
 using Data.Sheet;
 using TicTacToeGameData = Gameplay.TicTacToe.TicTacToeGameData;
 using System.Diagnostics;
+using Gameplay.GOA;
 
 namespace Metagame.Room
 {
@@ -19,7 +20,8 @@ namespace Metagame.Room
 		public record Idle() : RoomState;
 		public record SendMessage(string Message) : RoomState;
 		public record SendStartGame() : RoomState;
-		public record StartGame(TicTacToeGameData GameData) : RoomState;
+		public record StartTTTGame(TicTacToeGameData GameData) : RoomState;
+		public record StartGOAGame(GOAGameData GameData) : RoomState;
 		public record Leave() : RoomState;
 		public record Close() : RoomState;
 	}
@@ -113,7 +115,12 @@ namespace Metagame.Room
 						_view.Render(_prop);
 						break;
 
-					case RoomState.StartGame info:
+					case RoomState.StartTTTGame info:
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
+						_prop = _prop with { State = new RoomState.Close() };
+						break;
+
+					case RoomState.StartGOAGame info:
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
@@ -172,7 +179,8 @@ namespace Metagame.Room
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
-			_webSocketPresenter.RegisterOnReceiveStartGame(result => _actionQueue.Add(() => _StartGame(result)));
+			_webSocketPresenter.RegisterOnReceiveStartTTTGame(result => _actionQueue.Add(() => _StartTTTGame(result)));
+			_webSocketPresenter.RegisterOnReceiveStartGOAGame(result => _actionQueue.Add(() => _StartGOAGame(result)));
 
 			if (await
 				_webSocketPresenter
@@ -235,9 +243,14 @@ namespace Metagame.Room
 			};
 		}
 
-		private void _StartGame(TicTacToeGameResult result)
+		private void _StartTTTGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
+			_prop = _prop with { State = new RoomState.StartTTTGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
+		}
+
+		private void _StartGOAGame(GOAGameResult result)
+		{
+			_prop = _prop with { State = new RoomState.StartGOAGame(new GOAGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
 		}
 	}
 }

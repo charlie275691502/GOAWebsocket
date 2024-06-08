@@ -237,7 +237,7 @@ namespace Web
 		public int Order;
 		[JsonProperty("is_bot")]
 		public bool IsBot;
-		[JsonProperty("character_id")]
+		[JsonProperty("character_key")]
 		public string CharacterKey;
 		[JsonProperty("public_cards")]
 		public int[] PublicCards;
@@ -276,17 +276,16 @@ namespace Web
 
 	}
 
-	public class GOAChoosePositionActionCommandResult : GOAActionCommandResult
+	public class GOARevealBoardCardsActionCommandResult : GOAActionCommandResult
+	{
+		[JsonProperty("positions")]
+		public int[] Positions;
+	}
+
+	public class GOAChooseBoardCardActionCommandResult : GOAActionCommandResult
 	{
 		[JsonProperty("position")]
 		public int Position;
-		[JsonProperty("value")]
-		public int Value;
-	}
-
-	public class GOAResignActionCommandResult : GOAActionCommandResult
-	{
-
 	}
 }
 

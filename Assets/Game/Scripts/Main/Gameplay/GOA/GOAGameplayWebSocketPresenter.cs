@@ -25,7 +25,7 @@ namespace Gameplay.GOA
 
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.Start(int roomId)
 		{
-			return _StartWebsocket(string.Format("TTTGame/games/{0}/", roomId.ToString()));
+			return _StartWebsocket(string.Format("GOAGame/games/{0}/", roomId.ToString()));
 		}
 		
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChoosePosition(int position)

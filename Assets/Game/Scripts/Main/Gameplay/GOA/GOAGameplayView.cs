@@ -2,6 +2,7 @@ using Common.AssetSession;
 using Common.LinqExtension;
 using EnhancedUI.EnhancedScroller;
 using Metagame;
+using Optional;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,10 +109,10 @@ namespace Gameplay.GOA
 
 		private void _Render(GOAGameplayProperty prop)
 		{
-			_selfPlayer.Render(prop.SelfPlayer);
+			_selfPlayer.Render(prop.SelfPlayer.Some());
 			_enemyPlayers.ZipForEach(
-				prop.EnemyPlayers,
-				(enemyPlayer, viewData) => enemyPlayer.Render(viewData));
+				prop.EnemyPlayers.ExtendUntil(_enemyPlayers.Count()),
+				(enemyPlayer, viewDataOpt) => enemyPlayer.Render(viewDataOpt));
 			_board.Render(prop.Board);
 			_handCards.Render(prop.HandPublicCards);
 			_characterDetail.Render(prop.CharacterDetailOpt);
