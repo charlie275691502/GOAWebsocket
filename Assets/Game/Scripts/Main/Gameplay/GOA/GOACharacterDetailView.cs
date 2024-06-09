@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using BestHTTP.PlatformSupport.IL2CPP;
+using I2.Loc;
 using Optional;
 using UnityEngine;
 using UnityEngine.UI;
@@ -9,9 +10,9 @@ using UnityEngine.UI;
 namespace Gameplay.GOA
 {
 	public record GOACharacterDetailViewData(
-		string CharacterName,
-		string SkillName,
-		string SkillDescription
+		string CharacterNameKey,
+		string SkillNameKey,
+		string SkillDescriptionKey
 	);
 	
 	public class GOACharacterDetailView : MonoBehaviour
@@ -19,11 +20,11 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _panel;
 		[SerializeField]
-		private Text _characterNameText;
+		private Localize _characterNameLocalize;
 		[SerializeField]
-		private Text _skillNameText;
+		private Localize _skillNameLocalize;
 		[SerializeField]
-		private Text _skillDescriptionText;
+		private Localize _skillDescriptionLocalize;
 
 		public void RegisterCallback()
 		{
@@ -36,9 +37,9 @@ namespace Gameplay.GOA
 				viewData => 
 				{
 					_panel.SetActive(true);
-					_characterNameText.text = viewData.CharacterName;
-					_skillNameText.text = viewData.SkillName;
-					_skillDescriptionText.text = viewData.SkillDescription;
+					_characterNameLocalize.SetTerm(viewData.CharacterNameKey);
+					_skillNameLocalize.SetTerm(viewData.SkillNameKey);
+					_skillDescriptionLocalize.SetTerm(viewData.SkillDescriptionKey);
 				},
 				() => _panel.SetActive(false)
 			);

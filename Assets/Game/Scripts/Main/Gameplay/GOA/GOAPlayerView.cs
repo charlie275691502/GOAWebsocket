@@ -5,6 +5,7 @@ using Codice.Client.BaseCommands.Merge;
 using Common;
 using Common.AssetSession;
 using Data.Sheet;
+using I2.Loc;
 using JetBrains.Annotations;
 using Optional;
 using UnityEngine;
@@ -18,8 +19,8 @@ namespace Gameplay.GOA
 		string CharacterImageKey,
 		bool IsBot,
 		string NickName,
-		string CharacterName,
-		string SkillDescription,
+		string CharacterNameKey,
+		string SkillDescriptionKey,
 		int PublicCardCount,
 		int StrategyCardCount,
 		int Power,
@@ -67,9 +68,9 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private Text _nickNameText;
 		[SerializeField]
-		private Text _characterNameText;
+		private Localize _characterNameLocalize;
 		[SerializeField]
-		private Text _skillDescriptionText;
+		private Localize _skillDescriptionLocalize;
 		[SerializeField]
 		private Text _publicCardCountText;
 		[SerializeField]
@@ -108,8 +109,8 @@ namespace Gameplay.GOA
 					_playerIndicatorGameObject.SetActive(!viewData.IsBot);
 					
 					_nickNameText.text = viewData.NickName;
-					_characterNameText.text = viewData.CharacterName;
-					_skillDescriptionText.text = viewData.SkillDescription;
+					_characterNameLocalize.SetTerm(viewData.CharacterNameKey);
+					_skillDescriptionLocalize.SetTerm(viewData.SkillDescriptionKey);
 					
 					_publicCardCountText.text = viewData.PublicCardCount.ToString();
 					_strategyCardCountText.text = viewData.StrategyCardCount.ToString();
