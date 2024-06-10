@@ -218,8 +218,10 @@ namespace Web
 		public int DrawCardCount;
 		[JsonProperty("grave_card_count")]
 		public int GraveCardCount;
-		[JsonProperty("cards")]
-		public int[] Cards;
+		[JsonProperty("masked_board_cards")]
+		public int[] BoardCards;
+		[JsonProperty("revealing_board_card_positions")]
+		public int[] RevealingBoardCardPositions;
 		[JsonProperty("turn")]
 		public int Turn;
 		[JsonProperty("taking_turn_player_id")]

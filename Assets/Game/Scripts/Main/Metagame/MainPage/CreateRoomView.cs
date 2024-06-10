@@ -93,7 +93,11 @@ namespace Metagame.MainPage.CreateRoom
 			_panel.SetActive(true);
 			_roomNameInputField.text = string.Empty;
 			_gameTypeDropdown.value = 0;
-			_playerPlotInputField.text = "2";
+			_playerPlotInputField.text = "4";
+				
+#if UNITY_EDITOR
+			_roomNameInputField.text = "Test";
+#endif
 		}
 
 		private void _Close()

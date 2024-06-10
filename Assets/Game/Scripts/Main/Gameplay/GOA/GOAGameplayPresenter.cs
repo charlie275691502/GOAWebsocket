@@ -189,7 +189,7 @@ namespace Gameplay.GOA
 			=> new GOABoardViewData(
 				_model.Board.DrawCardCount,
 				_model.Board.GraveCardCount,
-				_model.Board.Cards
+				_model.Board.BoardCards
 					.Select<CardDataState, CardViewDataState>(state => state switch
 					{
 						CardDataState.Empty => new CardViewDataState.Empty(),

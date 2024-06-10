@@ -17,14 +17,14 @@ namespace Gameplay.GOA
 	public record GOABoardData(
 		int DrawCardCount,
 		int GraveCardCount,
-		CardDataState[] Cards,
+		CardDataState[] BoardCards,
 		int Turn,
 		int TakingTurnPlayerId)
 	{
 		public GOABoardData(GOABoardResult result) : this(
 			result.DrawCardCount,
 			result.GraveCardCount,
-			result.Cards
+			result.BoardCards
 				.Select<int, CardDataState>(card => card switch
 				{
 					GOACardUtility.EMPTY_CARD_NUMBER => new CardDataState.Empty(),

@@ -19706,7 +19706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8f6742e4d1347c46808b87ebb67af02, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _environment: 1
+  _environment: 0
   _requestDebugMode: 1
 --- !u!1 &1681542873
 GameObject:

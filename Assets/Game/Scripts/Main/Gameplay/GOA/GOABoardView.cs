@@ -13,7 +13,7 @@ namespace Gameplay.GOA
 	public record GOABoardViewData(
 		int DrawCardCount,
 		int GraveCardCount,
-		GOACardViewData[] Cards
+		GOACardViewData[] BoardCards
 	);
 	
 	public class GOABoardView : MonoBehaviour
@@ -47,13 +47,13 @@ namespace Gameplay.GOA
 
 		public void Render(GOABoardViewData viewData)
 		{
-			if(viewData.Cards.Count() != _cards.Count())
+			if(viewData.BoardCards.Count() != _cards.Count())
 			{
-				_InstantiateCards(viewData.Cards.Count());
+				_InstantiateCards(viewData.BoardCards.Count());
 			}
 			
 			_cards.ZipForEach(
-				viewData.Cards,
+				viewData.BoardCards,
 				(publicCard, viewData) => publicCard.Render(viewData)
 			);
 			
