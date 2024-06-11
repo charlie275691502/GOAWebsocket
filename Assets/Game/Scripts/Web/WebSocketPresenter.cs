@@ -17,6 +17,12 @@ namespace Web
 		void Stop();
 	}
 	
+	public class ErrorMessageResult
+	{
+		[JsonProperty("error")]
+		public string Error;
+	}
+	
 	public abstract class WebSocketPresenter : IWebSocketPresenter
 	{
 		private ISetting _setting;
@@ -90,10 +96,10 @@ namespace Web
 				ret = result;
 			});
 			
-			_RegisterOnReceiveMessage<string>(failCommand, (message) => 
+			_RegisterOnReceiveMessage<ErrorMessageResult>(failCommand, (error) => 
 			{
 				leave = true;
-				ret = new UniTaskError(message);
+				ret = new UniTaskError(error.Error);
 			});
 			
 			_Send(body);
