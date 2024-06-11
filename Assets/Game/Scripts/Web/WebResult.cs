@@ -226,6 +226,8 @@ namespace Web
 		public int Turn;
 		[JsonProperty("taking_turn_player_id")]
 		public int TakingTurnPlayerId;
+		[JsonProperty("phase")]
+		public int Phase;
 	}
 
 	public class GOASettingResult

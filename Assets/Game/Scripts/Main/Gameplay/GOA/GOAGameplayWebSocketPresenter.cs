@@ -12,7 +12,9 @@ namespace Gameplay.GOA
 	public interface IGOAGameplayWebSocketPresenter : IWebSocketPresenter
 	{
 		UniTask<OneOf<None, UniTaskError>> Start(int roomId);
-		UniTask<OneOf<None, UniTaskError>> ChoosePosition(int position);
+		UniTask<OneOf<None, UniTaskError>> RevealBoardCards(int[] positions);
+		UniTask<OneOf<None, UniTaskError>> ChooseRevealingBoardCard(int position);
+		UniTask<OneOf<None, UniTaskError>> ChooseOpenBoardCard(int position);
 		void RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage);
 		void RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage);
 	}
@@ -28,12 +30,30 @@ namespace Gameplay.GOA
 			return _StartWebsocket(string.Format("GOAGame/games/{0}/", roomId.ToString()));
 		}
 		
-		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChoosePosition(int position)
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.RevealBoardCards(int[] positions)
 			=>
 				_SendWaitTillReturn<None>(
 					new Dictionary<string, object>()
 					{
-						{"command", "choose_position_action"},
+						{"command", "reveal_board_cards_action"},
+						{"positions", positions},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChooseRevealingBoardCard(int position)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "choose_revealing_board_card_action"},
+						{"position", position},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChooseOpenBoardCard(int position)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "choose_open_board_card_action"},
 						{"position", position},
 					});
 

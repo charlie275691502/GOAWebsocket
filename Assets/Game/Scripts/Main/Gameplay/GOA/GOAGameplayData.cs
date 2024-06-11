@@ -14,12 +14,21 @@ namespace Gameplay.GOA
 		public record Open(int Key) : CardDataState;
 	}
 	
+	// Must follow backend definition
+	public enum Phase
+	{
+		ChooseBoardCardPhase = 1,
+		ActionPhase = 2,
+	}
+	
 	public record GOABoardData(
 		int DrawCardCount,
 		int GraveCardCount,
 		CardDataState[] BoardCards,
+		int[] RevealingBoardCardPositions,
 		int Turn,
-		int TakingTurnPlayerId)
+		int TakingTurnPlayerId,
+		Phase Phase)
 	{
 		public GOABoardData(GOABoardResult result) : this(
 			result.DrawCardCount,
@@ -32,8 +41,10 @@ namespace Gameplay.GOA
 					_ => new CardDataState.Open(card),
 				})
 				.ToArray(),
+			result.RevealingBoardCardPositions,
 			result.Turn,
-			result.TakingTurnPlayerId) { }
+			result.TakingTurnPlayerId,
+			(Phase)result.Phase) { }
 	}
 
 	public record GOAPlayerData(

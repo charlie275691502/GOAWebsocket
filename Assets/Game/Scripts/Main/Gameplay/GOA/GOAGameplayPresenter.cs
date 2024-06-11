@@ -11,6 +11,7 @@ using Common.Warning;
 using Cysharp.Threading.Tasks;
 using Data.Sheet;
 using Metagame;
+using ModestTree;
 using Optional;
 using Optional.Collections;
 using Optional.Unsafe;
@@ -23,6 +24,7 @@ namespace Gameplay.GOA
 	{
 		public record Open() : GOAGameplayState;
 		public record Idle() : GOAGameplayState;
+		public record ClickBoardCard(int Position) : GOAGameplayState;
 		public record Close() : GOAGameplayState;
 	}
 
@@ -35,6 +37,7 @@ namespace Gameplay.GOA
 		List<int> SelectingBoardCards,
 		List<int> SelectingHandCards,
 		bool IsGameEnd);
+		
 
 	public record GOAGameplayProperty(
 		GOAGameplayState State,
@@ -81,7 +84,10 @@ namespace Gameplay.GOA
 
 			_actionQueue = new ActionQueue();
 
-			_view.RegisterCallback(assetSession);
+			_view.RegisterCallback(
+				assetSession,
+				(position) =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickBoardCard(position)));
 		}
 
 		async UniTask IGOAGameplayPresenter.Run(GOAGameData gameData)
@@ -123,6 +129,45 @@ namespace Gameplay.GOA
 						break;
 
 					case GOAGameplayState.Idle:
+						break;
+						
+					case GOAGameplayState.ClickBoardCard Info:
+						if (_model.SelfPlayerId == _model.TakingTurnPlayerId && _model.Board.Phase == Phase.ChooseBoardCardPhase)
+						{
+							if (_model.Board.BoardCards[Info.Position] is CardDataState.Covered && _model.Board.RevealingBoardCardPositions.Count() == 0)
+							{
+								if (_model.SelectingBoardCards.Contains(Info.Position))
+									_model.SelectingBoardCards.Remove(Info.Position);
+								else 
+									_model.SelectingBoardCards.Add(Info.Position);
+									
+								if (_model.SelectingBoardCards.Count() >= 2)
+								{
+									await _webSocketPresenter
+										.RevealBoardCards(_model.SelectingBoardCards.ToArray())
+										.RunAndHandleInternetError(_warningPresenter);
+									_model.SelectingBoardCards.Clear();
+								}
+							} else if (_model.Board.BoardCards[Info.Position] is CardDataState.Open)
+							{
+								if (_model.Board.RevealingBoardCardPositions.ContainsItem(Info.Position))
+								{
+									await _webSocketPresenter
+										.ChooseRevealingBoardCard(Info.Position)
+										.RunAndHandleInternetError(_warningPresenter);
+								} else 
+								{
+									await _webSocketPresenter
+										.ChooseOpenBoardCard(Info.Position)
+										.RunAndHandleInternetError(_warningPresenter);
+								}
+								_model.SelectingBoardCards.Clear();
+							}
+							
+							_UpdatePropertyThenRender();
+						}
+						
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
 
 					case GOAGameplayState.Close:
@@ -190,13 +235,13 @@ namespace Gameplay.GOA
 				_model.Board.DrawCardCount,
 				_model.Board.GraveCardCount,
 				_model.Board.BoardCards
-					.Select<CardDataState, CardViewDataState>(state => state switch
+					.Select<CardDataState, CardViewDataState>((state, position) => state switch
 					{
 						CardDataState.Empty => new CardViewDataState.Empty(),
-						CardDataState.Covered => new CardViewDataState.Covered(false),
+						CardDataState.Covered => new CardViewDataState.Covered(_model.SelectingBoardCards.Contains(position)),
 						CardDataState.Open Info => new CardViewDataState.Open(
 							true,
-							false,
+							_model.Board.RevealingBoardCardPositions.Contains(position),
 							_googleSheetLoader.Container.GOACards
 								.GetRow(Info.Key)
 								.Map(card => card.ImageKey)

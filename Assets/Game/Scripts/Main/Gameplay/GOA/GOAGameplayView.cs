@@ -14,7 +14,7 @@ namespace Gameplay.GOA
 {
 	public interface IGOAGameplayView
 	{
-		void RegisterCallback(IAssetSession assetSession);
+		void RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard);
 		void Render(GOAGameplayProperty prop);
 	}
 
@@ -47,7 +47,7 @@ namespace Gameplay.GOA
 
 		private GOAGameplayProperty _prop;
 
-		void IGOAGameplayView.RegisterCallback(IAssetSession assetSession)
+		void IGOAGameplayView.RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard)
 		{
 			// _button.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
 			_selfPlayer.RegisterCallback(
@@ -59,7 +59,7 @@ namespace Gameplay.GOA
 					() => {} ));
 			_board.RegisterCallback(
 				assetSession,
-				(index) => {} );
+				onClickBoardCard);
 			_handCards.RegisterCallback(
 				assetSession,
 				(index) => {} );
