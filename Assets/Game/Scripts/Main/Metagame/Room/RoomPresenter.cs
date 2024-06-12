@@ -7,7 +7,10 @@ using Common.Class;
 using Common.UniTaskExtension;
 using Cysharp.Threading.Tasks;
 using Optional.Unsafe;
+using Data.Sheet;
 using TicTacToeGameData = Gameplay.TicTacToe.TicTacToeGameData;
+using System.Diagnostics;
+using Gameplay.GOA;
 
 namespace Metagame.Room
 {
@@ -17,7 +20,8 @@ namespace Metagame.Room
 		public record Idle() : RoomState;
 		public record SendMessage(string Message) : RoomState;
 		public record SendStartGame() : RoomState;
-		public record StartGame(TicTacToeGameData GameData) : RoomState;
+		public record StartTTTGame(TicTacToeGameData GameData) : RoomState;
+		public record StartGOAGame(GOAGameData GameData) : RoomState;
 		public record Leave() : RoomState;
 		public record Close() : RoomState;
 	}
@@ -36,6 +40,7 @@ namespace Metagame.Room
 		private IRoomWebSocketPresenter _webSocketPresenter;
 		private BackendPlayerData _backendPlayerData;
 		private IRoomView _view;
+		private IGoogleSheetLoader _googleSheetLoader;
 
 		private ActionQueue _actionQueue;
 
@@ -45,6 +50,7 @@ namespace Metagame.Room
 			IHTTPPresenter hTTPPresenter,
 			IRoomWebSocketPresenter webSocketPresenter,
 			IWarningPresenter warningPresenter,
+			IGoogleSheetLoader googleSheetLoader,
 			BackendPlayerData backendPlayerData,
 			IRoomView view)
 		{
@@ -53,6 +59,7 @@ namespace Metagame.Room
 			_warningPresenter = warningPresenter;
 			_backendPlayerData = backendPlayerData;
 			_view = view;
+			_googleSheetLoader = googleSheetLoader;
 
 			_actionQueue = new ActionQueue();
 			
@@ -108,7 +115,12 @@ namespace Metagame.Room
 						_view.Render(_prop);
 						break;
 
-					case RoomState.StartGame info:
+					case RoomState.StartTTTGame info:
+						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
+						_prop = _prop with { State = new RoomState.Close() };
+						break;
+
+					case RoomState.StartGOAGame info:
 						ret = ret with { Type = new MetagameSubTabReturnType.Switch(new MetagameState.Game(info.GameData)) };
 						_prop = _prop with { State = new RoomState.Close() };
 						break;
@@ -147,13 +159,17 @@ namespace Metagame.Room
 				result.Id,
 				result.RoomName,
 				new GameSetting(result.GameSetting),
-				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList(),
+				result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList(),
 				result.Messages.Select(message => new MessageViewData()
 				{
 					Id = message.Id,
 					Content = message.Content,
 					NickName = message.Player.NickName,
-					AvatarImageKey = "Red",
+					AvatarImageKey =
+						_googleSheetLoader.Container.Avatars
+							.GetRow(message.Player.AvatarKey)
+							.Map(avatar => avatar.ImageKey)
+							.ValueOr(string.Empty),
 				}).ToList(),
 				true
 			);
@@ -163,7 +179,8 @@ namespace Metagame.Room
 		{
 			_webSocketPresenter.RegisterOnReceiveAppendMessage(result => _actionQueue.Add(() => _AppendMessage(result)));
 			_webSocketPresenter.RegisterOnReceiveUpdateRoom(result => _actionQueue.Add(() => _UpdateRoom(result)));
-			_webSocketPresenter.RegisterOnReceiveStartGame(result => _actionQueue.Add(() => _StartGame(result)));
+			_webSocketPresenter.RegisterOnReceiveStartTTTGame(result => _actionQueue.Add(() => _StartTTTGame(result)));
+			_webSocketPresenter.RegisterOnReceiveStartGOAGame(result => _actionQueue.Add(() => _StartGOAGame(result)));
 
 			if (await
 				_webSocketPresenter
@@ -201,7 +218,11 @@ namespace Metagame.Room
 							Id = result.Id,
 							Content = result.Content,
 							NickName = result.Player.NickName,
-							AvatarImageKey = "Red",
+							AvatarImageKey =
+								_googleSheetLoader.Container.Avatars
+									.GetRow(result.Player.AvatarKey)
+									.Map(avatar => avatar.ImageKey)
+									.ValueOr(string.Empty),
 						})
 						.ToList()
 				}
@@ -217,14 +238,19 @@ namespace Metagame.Room
 					Id = result.Id,
 					RoomName = result.RoomName,
 					GameSetting = new GameSetting(result.GameSetting),
-					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
+					Players = result.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList()
 				}
 			};
 		}
 
-		private void _StartGame(TicTacToeGameResult result)
+		private void _StartTTTGame(TicTacToeGameResult result)
 		{
-			_prop = _prop with { State = new RoomState.StartGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id)) };
+			_prop = _prop with { State = new RoomState.StartTTTGame(new TicTacToeGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
+		}
+
+		private void _StartGOAGame(GOAGameResult result)
+		{
+			_prop = _prop with { State = new RoomState.StartGOAGame(new GOAGameData(result, _backendPlayerData.PlayerData.Id, _googleSheetLoader)) };
 		}
 	}
 }

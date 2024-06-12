@@ -12,7 +12,9 @@ using Metagame.MainPage.CreateRoom;
 using Metagame.Room;
 using Gameplay.TicTacToe;
 using Common.AssetSession;
+using Data.Sheet;
 using Gameplay;
+using Gameplay.GOA;
 
 namespace Main
 {
@@ -43,6 +45,8 @@ namespace Main
 
 		[SerializeField]
 		private TicTacToeGameplayView _ticTacToeGameplayView;
+		[SerializeField]
+		private GOAGameplayView _gOAGameplayView;
 
 		public override void InstallBindings()
 		{
@@ -59,6 +63,10 @@ namespace Main
 			Container
 				.Bind<ITicTacToeGameplayWebSocketPresenter>()
 				.To<TicTacToeGameplayWebSocketPresenter>()
+				.AsSingle();
+			Container
+				.Bind<IGOAGameplayWebSocketPresenter>()
+				.To<GOAGameplayWebSocketPresenter>()
 				.AsSingle();
 
 			Container
@@ -84,6 +92,10 @@ namespace Main
 			Container
 				.Bind<IAssetSession>()
 				.To<ResourceLoader>()
+				.AsSingle();
+			Container
+				.Bind<IGoogleSheetLoader>()
+				.To<GoogleSheetLoader>()
 				.AsSingle();
 			Container
 				.Bind<IWarningPresenter>()
@@ -186,6 +198,15 @@ namespace Main
 				.Bind<ITicTacToeGameplayView>()
 				.To<TicTacToeGameplayView>()
 				.FromInstance(_ticTacToeGameplayView);
+			
+			Container
+				.Bind<IGOAGameplayPresenter>()
+				.To<GOAGameplayPresenter>()
+				.AsSingle();
+			Container
+				.Bind<IGOAGameplayView>()
+				.To<GOAGameplayView>()
+				.FromInstance(_gOAGameplayView);
 				
 			#endregion
 		}

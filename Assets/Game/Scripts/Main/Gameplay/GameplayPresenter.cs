@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using Main;
 using Common.Class;
 using Gameplay.TicTacToe;
+using Gameplay.GOA;
 
 namespace Gameplay
 {
@@ -18,11 +19,15 @@ namespace Gameplay
 	public class GameplayPresenter : IGameplayPresenter
 	{
 		private ITicTacToeGameplayPresenter _ticTacToeGameplayPresenter;
+		private IGOAGameplayPresenter _gOAGameplayPresenter;
+		
 
 		public GameplayPresenter(
-			ITicTacToeGameplayPresenter ticTacToeGameplayPresenter)
+			ITicTacToeGameplayPresenter ticTacToeGameplayPresenter,
+			IGOAGameplayPresenter gOAGameplayPresenter)
 		{
 			_ticTacToeGameplayPresenter = ticTacToeGameplayPresenter;
+			_gOAGameplayPresenter = gOAGameplayPresenter;
 		}
 
 		async UniTask<MainSubTabReturn> IGameplayPresenter.Run(GameplayParameter parameter)
@@ -37,6 +42,7 @@ namespace Gameplay
 			=> parameter.GameData switch
 			{
 				TicTacToeGameData => _ticTacToeGameplayPresenter.Run((TicTacToeGameData)parameter.GameData),
+				GOAGameData => _gOAGameplayPresenter.Run((GOAGameData)parameter.GameData),
 				_ => throw new System.NotImplementedException(),
 			};
 	}

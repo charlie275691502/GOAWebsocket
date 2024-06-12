@@ -1,0 +1,629 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f0b0c553be8edd4682e9180fdd13e37, type: 3}
+  m_Name: I2Languages
+  m_EditorClassIdentifier: 
+  mSource:
+    UserAgreesToHaveItOnTheScene: 0
+    UserAgreesToHaveItInsideThePluginsFolder: 0
+    GoogleLiveSyncIsUptoDate: 1
+    mTerms:
+    - Term: UI/App_Name
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6B0A\u529B\u4E16\u4EE3"
+      - Generation of Authorisation
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/CLICK_TO_START
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u958B\u59CB\u904A\u6232"
+      - Click to Start
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/LOGIN_TITLE
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165"
+      - LOGIN
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/LOGIN_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165"
+      - Login
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/REGISTER_TITLE
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A"
+      - REGISTER
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/REGISTER_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A"
+      - Register
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/SWITCH_TO_LOGIN_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u767B\u5165\u65E2\u6709\u5E33\u865F"
+      - Already have an account?
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/SWITCH_TO_REGISTER_BUTTON
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8A3B\u518A\u65B0\u5E33\u865F"
+      - Don't have an account?
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/USERNAME
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5E33\u865F"
+      - username
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/PASSWORD
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5BC6\u78BC"
+      - password
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/CONFIRM_PASSWORD
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u78BA\u8A8D\u5BC6\u78BC"
+      - confirm password
+      Flags: 0000
+      Languages_Touch: []
+    - Term: UI/EMAIL
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4FE1\u7BB1"
+      - email
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/NapoleonName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u62FF\u7834\u5D19\u4E00\u4E16"
+      - Napoleon
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/MichelNeyName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u7C73\u6B47\u723E\uFF0E\u5167\u4F0A"
+      - MichelNey
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/TalleyrandName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5854\u5217\u6717"
+      - Talleyrand
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/FriedrichName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8153\u7279\u70C8\u5A01\u5EC9\u4E09\u4E16"
+      - Friedrich
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/BlucherName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u99AE\uFF0E\u5E03\u5442\u6B47\u723E"
+      - Blucher
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/SteinName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5361\u723E\uFF0E\u65BD\u6CF0\u56E0"
+      - Stein
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/FranzName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6CD5\u862D\u8332\u4E00\u4E16"
+      - Franz
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/MetternichName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6885\u7279\u6D85"
+      - Metternich
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/KarlName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5361\u723E\u5927\u516C"
+      - Karl
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/AlexanderName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E9E\u6B77\u5C71\u5927\u4E00\u4E16"
+      - Alexander
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/BarclayName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5DF4\u514B\u840A\u89AA\u738B"
+      - Barclay
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/FernandoName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6590\u8FEA\u5357\u4E03\u4E16"
+      - Fernando
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/JenkinsonName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5229\u7269\u6D66\u4F2F\u7235"
+      - Jenkinson
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/MuratName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u7E46\u62C9\u5143\u5E25"
+      - Murat
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/LouisName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8DEF\u6613\u5341\u516B"
+      - Louis
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/JohanName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5361\u723E\u5341\u56DB\u4E16\u7D04\u7FF0"
+      - Johan
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/ByronName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u62DC\u502B"
+      - Byron
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/PellicoName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4F69\u5229\u79D1"
+      - Pellico
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterName/LafayetteName
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u62C9\u6CD5\u8449\u4FAF\u7235"
+      - Lafayette
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/NapoleonSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u706B\u7832\u5175\u9023"
+      - artillery battery
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/MichelNeySkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9AD8\u5730\u885D\u92D2"
+      - Highland Charge
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/TalleyrandSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5916\u4EA4\u6298\u885D"
+      - diplomatic negotiations
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/FriedrichSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6D74\u8840\u65B0\u751F"
+      - Rebirth from blood
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/BlucherSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u958B\u706B\u6EF2\u900F"
+      - open fire infiltration
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/SteinSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9769\u65B0\u653F\u5E9C"
+      - reform government
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/FranzSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u653F\u6CBB\u806F\u59FB"
+      - political marriage
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/MetternichSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4FDD\u5B88\u58C1\u58D8"
+      - conservative barrier
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/KarlSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u8FC2\u8FF4\u6230\u8853"
+      - roundabout tactics
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/AlexanderSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6975\u5730\u51CD\u571F"
+      - polar frozen soil
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/BarclaySkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u7126\u571F\u6230\u8853"
+      - scorched earth tactics
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/FernandoSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9ED1\u6697\u5341\u5E74"
+      - dark decade
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/JenkinsonSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5F8C\u52E4\u88DC\u7D66"
+      - Logistics supply
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/MuratSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u885D\u64CA\u6230\u8853"
+      - shock tactics
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/LouisSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u7D93\u6FDF\u5FA9\u7526"
+      - Economic recovery
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/JohanSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9257\u5F62\u653B\u52E2"
+      - pincer offensive
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/ByronSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9769\u547D\u601D\u6F6E"
+      - revolutionary thought
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/PellicoSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u6C11\u65CF\u9769\u547D"
+      - national revolution
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkill/LafayetteSkill
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E16\u754C\u9769\u547D"
+      - world revolution
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/NapoleonSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u300C\u91CB\u51FA\u6B0A\u529B\u300D\u6642\uFF0C\u53EF\u4EE5\u6307\u5B9A\u4E00\u5F35\u6B0A\u529B\u724C\uFF0C\u82E5\u9019\u5F35\u724C\u5728\u5176\u4ED6\u73A9\u5BB6\u7684\u624B\u724C\u4E2D\uFF0C\u5247\u7ACB\u5373\u596A\u53D6\u9019\u5F35\u724C\u3002"
+      - When using the active skill "Release Power", you can designate a power card.
+        If this card is in the hand of another player, you can immediately seize
+        this card.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/MichelNeySkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u7576\u5176\u4ED6\u73A9\u5BB6\u56DE\u5408\u7D50\u675F\u6642\uFF0C\u53EF\u4EE5\u62FF\u53D6\u5834\u4E0A\u4EFB\u610F\u4E00\u5F35\u7FFB\u958B\u7684\u724C\uFF0C\u6B64\u6280\u80FD\u4E00\u8F2A\u6703\u8B70\u5468\u671F\u5167\u53EA\u80FD\u767C\u52D5\u4E00\u6B21\u3002"
+      - As an active skill, when other players' turns end, they can take any turned-over
+        card on the field. This skill can only be activated once within a meeting
+        cycle.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/TalleyrandSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u81EA\u8EAB\u7684\u6BCF\u5F35\u6E05\u5EC9\u5F62\u8C61\u906E\u853D\u4E8C\u5F35\u6B0A\u529B\u724C\u3002\u4E3B\u52D5\u6280\uFF0C\u5728\u81EA\u5DF1\u56DE\u5408\u4E2D\u4F7F\u7528\u6216\u4E1F\u68C4\u6E05\u5EC9\u5F62\u8C61\u6642\uFF0C\u53EF\u4EE5\u4E1F\u68C4\u4E00\u5F35\u624B\u724C\u3002"
+      - 'Passive skill: each of your own clean images covers two power cards. As
+        an active skill, when you use or discard the image of integrity during your
+        turn, you can discard a card from your hand.'
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/FriedrichSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u9769\u547D\u9580\u6ABB\u6E1B\u5C11\uFF18\uFF0C\u4F7F\u7528\u300C\u653F\u6CBB\u6539\u9769\u300D\u6642\uFF0C\u6548\u679C\u589E\u52A0\uFF11\u500D\u3002
+        \u5FC5\u6BBA\u6280\uFF0C\u9769\u547D\u9580\u6ABB\u6C38\u4E45\u589E\u52A0\uFF15\uFF0C\u540C\u6642\u81EA\u8EAB\u88AB\u52D5\u6280\u6C38\u4E45\u7121\u6548\u3002"
+      - Passive skill, the revolution threshold is reduced by 8. When using "Political
+        Reform", the effect is doubled. A special move, the revolution threshold
+        is permanently increased by 5, and its own passive skills are permanently
+        invalid.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/BlucherSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u5FC5\u9808\u9032\u884C\u4E8C\u6B21\u62BD\u724C\u968E\u6BB5\u3002"
+      - Passive skills require a second card drawing phase.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/SteinSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u8FFD\u52A0\u52DD\u5229\u689D\u4EF6\u300C\u8B8A\u9769\u8005\u300D\uFF1A\u4E0D\u5206\u7A2E\u985E\uFF11~\uFF18\u6B0A\u529B\u724C\u5404\u6301\u6709\u81F3\u5C11\u4E00\u5F35\u3002"
+      - 'Passive skill, additional victory condition "Changer": hold at least one
+        of each of the 1 to 8 power cards regardless of type.'
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/FranzSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u5FC5\u6BBA\u6280\uFF0C\u884C\u52D5\u968E\u6BB5\u6642\u767C\u52D5\uFF0C\u4E00\u8F2A\u6703\u8B70\u9031\u671F\u5167\u81EA\u5DF1\u4E0D\u6703\u88AB\u9769\u547D\uFF0C\u5176\u4ED6\u73A9\u5BB6\u4E0D\u5F97\u4F7F\u7528\u6C7A\u7B56\u724C\uFF0C\u5176\u4ED6\u73A9\u5BB6\u4E0D\u5F97\u5BA3\u5E03\u52DD\u5229\u3002"
+      - A special move, activated during the action phase. You will not be revolutionized
+        during a meeting period. Other players are not allowed to use decision cards,
+        and other players are not allowed to declare victory.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/MetternichSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u81EA\u8EAB\u624B\u724C\u6B0A\u529B\u9EDE\u70BA\u8CEA\u6578\u6642\uFF0C\u4E0D\u6703\u5F15\u767C\u9769\u547D\u3002 "
+      - 'Passive skill, when the power point of the card in your hand is a prime
+        number, it will not trigger a revolution. '
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/KarlSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u56DE\u5408\u7D50\u675F\u5F8C\uFF0C\u7576\u81EA\u5DF1\u7684\u9EDE\u6578\u5728\u300C\u81EA\u5DF1\u9769\u547D\u9580\u6ABB\u6E1B\uFF14\u300D\u4EE5\u4E0A\u6642\uFF0C\u53EF\u4EE5\u4E1F\u68C4\u4E00\u5F35\u624B\u724C\uFF0C\u4E00\u56DE\u5408\u53EA\u80FD\u767C\u52D5\u4E00\u6B21\u3002"
+      - As an active skill, after the round, when your points are above "your own
+        revolution threshold minus 4", you can discard a card from your hand and
+        can only activate it once per round.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/AlexanderSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u6703\u8B70\u53EC\u958B\u6642\uFF0C\u300C\u51B0\u5C01\u300D\u6B0A\u529B\u503C\u6BD4\u81EA\u5DF1\u5C0F\u7684\u4EBA\u76F4\u5230\u4E0B\u4E00\u6B21\u6703\u8B70\u53EC\u958B\u3002\u88AB\u300C\u51B0\u5C01\u300D\u7684\u73A9\u5BB6\u4E0D\u80FD\u5BA3\u5E03\u52DD\u5229\u3002"
+      - Passive skill, when a meeting is held, "freeze" people with lower power value
+        than yourself until the next meeting. Players who are "frozen" cannot declare
+        victory.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/BarclaySkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u56DE\u5408\u7D50\u675F\u6642\uFF0C\u53EF\u4EE5\u628A\u4E00\u5F35\u5834\u724C\u653E\u5165\u68C4\u724C\u5806\uFF0C\u4E00\u56DE\u5408\u53EA\u80FD\u767C\u52D5\u4E00\u6B21\u3002"
+      - As an active skill, at the end of the round, you can put a field card into
+        the discard pile and can only be activated once in a round.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/FernandoSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u6BCF\u6301\u6709\uFF16\u9EDE\u672A\u88AB\u906E\u853D\u7684\u6D77\u6B0A\u6216\u8ECD\u4E8B\u6B0A\u529B\u9EDE\uFF0C\u5C31\u589E\u52A0\uFF13\u9769\u547D\u9580\u6ABB\u3002\u6BCF\u5931\u53BB\u4E00\u5F35\u6D77\u6B0A\u6216\u8ECD\u4E8B\u6B0A\u529B\u724C\uFF0C\u9769\u547D\u9580\u6ABB\u6E1B\u5C11\uFF12\u3002"
+      - Passive skill, for every 6 unobstructed sea power or military power points
+        held, the revolution threshold is increased by 3. For each sea power or military
+        power card lost, the revolution threshold is reduced by 2.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/JenkinsonSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u6BCF\u6301\u6709\u4E09\u5F35\u624B\u724C\u5C31\u4F7F\u81EA\u5DF1\u9769\u547D\u9580\u6ABB\u589E\u52A0\uFF13\u3002"
+      - 'Passive skill: Every time you hold three cards in your hand, your revolution
+        threshold increases by 3.'
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/MuratSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u6307\u5B9A\u4E00\u540D\u73A9\u5BB6\uFF0C\u596A\u53D6\u8A72\u73A9\u5BB6\u7684\u4E00\u5F35\u624B\u724C\uFF0C\u4E00\u56DE\u5408\u53EA\u80FD\u767C\u52D5\u4E00\u6B21\u3002"
+      - The active skill is to designate a player and seize a card from that player's
+        hand. It can only be activated once per round.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/LouisSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u62BD\u724C\u968E\u6BB5\u53EA\u9078\u64C7\u4E00\u5F35\u724C\u6642\uFF0C\u53EF\u4EE5\u5C07\u5176\u7FFB\u958B\u653E\u56DE\u5834\u4E0A\u3002\u4E00\u6B21\u6703\u8B70\u5468\u671F\u5167\u53EA\u80FD\u767C\u52D5\u4E00\u6B21\u3002"
+      - Active skill, when only one card is selected during the card drawing phase,
+        it can be turned over and returned to the field. It can only be initiated
+        once within a meeting cycle.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/JohanSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u9257\u5F62\u653B\u52E2 \u88AB\u52D5\u6280\uFF0C\u62BD\u724C\u968E\u6BB5\u9078\u64C7\u8986\u84CB\u7684\u724C\u6642\uFF0C\u53EF\u4EE5\u89C0\u770B\u6700\u591A\u4E09\u5F35\uFF1B\u4E3B\u52D5\u6280\uFF0C\u5269\u9918\u7684\u724C\u653E\u56DE\u684C\u9762\u6642\u53EF\u4EE5\u4E0D\u7FFB\u958B\u3002"
+      - Pincer Offensive Passive skill, when selecting covered cards during the card
+        drawing phase, you can view up to three cards; active skill, you do not need
+        to turn over the remaining cards when they are put back on the table.
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/ByronSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u81EA\u5DF1\u4EE5\u5916\u7684\u73A9\u5BB6\u6BCF\u6210\u70BA\u4E00\u6B21\u6703\u8B70\u4E3B\u5C0E\u8005\uFF0C\u8A72\u73A9\u5BB6\u7684\u9769\u547D\u9580\u6ABB\u6E1B\u5C11\uFF13\u3002"
+      - 'Passive skill: every time a player other than yourself becomes the leader
+        of a meeting, the player''s revolution threshold is reduced by 3.'
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/PellicoSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u88AB\u52D5\u6280\uFF0C\u81EA\u5DF1\u6BCF\u7576\u4E1F\u51FA\u6216\u4E1F\u68C4\u4E00\u6B21\u624B\u724C\u6642\uFF0C\u81EA\u5DF1\u7684\u9769\u547D\u9580\u6ABB\u6E1B\u5C11\uFF11\uFF0C\u5176\u4ED6\u73A9\u5BB6\u7684\u9769\u547D\u9580\u6ABB\u6E1B\u5C11\uFF12\u3002"
+      - 'Passive skill: Whenever you throw or discard a card in your hand, your own
+        revolution threshold is reduced by 1, and the revolution threshold of other
+        players is reduced by 2.'
+      Flags: 0000
+      Languages_Touch: []
+    - Term: GOACharacterSkillDescription/LafayetteSkillDescription
+      TermType: 0
+      Description: 
+      Languages:
+      - "\u4E3B\u52D5\u6280\uFF0C\u4F7F\u7528\u300C\u62D3\u6B96\u300D\u6642\uFF0C\u6307\u5B9A\u4E00\u540D\u73A9\u5BB6\uFF0C\u5C07\u62D3\u6B96\u5F97\u5230\u7684\u724C\u4EA4\u7D66\u8A72\u73A9\u5BB6\u3002"
+      - The active skill, when using "Colonization", is to designate a player and
+        give the cards obtained by colonization to that player.
+      Flags: 0000
+      Languages_Touch: []
+    CaseInsensitiveTerms: 0
+    OnMissingTranslation: 3
+    mTerm_AppName: 
+    mLanguages:
+    - Name: Chinese (Traditional)
+      Code: zh-TW
+      Flags: 0
+    - Name: English
+      Code: en
+      Flags: 0
+    IgnoreDeviceLanguage: 1
+    _AllowUnloadingLanguages: 0
+    Google_WebServiceURL: https://script.google.com/macros/s/AKfycbxOIZtPip0GIFdgoMyvesdl9NSdiOdvnUiSvhq0Zb79CYLVOlAzG9EFSOQxP4V-iTU7/exec
+    Google_SpreadsheetKey: 1XIqG2QEWoVEATFDl0pVODiXrIqLnFjs716V_JdqzsuM
+    Google_SpreadsheetName: I2Loc GOAWebsocket Localization
+    Google_LastUpdatedVersion: 1717849505123
+    Google_Password: 
+    GoogleUpdateFrequency: 0
+    GoogleInEditorCheckFrequency: 0
+    GoogleUpdateSynchronization: 1
+    GoogleUpdateDelay: 0
+    Assets: []
+    Spreadsheet_LocalFileName: 
+    Spreadsheet_LocalCSVSeparator: ','
+    Spreadsheet_LocalCSVEncoding: utf-8
+    Spreadsheet_SpecializationAsRows: 1
+    Spreadsheet_SortRows: 1

@@ -1,6 +1,9 @@
 using UnityEngine;
 using Authorization;
 using Metagame;
+using Cysharp.Threading.Tasks;
+using Data.Sheet;
+using Common.Class;
 using Gameplay;
 using Cysharp.Threading.Tasks;
 
@@ -18,16 +21,19 @@ namespace Main
 
 	public class Main : MonoBehaviour
 	{
+		private IGoogleSheetLoader _googleSheetLoader;
 		private IAuthorizationPresenter _authorizationPresenter;
 		private IMetagamePresenter _metagamePresenter;
 		private IGameplayPresenter _gameplayPresenter;
 
 		[Zenject.Inject]
 		public void Zenject(
+			IGoogleSheetLoader googleSheetLoader,
 			IAuthorizationPresenter authorizationPresenter,
 			IMetagamePresenter metagamePresenter,
 			IGameplayPresenter gameplayPresenter)
 		{
+			_googleSheetLoader = googleSheetLoader;
 			_authorizationPresenter = authorizationPresenter;
 			_metagamePresenter = metagamePresenter;
 			_gameplayPresenter = gameplayPresenter;
@@ -40,6 +46,7 @@ namespace Main
 
 		private async UniTask _Main()
 		{
+			await _LoadExcelData();
 			var prop = new MainProperty(new MainState.Authorization());
 			while (prop.State is not MainState.Close)
 			{
@@ -55,6 +62,11 @@ namespace Main
 						break;
 				}
 			}
+		}
+		
+		private async UniTask _LoadExcelData()
+		{
+			await _googleSheetLoader.Bake();
 		}
 
 		private UniTask<MainSubTabReturn> _GetCurrentSubTabUniTask(MainState type)

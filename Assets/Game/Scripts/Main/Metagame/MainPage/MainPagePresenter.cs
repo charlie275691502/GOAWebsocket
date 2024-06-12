@@ -9,6 +9,7 @@ using Optional;
 using Optional.Unsafe;
 using Web;
 using Metagame.MainPage.CreateRoom;
+using Data.Sheet;
 
 namespace Metagame.MainPage
 {
@@ -21,6 +22,7 @@ namespace Metagame.MainPage
 	{
 		public record Open() : MainPageState;
 		public record Idle() : MainPageState;
+		public record RefreshRoomList() : MainPageState;
 		public record JoinRoom(int RoomId) : MainPageState;
 		public record CreateRoom() : MainPageState;
 		public record Close() : MainPageState;
@@ -34,6 +36,7 @@ namespace Metagame.MainPage
 		private IWarningPresenter _warningPresenter;
 		private ICreateRoomPresenter _createRoomPresenter;
 		private IMainPageView _view;
+		private IGoogleSheetLoader _googleSheetLoader;
 		
 		private MainPageProperty _prop;
 
@@ -41,14 +44,18 @@ namespace Metagame.MainPage
 			IHTTPPresenter hTTPPresenter,
 			IWarningPresenter warningPresenter,
 			ICreateRoomPresenter createRoomPresenter,
-			IMainPageView view)
+			IMainPageView view,
+			IGoogleSheetLoader googleSheetLoader)
 		{
 			_hTTPPresenter = hTTPPresenter;
 			_warningPresenter = warningPresenter;
 			_createRoomPresenter = createRoomPresenter;
 			_view = view;
+			_googleSheetLoader = googleSheetLoader;
 
 			_view.RegisterCallback(
+				() =>
+					_ChangeStateIfIdle(new MainPageState.RefreshRoomList()),
 				(roomId) =>
 					_ChangeStateIfIdle(new MainPageState.JoinRoom(roomId)),
 				() =>
@@ -59,15 +66,12 @@ namespace Metagame.MainPage
 		{
 			var ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Close());
 
-			var roomListOpt = await _hTTPPresenter.GetRoomList().RunAndHandleInternetError(_warningPresenter);
-			if (!roomListOpt.HasValue)
-			{
-				return ret;
-			}
-
-			var roomList = roomListOpt.ValueOrFailure();
-			var roomViewDatas = _GetRoomViewDatas(roomList);
-			_prop = new MainPageProperty(new MainPageState.Open(), roomViewDatas);
+			await _GetRoomList()
+				.Match(
+					rooms => 
+						_prop = new MainPageProperty(new MainPageState.Open(), rooms),
+					() => 
+						_prop = new MainPageProperty(new MainPageState.Close(), new List<RoomViewData>()));
 
 			while (_prop.State is not MainPageState.Close)
 			{
@@ -79,6 +83,19 @@ namespace Metagame.MainPage
 						break;
 
 					case MainPageState.Idle:
+						break;
+
+					case MainPageState.RefreshRoomList:
+						await _GetRoomList()
+							.Match(
+								rooms => 
+									_prop = _prop with 
+									{ 
+										State = new MainPageState.Idle(),
+										Rooms = rooms,
+									},
+								() => 
+									_prop = new MainPageProperty(new MainPageState.Close(), new List<RoomViewData>()));
 						break;
 
 					case MainPageState.JoinRoom info:
@@ -94,7 +111,8 @@ namespace Metagame.MainPage
 									_prop = _prop with { State = new MainPageState.Close() };
 									ret = new MetagameSubTabReturn(new MetagameSubTabReturnType.Switch(new MetagameState.Room(roomId)));
 								},
-								() => _prop = _prop with { State = new MainPageState.Idle() });
+								() => 
+									_prop = _prop with { State = new MainPageState.Idle() });
 						break;
 
 					case MainPageState.Close:
@@ -119,16 +137,29 @@ namespace Metagame.MainPage
 			_prop = _prop with { State = targetState };
 		}
 		
-		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
+		private async UniTask<Option<List<RoomViewData>>> _GetRoomList()
 		{
-			return result.Select(roomResult => 
-				new RoomViewData(
-					roomResult.Id,
-					roomResult.RoomName,
-					new GameSetting(roomResult.GameSetting),
-					roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult)).ToList()
-				)).ToList();
+			var roomListOpt = await _hTTPPresenter.GetRoomList().RunAndHandleInternetError(_warningPresenter);
+			if (!roomListOpt.HasValue)
+			{
+				return Option.None<List<RoomViewData>>();
+			}
+
+			var roomList = roomListOpt.ValueOrFailure();
+			return _GetRoomViewDatas(roomList).Some();
 		}
+		
+		private List<RoomViewData> _GetRoomViewDatas(RoomListResult result)
+			=> result
+				.Where(roomResult => roomResult.Players.Count > 0)
+				.Select(roomResult => 
+					new RoomViewData(
+						roomResult.Id,
+						roomResult.RoomName,
+						new GameSetting(roomResult.GameSetting),
+						roomResult.Players.Select(playerDataResult => new PlayerViewData(playerDataResult, _googleSheetLoader)).ToList()
+					))
+				.ToList();
 
 		private async UniTask<Option<int>> _CreateRoom()
 		{

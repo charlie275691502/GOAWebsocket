@@ -19,8 +19,8 @@ namespace Web
 		public string NickName;
 		[JsonProperty("coin")]
 		public int Coin;
-		[JsonProperty("avatar_id")]
-		public string AvatarId;
+		[JsonProperty("avatar_key")]
+		public string AvatarKey;
 	}
 	
 	public class GameSettingResult
@@ -56,8 +56,8 @@ namespace Web
 		public int Id;
 		[JsonProperty("nick_name")]
 		public string NickName;
-		[JsonProperty("avatar_id")]
-		public string AvatarId;
+		[JsonProperty("avatar_key")]
+		public string AvatarKey;
 	}
 	
 	public class MessageResult
@@ -75,6 +75,8 @@ namespace Web
 		[JsonProperty("messages")]
 		public List<MessageResult> Messages;
 	}
+	
+#region TTT
 
 	public class TicTacToeGameResult
 	{
@@ -169,4 +171,126 @@ namespace Web
 	{
 
 	}
+	
+#endregion
+
+#region GOA
+
+	public class GOAGameResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("board")]
+		public GOABoardResult Board;
+		[JsonProperty("players")]
+		public GOAPlayerResult[] Players;
+		[JsonProperty("setting")]
+		public GOASettingResult Setting;
+	}
+
+	public class GOASummaryResult
+	{
+		[JsonProperty("winner")]
+		public GOAPlayerResult Winner;
+		[JsonProperty("turns")]
+		public int Turns;
+	}
+
+	public class GOARecordResult
+	{
+		[JsonProperty("id")]
+		public int Id;
+		[JsonProperty("init_board")]
+		public GOABoardResult InitBoard;
+		[JsonProperty("players")]
+		public GOAPlayerResult[] Players;
+		[JsonProperty("actions")]
+		public GOAActionResult[] Actions;
+		[JsonProperty("setting")]
+		public GOASettingResult Setting;
+		[JsonProperty("summary")]
+		public TicTacToeSummaryResult Summary;
+	}
+
+	public class GOABoardResult
+	{
+		[JsonProperty("draw_card_count")]
+		public int DrawCardCount;
+		[JsonProperty("grave_card_count")]
+		public int GraveCardCount;
+		[JsonProperty("masked_board_cards")]
+		public int[] BoardCards;
+		[JsonProperty("revealing_board_card_positions")]
+		public int[] RevealingBoardCardPositions;
+		[JsonProperty("turn")]
+		public int Turn;
+		[JsonProperty("taking_turn_player_id")]
+		public int TakingTurnPlayerId;
+		[JsonProperty("phase")]
+		public int Phase;
+	}
+
+	public class GOASettingResult
+	{
+		
+	}
+
+	public class GOAPlayerResult
+	{
+		[JsonProperty("order")]
+		public int Order;
+		[JsonProperty("is_bot")]
+		public bool IsBot;
+		[JsonProperty("character_key")]
+		public string CharacterKey;
+		[JsonProperty("public_cards")]
+		public int[] PublicCards;
+		[JsonProperty("public_card_count")]
+		public int PublicCardCount;
+		[JsonProperty("strategy_cards")]
+		public int[] StrategyCards;
+		[JsonProperty("strategy_card_count")]
+		public int StrategyCardCount;
+		[JsonProperty("power")]
+		public int Power;
+		[JsonProperty("power_limit")]
+		public int PowerLimit;
+		[JsonProperty("player")]
+		public PlayerDataResult Player;
+		[JsonProperty("elo")]
+		public int Elo;
+		[JsonProperty("played_game_count")]
+		public int PlayedGameCount;
+		[JsonProperty("win_game_count")]
+		public int WinGameCount;
+	}
+
+	public class GOAActionResult
+	{
+		[JsonProperty("player_id")]
+		public int PlayerId;
+		[JsonProperty("action_command_type")]
+		public string ActionCommandType;
+		[JsonProperty("action_command")]
+		public GOAActionCommandResult ActionCommand;
+	}
+
+	public class GOAActionCommandResult
+	{
+
+	}
+
+	public class GOARevealBoardCardsActionCommandResult : GOAActionCommandResult
+	{
+		[JsonProperty("positions")]
+		public int[] Positions;
+	}
+
+	public class GOAChooseBoardCardActionCommandResult : GOAActionCommandResult
+	{
+		[JsonProperty("position")]
+		public int Position;
+	}
 }
+
+#endregion

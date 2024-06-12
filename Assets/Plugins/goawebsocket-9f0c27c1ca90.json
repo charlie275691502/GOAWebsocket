@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "goawebsocket",
+  "private_key_id": "9f0c27c1ca9009631823132b7d9321c54b7b604f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDLJJKABCoirGKG\n7dEU7GxItkeN/n8ZRs2xvWShjbGQ6eWA2v+Zsvd141WG+eZmCwbDv098uBsYKTKO\nNPVy+k38+QL20sYVRbXqie6hA1QvXfX0ihT2NWTvauwEm/c8mrUxkpypaE9jJjhl\ncir56y5Dp9pIjH13+atQfZBwhVjlMd9MZJcmwCIZctxTMFRAZq65jxDGuol4eowR\nfY7Vg0pk0puXt9hhYHLhj3RYCIDXlB/PXbGmnQcaUr4SBscRG/rZc3tlOzVWF8a+\n+pNxh0TRvBIup7CQ3PsEeOhur+7nriJKvGwc4E6xxGJZ3HLeuLTG9Freo/3rO17R\n1Tx9x/whAgMBAAECggEABAsj0WGD1zHYOjhUn5Z/J0ldjkGBFSc4I/ARpzeTT7+g\nHlr9mHkb/OA8DRY/VEum5FGUCvb9LxNu2q7KLfI2iDEKspAKelTrZJI/SjwvOkwj\n/6yZ8zan3i4iKYtTNgUcUzLIZITbg604lShbG6NnRdh6+1O0kaVKGC2PqPW2icVV\nwfEdo5unsS9IAEhz5SuZRuM3c8XbLfEaueb/OcCabtrIilamE//9eV4DCDvVR4vG\nLoP6czhz7Iqsm92/KXEM8+Jvzyqhm2mMoX/CbIyVfK3aw85vlwkxEu7bOpbuNK62\neqxUMOb0zeZHVri1Qy39mVDvUKBy9+9e3FXJgdxNIwKBgQD2bKZzm4I1EauWAh/k\nrznk6QcR7fCRQLqHX3wKB186mIzvxFzpODNlUHnBhogrchKUTq61wbIsn2JwKeEK\ntqfOb29k8JReDoM3Rz4yoj2VPbWJ3pRiuMofBFWjSuT7WaFYB37UuUdIVO1mBqTs\ncCe8fYjHInSyp0t+/mkp+FL05wKBgQDTCV8K+DKVPiSmdqdpESCIkPMT8fIcXcQC\nJJGJXjemUz7SwY7baL7eAW/ka3shambPo/nbkrXW2c2jQ9JTns2VUbQUkjK1hGKb\noBXhYw7OPR7gsGRGZG5JlAVoxMeOqdWdJiLUq34ANZMi/CxwxN0n6fDmJTix7HGh\nrKKPmQVdtwKBgHT+sqxSmagugoOO8Kt3UgpPZI7ro/qie6zH9bEhPOIqCUfQt7f2\nedhRM+1gvQe7efy1upcKplgvN+I+z9xxSgxltcJ7wkVBqKS3C12oz4oqqSUS6upQ\nB45gVXRYm4yGSmbr8Bh4+tHpmGiHIQgsW4FPLIA26KblbJ+XlEBb6K7jAoGBAM93\nKwRxs+icSxOLGlFkEQOw3AcDl+zjEUq6AIl3ImZU+DHhLzvr4ZgG+aUpNMdI/wGq\nRnvh4vnw7QRQLHkgaSMeS1bd0xQ3rWkpG9mTtH5z/+MMBchd+z5CUn8I1NYfiG0R\njLReU2SJRrjiCB5kqrYOelEGzpG7zIoQWU+qM2hJAoGBAK5OIKgR70pi1zVNQk96\nBKAGvoCuV2Lvx5EqoWBNbvs3v/koHTvF7tovhoRZybVDU0SS8jJyjZ8ieecgE+3Z\n0gv+xhcoTsnnHFBOGUFz+2I24Ia6gtaDzPPRSMf5HUaCpHq17G6MCNCkvkJKBsHv\noIcXIJBRfMaA2/7nrCPEHfki\n-----END PRIVATE KEY-----\n",
+  "client_email": "goabakingsheet@goawebsocket.iam.gserviceaccount.com",
+  "client_id": "114738783065511060767",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/goabakingsheet%40goawebsocket.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

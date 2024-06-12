@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Plugins/I2/Localization/Examples/Common.meta
+guid: ed480d3c546a9274ca0600d6f2a9cf91
+folderAsset: yes
+timeCreated: 1463338425
+licenseType: Store
+========
+guid: 7955a17b4bf4c5948938fa90a93f774f
+folderAsset: yes
+>>>>>>>> parent of 1a2265b (remove baking sheet, add json):Assets/Game/Scripts/Common/Data/Sheet.meta
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
