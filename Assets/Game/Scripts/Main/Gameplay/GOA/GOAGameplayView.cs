@@ -14,7 +14,7 @@ namespace Gameplay.GOA
 {
 	public interface IGOAGameplayView
 	{
-		void RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard);
+		void RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard, Action onClickEndTurn);
 		void Render(GOAGameplayProperty prop);
 	}
 
@@ -43,13 +43,18 @@ namespace Gameplay.GOA
 		
 		
 		[SerializeField]
-		private Button _button;
+		private Button _endTurnbutton;
+		[SerializeField]
+		private GameObject _endTurnbuttonGameObject;
+		[SerializeField]
+		private GameObject _chooseBoardCardPhaseHintGameObject;
+		[SerializeField]
+		private GameObject _actionPhaseHintGameObject;
 
 		private GOAGameplayProperty _prop;
 
-		void IGOAGameplayView.RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard)
+		void IGOAGameplayView.RegisterCallback(IAssetSession assetSession, Action<int> onClickBoardCard, Action onClickEndTurn)
 		{
-			// _button.onClick.AddListener(() => onClickReturnHomeButton?.Invoke());
 			_selfPlayer.RegisterCallback(
 				assetSession,
 				() => {} );
@@ -70,6 +75,8 @@ namespace Gameplay.GOA
 			_strategyCardDetail.RegisterCallback(
 				assetSession,
 				() => {} );
+				
+			_endTurnbutton.onClick.AddListener(() => onClickEndTurn?.Invoke());
 		}
 
 		void IGOAGameplayView.Render(GOAGameplayProperty prop)
@@ -85,6 +92,8 @@ namespace Gameplay.GOA
 					break;
 
 				case GOAGameplayState.Idle:
+				case GOAGameplayState.ClickBoardCard:
+				case GOAGameplayState.ClickEndTurn:
 					_Render(prop);
 					break;
 
@@ -118,6 +127,9 @@ namespace Gameplay.GOA
 			_characterDetail.Render(prop.CharacterDetailOpt);
 			_publicCardDetail.Render(prop.PublicCardDetailOpt);
 			_strategyCardDetail.Render(prop.StrategyCardDetailOpt);
+			_chooseBoardCardPhaseHintGameObject.SetActive(prop.ShowChooseBoardCardPhaseHint);
+			_actionPhaseHintGameObject.SetActive(prop.ShowActionPhaseHint);
+			_endTurnbuttonGameObject.SetActive(prop.ShowEndTurnButton);
 		}
 	}
 }

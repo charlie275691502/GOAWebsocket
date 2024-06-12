@@ -15,6 +15,7 @@ namespace Gameplay.GOA
 		UniTask<OneOf<None, UniTaskError>> RevealBoardCards(int[] positions);
 		UniTask<OneOf<None, UniTaskError>> ChooseRevealingBoardCard(int position);
 		UniTask<OneOf<None, UniTaskError>> ChooseOpenBoardCard(int position);
+		UniTask<OneOf<None, UniTaskError>> EndTurn();
 		void RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage);
 		void RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage);
 	}
@@ -55,6 +56,14 @@ namespace Gameplay.GOA
 					{
 						{"command", "choose_open_board_card_action"},
 						{"position", position},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.EndTurn()
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "end_turn_action"},
 					});
 
 		void IGOAGameplayWebSocketPresenter.RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage)

@@ -25,6 +25,7 @@ namespace Gameplay.GOA
 		public record Open() : GOAGameplayState;
 		public record Idle() : GOAGameplayState;
 		public record ClickBoardCard(int Position) : GOAGameplayState;
+		public record ClickEndTurn() : GOAGameplayState;
 		public record Close() : GOAGameplayState;
 	}
 
@@ -36,7 +37,11 @@ namespace Gameplay.GOA
 		GOABoardData Board,
 		List<int> SelectingBoardCards,
 		List<int> SelectingHandCards,
-		bool IsGameEnd);
+		bool IsGameEnd)
+		{
+			public bool IsSelfTurn()
+				=> TakingTurnPlayerId == SelfPlayerId;
+		}
 		
 
 	public record GOAGameplayProperty(
@@ -48,7 +53,10 @@ namespace Gameplay.GOA
 		GOAHandCardsViewData HandPublicCards,
 		Option<GOACharacterDetailViewData> CharacterDetailOpt,
 		Option<GOAPublicCardDetaialViewData> PublicCardDetailOpt,
-		Option<GOAStrategyCardDetaialViewData> StrategyCardDetailOpt);
+		Option<GOAStrategyCardDetaialViewData> StrategyCardDetailOpt,
+		bool ShowChooseBoardCardPhaseHint,
+		bool ShowActionPhaseHint,
+		bool ShowEndTurnButton);
 
 	public interface IGOAGameplayPresenter
 	{
@@ -87,7 +95,9 @@ namespace Gameplay.GOA
 			_view.RegisterCallback(
 				assetSession,
 				(position) =>
-					_ChangeStateIfIdle(new GOAGameplayState.ClickBoardCard(position)));
+					_ChangeStateIfIdle(new GOAGameplayState.ClickBoardCard(position)),
+				() =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickEndTurn()));
 		}
 
 		async UniTask IGOAGameplayPresenter.Run(GOAGameData gameData)
@@ -114,7 +124,10 @@ namespace Gameplay.GOA
 				_GetHandCardsViewData(),
 				Option.None<GOACharacterDetailViewData>(),
 				Option.None<GOAPublicCardDetaialViewData>(),
-				Option.None<GOAStrategyCardDetaialViewData>());
+				Option.None<GOAStrategyCardDetaialViewData>(),
+				false,
+				false,
+				false);
 
 			await _JoinGame(_gameData.GameId);
 
@@ -132,7 +145,7 @@ namespace Gameplay.GOA
 						break;
 						
 					case GOAGameplayState.ClickBoardCard Info:
-						if (_model.SelfPlayerId == _model.TakingTurnPlayerId && _model.Board.Phase == Phase.ChooseBoardCardPhase)
+						if (_model.IsSelfTurn() && _model.Board.Phase == Phase.ChooseBoardCardPhase)
 						{
 							if (_model.Board.BoardCards[Info.Position] is CardDataState.Covered && _model.Board.RevealingBoardCardPositions.Count() == 0)
 							{
@@ -167,6 +180,16 @@ namespace Gameplay.GOA
 							_UpdatePropertyThenRender();
 						}
 						
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
+						break;
+						
+					case GOAGameplayState.ClickEndTurn:
+						if (_model.IsSelfTurn() && _model.Board.Phase == Phase.ActionPhase)
+						{
+							await _webSocketPresenter
+								.EndTurn()
+								.RunAndHandleInternetError(_warningPresenter);
+						}
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
 
@@ -291,6 +314,9 @@ namespace Gameplay.GOA
 				EnemyPlayers = _GetEnemyPlayersViewData(),
 				Board = _GetBoardViewData(),
 				HandPublicCards = _GetHandCardsViewData(),
+				ShowChooseBoardCardPhaseHint = _model.IsSelfTurn() && _model.Board.Phase == Phase.ChooseBoardCardPhase,
+				ShowActionPhaseHint = _model.IsSelfTurn() && _model.Board.Phase == Phase.ActionPhase,
+				ShowEndTurnButton = _model.IsSelfTurn() && _model.Board.Phase == Phase.ActionPhase,
 			};
 			
 			_view.Render(_prop);
