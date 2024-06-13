@@ -228,6 +228,12 @@ namespace Web
 		public int TakingTurnPlayerId;
 		[JsonProperty("phase")]
 		public int Phase;
+		[JsonProperty("is_mask_used")]
+		public int IsMaskUsed;
+		[JsonProperty("is_reform_used")]
+		public int IsReformUsed;
+		[JsonProperty("is_expand_used")]
+		public int IsExpandUsed;
 	}
 
 	public class GOASettingResult
