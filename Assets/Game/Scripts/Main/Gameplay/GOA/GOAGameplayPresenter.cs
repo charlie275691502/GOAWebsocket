@@ -234,6 +234,7 @@ namespace Gameplay.GOA
 				
 		private GOAPlayerData[] _GetEnemyPlayersModel(GOAGameData gameData)
 			=> _GetEnemyPlayerOrders(gameData)
+				.Where(order => _GetSelfPlayerModel(gameData).Order != order)
 				.Select(order => gameData.Players.FirstOrNone(player => player.Player.Id == gameData.SelfPlayerId))
 				.Values()
 				.ToArray();
