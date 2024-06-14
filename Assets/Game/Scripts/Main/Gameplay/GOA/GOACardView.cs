@@ -29,6 +29,7 @@ namespace Gameplay.GOA
 		public void RegisterCallback(IAssetSession assetSession, Action onClickButton)
 		{
 			_image.Initialize(assetSession);
+			_button.onClick.RemoveAllListeners();
 			_button.onClick.AddListener(() => onClickButton?.Invoke());
 		}
 

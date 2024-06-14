@@ -11,7 +11,7 @@ namespace Gameplay.GOA
 	{
 		public record Empty() : CardDataState;
 		public record Covered() : CardDataState;
-		public record Open(int Key) : CardDataState;
+		public record Open(int Id) : CardDataState;
 	}
 	
 	// Must follow backend definition
@@ -19,6 +19,13 @@ namespace Gameplay.GOA
 	{
 		ChooseBoardCardPhase = 1,
 		ActionPhase = 2,
+	}
+	
+	public enum ActionPhase
+	{
+		None = 0,
+		Reform = 1,
+		Expand = 2,
 	}
 	
 	public record GOABoardData(

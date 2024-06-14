@@ -10,7 +10,8 @@ using UnityEngine.UI;
 namespace Gameplay.GOA
 {
 	public record GOAPublicCardDetaialViewData(
-		string ImageKey
+		string ImageKey,
+		bool ActivateUseCardButton
 	);
 	
 	public class GOAPublicCardDetaialView : MonoBehaviour
@@ -20,12 +21,12 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private AsyncImage _image;
 		[SerializeField]
-		private Button _useButton;
+		private Button _useCardButton;
 		
-		public void RegisterCallback(IAssetSession assetSession, Action onClickUseButton)
+		public void RegisterCallback(IAssetSession assetSession, Action onClickUseCardButton)
 		{
 			_image.Initialize(assetSession);
-			_useButton.onClick.AddListener(() => onClickUseButton?.Invoke());
+			_useCardButton.onClick.AddListener(() => onClickUseCardButton?.Invoke());
 		}
 
 		public void Render(Option<GOAPublicCardDetaialViewData> viewDataOpt)
@@ -34,6 +35,7 @@ namespace Gameplay.GOA
 				viewData => 
 				{
 					_panel.SetActive(true);
+					_useCardButton.interactable = viewData.ActivateUseCardButton;
 					_image.LoadSprite(AssetType.GOAPublicCardDetail, viewData.ImageKey);
 				},
 				() => _panel.SetActive(false)

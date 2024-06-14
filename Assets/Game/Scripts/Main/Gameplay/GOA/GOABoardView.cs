@@ -19,6 +19,10 @@ namespace Gameplay.GOA
 	public class GOABoardView : MonoBehaviour
 	{
 		[SerializeField]
+		private Text _drawPileCountText;
+		[SerializeField]
+		private Text _gravePileCountText;
+		[SerializeField]
 		private GameObject _drawPileMultipleGameObject;
 		[SerializeField]
 		private GameObject _drawPileOneGameObject;
@@ -57,6 +61,8 @@ namespace Gameplay.GOA
 				(publicCard, viewData) => publicCard.Render(viewData)
 			);
 			
+			_drawPileCountText.text = viewData.DrawCardCount.ToString();
+			_gravePileCountText.text = viewData.GraveCardCount.ToString();
 			_drawPileMultipleGameObject.SetActive(viewData.DrawCardCount > 1);
 			_drawPileOneGameObject.SetActive(viewData.DrawCardCount == 1);
 			_drawPileEmptyGameObject.SetActive(viewData.DrawCardCount == 0);

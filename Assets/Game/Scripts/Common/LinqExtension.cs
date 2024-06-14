@@ -17,6 +17,15 @@ namespace Common.LinqExtension
 					return default(None);
 				})
 				.ToArray();
+				
+		public static void ZipForEach<T1, T2>(this IEnumerable<T1> first, IEnumerable<T2> second, Action<T1, T2, int> action)
+			=> first
+				.Zip(second.Select((value, index) => (value, index)), (a, b) =>
+				{
+					action(a, b.value, b.index);
+					return default(None);
+				})
+				.ToArray();
 
 		public static void ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
 		{

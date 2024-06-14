@@ -229,11 +229,11 @@ namespace Web
 		[JsonProperty("phase")]
 		public int Phase;
 		[JsonProperty("is_mask_used")]
-		public int IsMaskUsed;
+		public bool IsMaskUsed;
 		[JsonProperty("is_reform_used")]
-		public int IsReformUsed;
+		public bool IsReformUsed;
 		[JsonProperty("is_expand_used")]
-		public int IsExpandUsed;
+		public bool IsExpandUsed;
 	}
 
 	public class GOASettingResult

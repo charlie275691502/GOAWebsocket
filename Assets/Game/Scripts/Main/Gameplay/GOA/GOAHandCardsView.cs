@@ -37,7 +37,10 @@ namespace Gameplay.GOA
 			
 			_cards.ZipForEach(
 				viewData.Cards,
-				(publicCard, viewData) => publicCard.Render(viewData)
+				(publicCard, viewData, index) => {
+					publicCard.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
+					publicCard.Render(viewData);
+				}
 			);
 		}
 		
@@ -55,7 +58,6 @@ namespace Gameplay.GOA
 				var publicCard = _cardPool.GetGameObject();
 				publicCard.transform.parent = _cardsFolder;
 				var publicCardView = publicCard.GetComponent<GOACardView>();
-				publicCardView.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
 				_cards.Add(publicCardView);
 			}
 		}

@@ -15,6 +15,9 @@ namespace Gameplay.GOA
 		UniTask<OneOf<None, UniTaskError>> RevealBoardCards(int[] positions);
 		UniTask<OneOf<None, UniTaskError>> ChooseRevealingBoardCard(int position);
 		UniTask<OneOf<None, UniTaskError>> ChooseOpenBoardCard(int position);
+		UniTask<OneOf<None, UniTaskError>> UseMask(int card);
+		UniTask<OneOf<None, UniTaskError>> UseReform(int card, int target_card);
+		UniTask<OneOf<None, UniTaskError>> UseExpand(int card, int target_position);
 		UniTask<OneOf<None, UniTaskError>> EndTurn();
 		void RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage);
 		void RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage);
@@ -56,6 +59,35 @@ namespace Gameplay.GOA
 					{
 						{"command", "choose_open_board_card_action"},
 						{"position", position},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseMask(int card)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "use_mask_action"},
+						{"card", card},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseReform(int card, int target_card)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "use_reform_action"},
+						{"card", card},
+						{"target_card", target_card},
+					});
+		
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseExpand(int card, int target_position)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "use_expand_action"},
+						{"card", card},
+						{"target_position", target_position},
 					});
 		
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.EndTurn()
