@@ -15,6 +15,7 @@ using Metagame;
 using ModestTree;
 using Optional;
 using Optional.Collections;
+using Optional.Linq;
 using Optional.Unsafe;
 using Web;
 using Zenject;
@@ -28,6 +29,9 @@ namespace Gameplay.GOA
 		public record ClickBoardCard(int Position) : GOAGameplayState;
 		public record ClickHandCard(int Position) : GOAGameplayState;
 		public record ClickUseButton() : GOAGameplayState;
+		public record ClickReleaseButton() : GOAGameplayState;
+		public record ClickReleaseRequirementConfirm() : GOAGameplayState;
+		public record ClickStrategyRequirementConfirm() : GOAGameplayState;
 		public record ClickEndTurn() : GOAGameplayState;
 		public record Close() : GOAGameplayState;
 	}
@@ -46,14 +50,14 @@ namespace Gameplay.GOA
 	{
 		private bool IsSelfTurn()
 			=> TakingTurnPlayerId == SelfPlayerId;
-			
+
 		public bool IsSelfTurnAndPhase(Phase phase)
 			=> IsSelfTurn() && Board.Phase == phase;
-			
+
 		public bool IsSelfTurnAndPhase(Phase phase, ActionPhase actionPhase)
 			=> IsSelfTurnAndPhase(phase) && ActionPhase == actionPhase;
 	}
-		
+
 
 	public record GOAGameplayProperty(
 		GOAGameplayState State,
@@ -61,15 +65,18 @@ namespace Gameplay.GOA
 		GOAPlayerViewData SelfPlayer,
 		GOAPlayerViewData[] EnemyPlayers,
 		GOABoardViewData Board,
-		GOAHandCardsViewData HandPublicCards,
+		GOAHandCardsViewData HandCards,
 		Option<GOACharacterDetailViewData> CharacterDetailOpt,
 		Option<GOAPublicCardDetaialViewData> PublicCardDetailOpt,
 		Option<GOAStrategyCardDetaialViewData> StrategyCardDetailOpt,
+		bool IsReleaseRequirementActionPhase,
+		bool IsStrategyRequirementActionPhase,
+		bool ShowReleaseButton,
+		bool ShowEndTurnButton,
 		bool ShowChooseBoardCardPhaseHint,
 		bool ShowActionPhaseHint,
 		bool ShowUseReformHint,
-		bool ShowUseExpandHint,
-		bool ShowEndTurnButton);
+		bool ShowUseExpandHint);
 
 	public interface IGOAGameplayPresenter
 	{
@@ -86,7 +93,7 @@ namespace Gameplay.GOA
 		private GOAGameData _gameData;
 		private GOAGameplayModel _model;
 		private GOAGameplayProperty _prop;
-		
+
 		private ActionQueue _actionQueue;
 
 		public const int BOARD_SIZE = 3;
@@ -114,6 +121,12 @@ namespace Gameplay.GOA
 				() =>
 					_ChangeStateIfIdle(new GOAGameplayState.ClickUseButton()),
 				() =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickReleaseButton()),
+				() =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickReleaseRequirementConfirm()),
+				() =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickStrategyRequirementConfirm()),
+				() =>
 					_ChangeStateIfIdle(new GOAGameplayState.ClickEndTurn()));
 		}
 
@@ -133,7 +146,7 @@ namespace Gameplay.GOA
 				Option.None<int>(),
 				false
 			);
-			
+
 			_prop = new GOAGameplayProperty(
 				new GOAGameplayState.Open(),
 				_model.Board.Turn,
@@ -144,6 +157,9 @@ namespace Gameplay.GOA
 				Option.None<GOACharacterDetailViewData>(),
 				_GetPublicCardDetailOpt(),
 				Option.None<GOAStrategyCardDetaialViewData>(),
+				false,
+				false,
+				false,
 				false,
 				false,
 				false,
@@ -164,7 +180,7 @@ namespace Gameplay.GOA
 
 					case GOAGameplayState.Idle:
 						break;
-						
+
 					case GOAGameplayState.ClickBoardCard Info:
 						if (_model.IsSelfTurnAndPhase(Phase.ChooseBoardCardPhase))
 						{
@@ -172,9 +188,9 @@ namespace Gameplay.GOA
 							{
 								if (_model.SelectingBoardCards.Contains(Info.Position))
 									_model.SelectingBoardCards.Remove(Info.Position);
-								else 
+								else
 									_model.SelectingBoardCards.Add(Info.Position);
-									
+
 								if (_model.SelectingBoardCards.Count() >= 2)
 								{
 									await _webSocketPresenter
@@ -182,14 +198,16 @@ namespace Gameplay.GOA
 										.RunAndHandleInternetError(_warningPresenter);
 									_model.SelectingBoardCards.Clear();
 								}
-							} else if (_model.Board.BoardCards[Info.Position] is CardDataState.Open)
+							}
+							else if (_model.Board.BoardCards[Info.Position] is CardDataState.Open)
 							{
 								if (_model.Board.RevealingBoardCardPositions.ContainsItem(Info.Position))
 								{
 									await _webSocketPresenter
 										.ChooseRevealingBoardCard(Info.Position)
 										.RunAndHandleInternetError(_warningPresenter);
-								} else 
+								}
+								else
 								{
 									await _webSocketPresenter
 										.ChooseOpenBoardCard(Info.Position)
@@ -197,7 +215,8 @@ namespace Gameplay.GOA
 								}
 								_model.SelectingBoardCards.Clear();
 							}
-						} else if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Expand))
+						}
+						else if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Expand))
 						{
 							if (_model.Board.BoardCards[Info.Position] is CardDataState.Open)
 							{
@@ -211,35 +230,36 @@ namespace Gameplay.GOA
 									await _webSocketPresenter
 										.UseExpand(_model.SelectingDetailCardIdOpt.ValueOrFailure(), Info.Position)
 										.RunAndHandleInternetError(_warningPresenter);
-									_model = _model with 
-									{ 
+									_model = _model with
+									{
 										SelectingDetailCardIdOpt = Option.None<int>(),
 										ActionPhase = ActionPhase.None,
 									};
 								}
 							}
 						}
-						
+
 						_UpdatePropertyThenRender();
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
-						
+
 					case GOAGameplayState.ClickHandCard Info:
-						var cardId = 
-							(Info.Position < _model.SelfPlayer.PublicCards.Count() )
+						var cardId =
+							(Info.Position < _model.SelfPlayer.PublicCards.Count())
 								? _model.SelfPlayer.PublicCards[Info.Position]
 								: _model.SelfPlayer.StrategyCards[Info.Position - _model.SelfPlayer.PublicCards.Count()];
 						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None))
 						{
 							var card = _googleSheetLoader.Container.GOACards.GetRow(cardId).ValueOrFailure();
-							_model = _model with 
+							_model = _model with
 							{
-								SelectingDetailCardIdOpt = 
-									card.CardType == CardType.Power 
+								SelectingDetailCardIdOpt =
+									card.CardType == CardType.Power
 										? Option.None<int>()
 										: cardId.Some()
 							};
-						} else if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Reform))
+						}
+						else if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Reform))
 						{
 							var card = _model.SelectingDetailCardIdOpt
 								.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
@@ -250,33 +270,53 @@ namespace Gameplay.GOA
 								await _webSocketPresenter
 									.UseReform(_model.SelectingDetailCardIdOpt.ValueOrFailure(), cardId)
 									.RunAndHandleInternetError(_warningPresenter);
-								_model = _model with 
-								{ 
+								_model = _model with
+								{
 									SelectingDetailCardIdOpt = Option.None<int>(),
 									ActionPhase = ActionPhase.None,
 								};
 							}
 						}
-						
+						else if (
+							_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingReleaseRequirement) ||
+							_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingStrategyRequirement))
+						{
+							_googleSheetLoader.Container.GOACards.GetRow(cardId)
+								.MatchSome(card =>
+								{
+									if (card.CardType == CardType.Power)
+									{
+										if (_model.SelectingHandCards.Contains(cardId))
+										{
+											_model.SelectingHandCards.Remove(cardId);
+										}
+										else
+										{
+											_model.SelectingHandCards.Add(cardId);
+										}
+									}
+								});
+						}
+
 						_UpdatePropertyThenRender();
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
-						
+
 					case GOAGameplayState.ClickUseButton:
 						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None))
 						{
 							var cardOpt = _model.SelectingDetailCardIdOpt
 								.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId));
-								
+
 							if (cardOpt.HasValue)
 							{
-								switch(cardOpt.ValueOrFailure().CardType)
+								switch (cardOpt.ValueOrFailure().CardType)
 								{
 									case CardType.ActionMask:
 										await _webSocketPresenter
 											.UseMask(_model.SelectingDetailCardIdOpt.ValueOrFailure())
 											.RunAndHandleInternetError(_warningPresenter);
-										_model = _model with { SelectingDetailCardIdOpt = Option.None<int>()};
+										_model = _model with { SelectingDetailCardIdOpt = Option.None<int>() };
 										break;
 									case CardType.ActionReform:
 										_model = _model with { ActionPhase = ActionPhase.Reform };
@@ -284,27 +324,102 @@ namespace Gameplay.GOA
 									case CardType.ActionExpand:
 										_model = _model with { ActionPhase = ActionPhase.Expand };
 										break;
+									case CardType.Strategy:
+										_model = _model with { ActionPhase = ActionPhase.ChoosingStrategyRequirement };
+										break;
 								}
 							}
 						}
-						
+
 						_UpdatePropertyThenRender();
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
-						
+
+					case GOAGameplayState.ClickReleaseButton:
+						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None))
+						{
+							_model = _model with { ActionPhase = ActionPhase.ChoosingReleaseRequirement };
+						}
+
+						_UpdatePropertyThenRender();
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
+						break;
+
+					case GOAGameplayState.ClickReleaseRequirementConfirm:
+						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingReleaseRequirement))
+						{
+							var cards = _model.SelectingHandCards
+								.Select(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
+								.Values();
+							if (
+								cards.Count() >= 3 &&
+								cards.All(card => card.CardType == CardType.Power) &&
+								cards.All(card => card.PowerType == cards.First().PowerType) &&
+								_IsPowerCardContinuousByOne(cards)
+								)
+							{
+								await _webSocketPresenter
+									.ReleaseCards(_model.SelectingHandCards.ToArray())
+									.RunAndHandleInternetError(_warningPresenter);
+								_model = _model with
+								{
+									ActionPhase = ActionPhase.None,
+									SelectingHandCards = new List<int>(),
+								};
+							}
+						}
+
+						_UpdatePropertyThenRender();
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
+						break;
+
+					case GOAGameplayState.ClickStrategyRequirementConfirm:
+						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingStrategyRequirement))
+						{
+							var cardOpt = _model.SelectingDetailCardIdOpt
+								.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId));
+
+							if (cardOpt.HasValue)
+							{
+								var card = cardOpt.ValueOrFailure();
+								var requirementCards = _model.SelectingHandCards
+									.Select(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
+									.Values();
+								if (_IsMatchRequirements(card, requirementCards))
+								{
+									await _webSocketPresenter
+										.UseStrategy(
+											_model.SelectingDetailCardIdOpt.ValueOrFailure(),
+											_model.SelectingHandCards.ToArray())
+										.RunAndHandleInternetError(_warningPresenter);
+									_model = _model with
+									{
+										ActionPhase = ActionPhase.None,
+										SelectingDetailCardIdOpt = Option.None<int>(),
+										SelectingHandCards = new List<int>(),
+									};
+								}
+							}
+						}
+
+						_UpdatePropertyThenRender();
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
+						break;
+
 					case GOAGameplayState.ClickEndTurn:
 						if (_model.IsSelfTurnAndPhase(Phase.ActionPhase))
 						{
-							_model = _model with 
+							_model = _model with
 							{
 								ActionPhase = ActionPhase.None,
 								SelectingDetailCardIdOpt = Option.None<int>(),
+								SelectingHandCards = new List<int>(),
 							};
 							await _webSocketPresenter
 								.EndTurn()
 								.RunAndHandleInternetError(_warningPresenter);
 						}
-						
+
 						_UpdatePropertyThenRender();
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
@@ -330,7 +445,7 @@ namespace Gameplay.GOA
 			onChangeStateSuccess?.Invoke();
 			_prop = _prop with { State = targetState };
 		}
-		
+
 		private int[] _GetEnemyPlayerOrders(GOAGameData gameData)
 		{
 			var selfPlayerOrder = gameData.Players
@@ -342,19 +457,19 @@ namespace Gameplay.GOA
 				.Select(index => (selfPlayerOrder + index) % playerCount)
 				.ToArray();
 		}
-		
+
 		private GOAPlayerData _GetSelfPlayerModel(GOAGameData gameData)
 			=> gameData.Players
 				.FirstOrNone(player => player.Player.Id == gameData.SelfPlayerId)
 				.ValueOrFailure();
-				
+
 		private GOAPlayerData[] _GetEnemyPlayersModel(GOAGameData gameData)
 			=> _GetEnemyPlayerOrders(gameData)
 				.Where(order => _GetSelfPlayerModel(gameData).Order != order)
 				.Select(order => gameData.Players.FirstOrNone(player => player.Player.Id == gameData.SelfPlayerId))
 				.Values()
 				.ToArray();
-		
+
 		private GOAPlayerViewData _GetSelfPlayerViewData()
 			=> new GOAPlayerViewData(
 				_model.SelfPlayer,
@@ -393,32 +508,45 @@ namespace Gameplay.GOA
 		private GOAHandCardsViewData _GetHandCardsViewData()
 			=> new GOAHandCardsViewData(
 				_model.SelfPlayer.PublicCards
-					.Select(cardKey => new GOACardViewData(new CardViewDataState.Open(
+					.Select(cardId => new GOACardViewData(new CardViewDataState.Open(
 						true,
-						false,
+						_model.SelectingHandCards.Contains(cardId),
 						_googleSheetLoader.Container.GOACards
-							.GetRow(cardKey)
+							.GetRow(cardId)
 							.Map(card => card.ImageKey)
 							.ValueOr(string.Empty))))
 					.Concat(
 						_model.SelfPlayer.StrategyCards
-							.Select(cardKey => new GOACardViewData(new CardViewDataState.Open(
+							.Select(cardId => new GOACardViewData(new CardViewDataState.Open(
 								false,
 								false,
 								_googleSheetLoader.Container.GOACards
-									.GetRow(cardKey)
+									.GetRow(cardId)
 									.Map(card => card.ImageKey)
 									.ValueOr(string.Empty)))))
 					.ToArray());
-					
+
 		private Option<GOAPublicCardDetaialViewData> _GetPublicCardDetailOpt()
 			=> _model.SelectingDetailCardIdOpt
 				.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
+				.Where(card =>
+					card.CardType == CardType.ActionMask ||
+					card.CardType == CardType.ActionReform ||
+					card.CardType == CardType.ActionExpand)
 				.Map(card => card.ImageKey)
 				.Map(imageKey => new GOAPublicCardDetaialViewData(
 					imageKey,
 					_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None)));
-					
+
+		private Option<GOAStrategyCardDetaialViewData> _GetStrategyCardDetailOpt()
+			=> _model.SelectingDetailCardIdOpt
+				.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
+				.Where(card => card.CardType == CardType.Strategy)
+				.Map(card => card.ImageKey)
+				.Map(imageKey => new GOAStrategyCardDetaialViewData(
+					imageKey,
+					_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None)));
+
 		private void _UpdateModel(GOAGameData gameData)
 		{
 			_model = _model with
@@ -429,7 +557,7 @@ namespace Gameplay.GOA
 				Board = gameData.Board,
 			};
 		}
-					
+
 		private void _UpdatePropertyThenRender()
 		{
 			_prop = _prop with
@@ -438,15 +566,19 @@ namespace Gameplay.GOA
 				SelfPlayer = _GetSelfPlayerViewData(),
 				EnemyPlayers = _GetEnemyPlayersViewData(),
 				Board = _GetBoardViewData(),
-				HandPublicCards = _GetHandCardsViewData(),
+				HandCards = _GetHandCardsViewData(),
 				PublicCardDetailOpt = _GetPublicCardDetailOpt(),
+				StrategyCardDetailOpt = _GetStrategyCardDetailOpt(),
+				IsReleaseRequirementActionPhase = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingReleaseRequirement),
+				IsStrategyRequirementActionPhase = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingStrategyRequirement),
+				ShowReleaseButton = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None),
+				ShowEndTurnButton = _model.IsSelfTurnAndPhase(Phase.ActionPhase),
 				ShowChooseBoardCardPhaseHint = _model.IsSelfTurnAndPhase(Phase.ChooseBoardCardPhase),
 				ShowActionPhaseHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None),
 				ShowUseReformHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Reform),
 				ShowUseExpandHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Expand),
-				ShowEndTurnButton = _model.IsSelfTurnAndPhase(Phase.ActionPhase),
 			};
-			
+
 			_view.Render(_prop);
 		}
 
@@ -474,5 +606,20 @@ namespace Gameplay.GOA
 			_UpdateModel(new GOAGameData(result, _model.SelfPlayerId, _googleSheetLoader));
 			_UpdatePropertyThenRender();
 		}
+
+		private bool _IsPowerCardContinuousByOne(IEnumerable<GOACardsSheet.GOACardRow> cards)
+		{
+			var sortedCards = cards.OrderBy(card => card.Power);
+			return sortedCards.Zip(sortedCards.Skip(1), (a, b) => b.Power - a.Power).All(diff => diff == 1);
+		}
+
+		private bool _IsMatchRequirements(GOACardsSheet.GOACardRow card, IEnumerable<GOACardsSheet.GOACardRow> requirementCards)
+			=>
+				requirementCards.Count() == card.Requirements.Count() &&
+				requirementCards
+					.OrderBy(card => card.PowerType)
+					.ThenBy(card => card.Power)
+					.Zip(card.Requirements, (a, b) => a.PowerType == b.PowerType && a.Power >= b.Power)
+					.All(_ => _);
 	}
 }

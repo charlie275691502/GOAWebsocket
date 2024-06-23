@@ -14,9 +14,9 @@ namespace Gameplay.GOA
 		public record Covered(bool IsChosen) : CardViewDataState;
 		public record Open(bool IsPublicCard, bool IsChosen, string ImageKey) : CardViewDataState;
 	}
-	
+
 	public record GOACardViewData(CardViewDataState State);
-	
+
 	public class GOACardView : MonoBehaviour
 	{
 		[SerializeField]
@@ -36,12 +36,12 @@ namespace Gameplay.GOA
 		public void Render(GOACardViewData viewData)
 		{
 			_panel.SetActive(viewData.State is not CardViewDataState.Empty);
-			switch(viewData.State)
+			switch (viewData.State)
 			{
 				case CardViewDataState.Empty:
 					_panel.SetActive(false);
 					break;
-				
+
 				case CardViewDataState.Covered Info:
 					_panel.SetActive(true);
 					_image.LoadSprite(
@@ -50,9 +50,12 @@ namespace Gameplay.GOA
 							: AssetType.GOAPublicCardNormal,
 						GOACardUtility.COVERED_CARD_IMAGE_KEY);
 					break;
-					
+
 				case CardViewDataState.Open Info:
 					_panel.SetActive(true);
+					Debug.LogError(Info.IsPublicCard);
+					Debug.LogError(Info.IsChosen);
+					Debug.LogError(Info.ImageKey);
 					_image.LoadSprite(
 						Info.IsPublicCard
 							? Info.IsChosen

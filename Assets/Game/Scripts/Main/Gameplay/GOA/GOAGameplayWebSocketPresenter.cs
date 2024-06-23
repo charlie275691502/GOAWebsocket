@@ -18,11 +18,13 @@ namespace Gameplay.GOA
 		UniTask<OneOf<None, UniTaskError>> UseMask(int card);
 		UniTask<OneOf<None, UniTaskError>> UseReform(int card, int target_card);
 		UniTask<OneOf<None, UniTaskError>> UseExpand(int card, int target_position);
+		UniTask<OneOf<None, UniTaskError>> ReleaseCards(int[] cards);
+		UniTask<OneOf<None, UniTaskError>> UseStrategy(int card, int[] requirementCards);
 		UniTask<OneOf<None, UniTaskError>> EndTurn();
 		void RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage);
 		void RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage);
 	}
-	
+
 	public class GOAGameplayWebSocketPresenter : WebSocketPresenter, IGOAGameplayWebSocketPresenter
 	{
 		public GOAGameplayWebSocketPresenter(ISetting setting, BackendPlayerData backendPlayerData) : base(setting, backendPlayerData)
@@ -33,7 +35,7 @@ namespace Gameplay.GOA
 		{
 			return _StartWebsocket(string.Format("GOAGame/games/{0}/", roomId.ToString()));
 		}
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.RevealBoardCards(int[] positions)
 			=>
 				_SendWaitTillReturn<None>(
@@ -42,7 +44,7 @@ namespace Gameplay.GOA
 						{"command", "reveal_board_cards_action"},
 						{"positions", positions},
 					});
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChooseRevealingBoardCard(int position)
 			=>
 				_SendWaitTillReturn<None>(
@@ -51,7 +53,7 @@ namespace Gameplay.GOA
 						{"command", "choose_revealing_board_card_action"},
 						{"position", position},
 					});
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ChooseOpenBoardCard(int position)
 			=>
 				_SendWaitTillReturn<None>(
@@ -60,7 +62,7 @@ namespace Gameplay.GOA
 						{"command", "choose_open_board_card_action"},
 						{"position", position},
 					});
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseMask(int card)
 			=>
 				_SendWaitTillReturn<None>(
@@ -69,7 +71,7 @@ namespace Gameplay.GOA
 						{"command", "use_mask_action"},
 						{"card", card},
 					});
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseReform(int card, int target_card)
 			=>
 				_SendWaitTillReturn<None>(
@@ -79,7 +81,7 @@ namespace Gameplay.GOA
 						{"card", card},
 						{"target_card", target_card},
 					});
-		
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseExpand(int card, int target_position)
 			=>
 				_SendWaitTillReturn<None>(
@@ -89,7 +91,26 @@ namespace Gameplay.GOA
 						{"card", card},
 						{"target_position", target_position},
 					});
-		
+
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.ReleaseCards(int[] cards)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "release_cards_action"},
+						{"cards", cards},
+					});
+
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.UseStrategy(int card, int[] requirementCards)
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "use_strategy_action"},
+						{"card", card},
+						{"requirement_cards", requirementCards},
+					});
+
 		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.EndTurn()
 			=>
 				_SendWaitTillReturn<None>(
@@ -102,7 +123,7 @@ namespace Gameplay.GOA
 		{
 			_RegisterOnReceiveMessage("update_game", onReceiveMessage);
 		}
-		
+
 		void IGOAGameplayWebSocketPresenter.RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage)
 		{
 			_RegisterOnReceiveMessage("summary", onReceiveMessage);

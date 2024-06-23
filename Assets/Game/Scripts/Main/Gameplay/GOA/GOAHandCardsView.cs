@@ -13,7 +13,7 @@ namespace Gameplay.GOA
 	public record GOAHandCardsViewData(
 		GOACardViewData[] Cards
 	);
-	
+
 	public class GOAHandCardsView : MonoBehaviour
 	{
 		[SerializeField]
@@ -34,31 +34,31 @@ namespace Gameplay.GOA
 		public void Render(GOAHandCardsViewData viewData)
 		{
 			_InstantiateCards(viewData.Cards.Count());
-			
+
 			_cards.ZipForEach(
 				viewData.Cards,
-				(publicCard, viewData, index) => {
-					publicCard.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
-					publicCard.Render(viewData);
+				(card, viewData, index) =>
+				{
+					card.RegisterCallback(_assetSession, () => _onClickCard?.Invoke(index));
+					card.Render(viewData);
 				}
 			);
 		}
-		
+
 		private void _InstantiateCards(int count)
 		{
-			for(int i=_cards.Count()-1; i >= count; i--)
+			for (int i = _cards.Count() - 1; i >= count; i--)
 			{
 				_cardPool.ReturnGameObject(_cards[i].gameObject);
 				_cards.RemoveAt(i);
 			}
-			
-			for(int i=_cards.Count(); i<count; i++)
+
+			for (int i = _cards.Count(); i < count; i++)
 			{
-				var index = i;
-				var publicCard = _cardPool.GetGameObject();
-				publicCard.transform.parent = _cardsFolder;
-				var publicCardView = publicCard.GetComponent<GOACardView>();
-				_cards.Add(publicCardView);
+				var card = _cardPool.GetGameObject();
+				card.transform.parent = _cardsFolder;
+				var cardView = card.GetComponent<GOACardView>();
+				_cards.Add(cardView);
 			}
 		}
 	}

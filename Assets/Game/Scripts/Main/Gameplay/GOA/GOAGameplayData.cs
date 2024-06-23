@@ -13,21 +13,24 @@ namespace Gameplay.GOA
 		public record Covered() : CardDataState;
 		public record Open(int Id) : CardDataState;
 	}
-	
+
 	// Must follow backend definition
 	public enum Phase
 	{
 		ChooseBoardCardPhase = 1,
 		ActionPhase = 2,
 	}
-	
+
 	public enum ActionPhase
 	{
-		None = 0,
-		Reform = 1,
-		Expand = 2,
+		None,
+		Reform,
+		Expand,
+		ChoosingReleaseRequirement,
+		ChoosingStrategyRequirement,
+		Strategy,
 	}
-	
+
 	public record GOABoardData(
 		int DrawCardCount,
 		int GraveCardCount,
@@ -51,7 +54,8 @@ namespace Gameplay.GOA
 			result.RevealingBoardCardPositions,
 			result.Turn,
 			result.TakingTurnPlayerId,
-			(Phase)result.Phase) { }
+			(Phase)result.Phase)
+		{ }
 	}
 
 	public record GOAPlayerData(
@@ -82,13 +86,15 @@ namespace Gameplay.GOA
 			new PlayerViewData(result.Player, googleSheetLoader),
 			result.Elo,
 			result.PlayedGameCount,
-			result.WinGameCount) { }
+			result.WinGameCount)
+		{ }
 	}
 
 	public record GOASettingData()
 	{
 		public GOASettingData(GOASettingResult result) : this(
-			) { }
+			)
+		{ }
 	}
 
 	public record GOAGameData(
@@ -103,7 +109,8 @@ namespace Gameplay.GOA
 			selfPlayerId,
 			new GOABoardData(result.Board),
 			_GetGOAPlayerDatas(result.Players, googleSheetLoader),
-			new GOASettingData(result.Setting)) { }
+			new GOASettingData(result.Setting))
+		{ }
 
 		public static GOAPlayerData[] _GetGOAPlayerDatas(GOAPlayerResult[] players, IGoogleSheetLoader googleSheetLoader)
 			=> players

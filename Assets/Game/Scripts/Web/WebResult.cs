@@ -10,7 +10,7 @@ namespace Web
 		[JsonProperty("refresh")]
 		public string RefreshKey;
 	}
-	
+
 	public class PlayerDataResult
 	{
 		[JsonProperty("id")]
@@ -22,7 +22,7 @@ namespace Web
 		[JsonProperty("avatar_key")]
 		public string AvatarKey;
 	}
-	
+
 	public class GameSettingResult
 	{
 		[JsonProperty("id")]
@@ -32,7 +32,7 @@ namespace Web
 		[JsonProperty("player_plot")]
 		public int PlayerPlot;
 	}
-	
+
 	public class RoomResult
 	{
 		[JsonProperty("id")]
@@ -44,12 +44,12 @@ namespace Web
 		[JsonProperty("players")]
 		public List<PlayerDataResult> Players;
 	}
-	
+
 	public class RoomListResult : List<RoomResult>
 	{
-		
+
 	}
-	
+
 	public class MessagePlayerResult
 	{
 		[JsonProperty("id")]
@@ -59,7 +59,7 @@ namespace Web
 		[JsonProperty("avatar_key")]
 		public string AvatarKey;
 	}
-	
+
 	public class MessageResult
 	{
 		[JsonProperty("id")]
@@ -69,14 +69,14 @@ namespace Web
 		[JsonProperty("player")]
 		public MessagePlayerResult Player;
 	}
-	
+
 	public class RoomWithMessagesResult : RoomResult
 	{
 		[JsonProperty("messages")]
 		public List<MessageResult> Messages;
 	}
-	
-#region TTT
+
+	#region TTT
 
 	public class TicTacToeGameResult
 	{
@@ -171,10 +171,10 @@ namespace Web
 	{
 
 	}
-	
-#endregion
 
-#region GOA
+	#endregion
+
+	#region GOA
 
 	public class GOAGameResult
 	{
@@ -234,11 +234,13 @@ namespace Web
 		public bool IsReformUsed;
 		[JsonProperty("is_expand_used")]
 		public bool IsExpandUsed;
+		[JsonProperty("is_strategy_used")]
+		public bool IsStrategyUsed;
 	}
 
 	public class GOASettingResult
 	{
-		
+
 	}
 
 	public class GOAPlayerResult
