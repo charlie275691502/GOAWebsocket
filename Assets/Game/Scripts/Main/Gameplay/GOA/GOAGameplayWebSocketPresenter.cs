@@ -21,6 +21,7 @@ namespace Gameplay.GOA
 		UniTask<OneOf<None, UniTaskError>> ReleaseCards(int[] cards);
 		UniTask<OneOf<None, UniTaskError>> UseStrategy(int card, int[] requirementCards);
 		UniTask<OneOf<None, UniTaskError>> EndTurn();
+		UniTask<OneOf<None, UniTaskError>> EndCongress();
 		void RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage);
 		void RegisterOnReceiveSummary(Action<GOASummaryResult> onReceiveMessage);
 	}
@@ -117,6 +118,14 @@ namespace Gameplay.GOA
 					new Dictionary<string, object>()
 					{
 						{"command", "end_turn_action"},
+					});
+
+		UniTask<OneOf<None, UniTaskError>> IGOAGameplayWebSocketPresenter.EndCongress()
+			=>
+				_SendWaitTillReturn<None>(
+					new Dictionary<string, object>()
+					{
+						{"command", "end_congress_action"},
 					});
 
 		void IGOAGameplayWebSocketPresenter.RegisterOnUpdateGame(Action<GOAGameResult> onReceiveMessage)

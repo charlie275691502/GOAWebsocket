@@ -22,7 +22,8 @@ namespace Gameplay.GOA
 			Action onClickReleaseCardButton,
 			Action onClickReleaseRequirementConfirmButton,
 			Action onClickStrategyRequirementConfirmButton,
-			Action onClickEndTurn);
+			Action onClickEndTurn,
+			Action onClickEndCongress);
 		void Render(GOAGameplayProperty prop);
 	}
 
@@ -63,9 +64,15 @@ namespace Gameplay.GOA
 		[SerializeField]
 		private GameObject _endTurnButtonGameObject;
 		[SerializeField]
+		private Button _endCongressButton;
+		[SerializeField]
+		private GameObject _endCongressButtonGameObject;
+		[SerializeField]
 		private GameObject _chooseBoardCardPhaseHintGameObject;
 		[SerializeField]
 		private GameObject _actionPhaseHintGameObject;
+		[SerializeField]
+		private GameObject _congressPhaseHintGameObject;
 		[SerializeField]
 		private GameObject _useReformHintGameObject;
 		[SerializeField]
@@ -85,7 +92,8 @@ namespace Gameplay.GOA
 			Action onClickReleaseCardButton,
 			Action onClickReleaseRequirementConfirmButton,
 			Action onClickStrategyRequirementConfirmButton,
-			Action onClickEndTurn)
+			Action onClickEndTurn,
+			Action onClickEndCongress)
 		{
 			_selfPlayer.RegisterCallback(
 				assetSession,
@@ -112,6 +120,7 @@ namespace Gameplay.GOA
 			_releaseRequirementConfirmButton.onClick.AddListener(() => onClickReleaseRequirementConfirmButton?.Invoke());
 			_strategyRequirementConfirmButton.onClick.AddListener(() => onClickStrategyRequirementConfirmButton?.Invoke());
 			_endTurnButton.onClick.AddListener(() => onClickEndTurn?.Invoke());
+			_endCongressButton.onClick.AddListener(() => onClickEndCongress?.Invoke());
 		}
 
 		void IGOAGameplayView.Render(GOAGameplayProperty prop)
@@ -134,6 +143,7 @@ namespace Gameplay.GOA
 				case GOAGameplayState.ClickReleaseRequirementConfirm:
 				case GOAGameplayState.ClickStrategyRequirementConfirm:
 				case GOAGameplayState.ClickEndTurn:
+				case GOAGameplayState.ClickEndCongress:
 					_Render(prop);
 					break;
 
@@ -168,15 +178,18 @@ namespace Gameplay.GOA
 			_publicCardDetail.Render(prop.PublicCardDetailOpt);
 			_strategyCardDetail.Render(prop.StrategyCardDetailOpt);
 
+			_turnText.text = prop.Turn.ToString();
 			_releaseRequirementConfirmButtonGameObject.SetActive(prop.IsReleaseRequirementActionPhase);
 			_strategyRequirementConfirmButtonGameObject.SetActive(prop.IsStrategyRequirementActionPhase);
 			_releaseButtonGameObject.SetActive(prop.ShowReleaseButton);
 			_endTurnButtonGameObject.SetActive(prop.ShowEndTurnButton);
+			_endCongressButtonGameObject.SetActive(prop.ShowEndCongressButton);
 
 			_choosingReleaseRequirementHintGameObject.SetActive(prop.IsReleaseRequirementActionPhase);
 			_choosingStrategyRequirementHintGameObject.SetActive(prop.IsStrategyRequirementActionPhase);
 			_chooseBoardCardPhaseHintGameObject.SetActive(prop.ShowChooseBoardCardPhaseHint);
 			_actionPhaseHintGameObject.SetActive(prop.ShowActionPhaseHint);
+			_congressPhaseHintGameObject.SetActive(prop.ShowCongressPhaseHint);
 			_useReformHintGameObject.SetActive(prop.ShowUseReformHint);
 			_useExpandHintGameObject.SetActive(prop.ShowUseExpandHint);
 		}

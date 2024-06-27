@@ -19,6 +19,7 @@ namespace Gameplay.GOA
 	{
 		ChooseBoardCardPhase = 1,
 		ActionPhase = 2,
+		CongressPhase = 3,
 	}
 
 	public enum ActionPhase
@@ -38,6 +39,7 @@ namespace Gameplay.GOA
 		int[] RevealingBoardCardPositions,
 		int Turn,
 		int TakingTurnPlayerId,
+		int ChairPersonPlayerId,
 		Phase Phase)
 	{
 		public GOABoardData(GOABoardResult result) : this(
@@ -54,6 +56,7 @@ namespace Gameplay.GOA
 			result.RevealingBoardCardPositions,
 			result.Turn,
 			result.TakingTurnPlayerId,
+			result.ChairPersonPlayerId,
 			(Phase)result.Phase)
 		{ }
 	}
@@ -68,6 +71,11 @@ namespace Gameplay.GOA
 		int StrategyCardCount,
 		int Power,
 		int PowerLimit,
+		bool IsMaskUsed,
+		bool IsReformUsed,
+		bool IsExpandUsed,
+		bool IsStrategyUsed,
+		bool IsEndCongress,
 		PlayerViewData Player,
 		int Elo,
 		int PlayedGameCount,
@@ -83,6 +91,11 @@ namespace Gameplay.GOA
 			result.StrategyCardCount,
 			result.Power,
 			result.PowerLimit,
+			result.IsMaskUsed,
+			result.IsReformUsed,
+			result.IsExpandUsed,
+			result.IsStrategyUsed,
+			result.IsEndCongress,
 			new PlayerViewData(result.Player, googleSheetLoader),
 			result.Elo,
 			result.PlayedGameCount,

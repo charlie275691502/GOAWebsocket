@@ -226,16 +226,10 @@ namespace Web
 		public int Turn;
 		[JsonProperty("taking_turn_player_id")]
 		public int TakingTurnPlayerId;
+		[JsonProperty("chair_person_player_id")]
+		public int ChairPersonPlayerId;
 		[JsonProperty("phase")]
 		public int Phase;
-		[JsonProperty("is_mask_used")]
-		public bool IsMaskUsed;
-		[JsonProperty("is_reform_used")]
-		public bool IsReformUsed;
-		[JsonProperty("is_expand_used")]
-		public bool IsExpandUsed;
-		[JsonProperty("is_strategy_used")]
-		public bool IsStrategyUsed;
 	}
 
 	public class GOASettingResult
@@ -263,6 +257,16 @@ namespace Web
 		public int Power;
 		[JsonProperty("power_limit")]
 		public int PowerLimit;
+		[JsonProperty("is_mask_used")]
+		public bool IsMaskUsed;
+		[JsonProperty("is_reform_used")]
+		public bool IsReformUsed;
+		[JsonProperty("is_expand_used")]
+		public bool IsExpandUsed;
+		[JsonProperty("is_strategy_used")]
+		public bool IsStrategyUsed;
+		[JsonProperty("is_end_congress")]
+		public bool IsEndCongress;
 		[JsonProperty("player")]
 		public PlayerDataResult Player;
 		[JsonProperty("elo")]

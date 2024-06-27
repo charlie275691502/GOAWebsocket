@@ -53,9 +53,6 @@ namespace Gameplay.GOA
 
 				case CardViewDataState.Open Info:
 					_panel.SetActive(true);
-					Debug.LogError(Info.IsPublicCard);
-					Debug.LogError(Info.IsChosen);
-					Debug.LogError(Info.ImageKey);
 					_image.LoadSprite(
 						Info.IsPublicCard
 							? Info.IsChosen

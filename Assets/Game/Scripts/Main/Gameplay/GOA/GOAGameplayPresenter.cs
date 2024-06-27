@@ -33,6 +33,7 @@ namespace Gameplay.GOA
 		public record ClickReleaseRequirementConfirm() : GOAGameplayState;
 		public record ClickStrategyRequirementConfirm() : GOAGameplayState;
 		public record ClickEndTurn() : GOAGameplayState;
+		public record ClickEndCongress() : GOAGameplayState;
 		public record Close() : GOAGameplayState;
 	}
 
@@ -56,6 +57,16 @@ namespace Gameplay.GOA
 
 		public bool IsSelfTurnAndPhase(Phase phase, ActionPhase actionPhase)
 			=> IsSelfTurnAndPhase(phase) && ActionPhase == actionPhase;
+
+		public bool IsUsedThisTurn(CardType cardType)
+			=> cardType switch
+			{
+				CardType.ActionMask => SelfPlayer.IsMaskUsed,
+				CardType.ActionReform => SelfPlayer.IsReformUsed,
+				CardType.ActionExpand => SelfPlayer.IsExpandUsed,
+				CardType.Strategy => SelfPlayer.IsStrategyUsed,
+				_ => throw new System.NotImplementedException(),
+			};
 	}
 
 
@@ -73,8 +84,10 @@ namespace Gameplay.GOA
 		bool IsStrategyRequirementActionPhase,
 		bool ShowReleaseButton,
 		bool ShowEndTurnButton,
+		bool ShowEndCongressButton,
 		bool ShowChooseBoardCardPhaseHint,
 		bool ShowActionPhaseHint,
+		bool ShowCongressPhaseHint,
 		bool ShowUseReformHint,
 		bool ShowUseExpandHint);
 
@@ -127,7 +140,9 @@ namespace Gameplay.GOA
 				() =>
 					_ChangeStateIfIdle(new GOAGameplayState.ClickStrategyRequirementConfirm()),
 				() =>
-					_ChangeStateIfIdle(new GOAGameplayState.ClickEndTurn()));
+					_ChangeStateIfIdle(new GOAGameplayState.ClickEndTurn()),
+				() =>
+					_ChangeStateIfIdle(new GOAGameplayState.ClickEndCongress()));
 		}
 
 		async UniTask IGOAGameplayPresenter.Run(GOAGameData gameData)
@@ -157,6 +172,8 @@ namespace Gameplay.GOA
 				Option.None<GOACharacterDetailViewData>(),
 				_GetPublicCardDetailOpt(),
 				Option.None<GOAStrategyCardDetaialViewData>(),
+				false,
+				false,
 				false,
 				false,
 				false,
@@ -424,6 +441,24 @@ namespace Gameplay.GOA
 						_prop = _prop with { State = new GOAGameplayState.Idle() };
 						break;
 
+					case GOAGameplayState.ClickEndCongress:
+						if (_model.Board.Phase == Phase.CongressPhase && !_model.SelfPlayer.IsEndCongress)
+						{
+							_model = _model with
+							{
+								SelfPlayer = _model.SelfPlayer with { IsEndCongress = true },
+								SelectingDetailCardIdOpt = Option.None<int>(),
+								SelectingHandCards = new List<int>(),
+							};
+							await _webSocketPresenter
+								.EndCongress()
+								.RunAndHandleInternetError(_warningPresenter);
+						}
+
+						_UpdatePropertyThenRender();
+						_prop = _prop with { State = new GOAGameplayState.Idle() };
+						break;
+
 					case GOAGameplayState.Close:
 						break;
 
@@ -533,19 +568,20 @@ namespace Gameplay.GOA
 					card.CardType == CardType.ActionMask ||
 					card.CardType == CardType.ActionReform ||
 					card.CardType == CardType.ActionExpand)
-				.Map(card => card.ImageKey)
-				.Map(imageKey => new GOAPublicCardDetaialViewData(
-					imageKey,
-					_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None)));
+				.Map(card => new GOAPublicCardDetaialViewData(
+					card.ImageKey,
+					_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None) &&
+					_model.IsUsedThisTurn(card.CardType) == false));
 
 		private Option<GOAStrategyCardDetaialViewData> _GetStrategyCardDetailOpt()
 			=> _model.SelectingDetailCardIdOpt
 				.FlatMap(cardId => _googleSheetLoader.Container.GOACards.GetRow(cardId))
 				.Where(card => card.CardType == CardType.Strategy)
-				.Map(card => card.ImageKey)
-				.Map(imageKey => new GOAStrategyCardDetaialViewData(
-					imageKey,
-					_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None)));
+				.Map(card => new GOAStrategyCardDetaialViewData(
+					card.ImageKey,
+					(_model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None) ||
+					_model.Board.Phase == Phase.CongressPhase) &&
+					_model.IsUsedThisTurn(card.CardType) == false));
 
 		private void _UpdateModel(GOAGameData gameData)
 		{
@@ -573,8 +609,10 @@ namespace Gameplay.GOA
 				IsStrategyRequirementActionPhase = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.ChoosingStrategyRequirement),
 				ShowReleaseButton = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None),
 				ShowEndTurnButton = _model.IsSelfTurnAndPhase(Phase.ActionPhase),
+				ShowEndCongressButton = _model.Board.Phase == Phase.CongressPhase && !_model.SelfPlayer.IsEndCongress,
 				ShowChooseBoardCardPhaseHint = _model.IsSelfTurnAndPhase(Phase.ChooseBoardCardPhase),
 				ShowActionPhaseHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.None),
+				ShowCongressPhaseHint = _model.Board.Phase == Phase.CongressPhase,
 				ShowUseReformHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Reform),
 				ShowUseExpandHint = _model.IsSelfTurnAndPhase(Phase.ActionPhase, ActionPhase.Expand),
 			};

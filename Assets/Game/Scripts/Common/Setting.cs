@@ -27,7 +27,7 @@ namespace Common
 		// public bool SavePassword { get => _environment != Environment.Prod; }
 		public bool SavePassword { get => true; }
 
-		private static string _devDomain = "192.168.169.108:9000";
+		private static string _devDomain = "192.168.233.108:9000";
 		private static string _prodDomain = "52.62.163.1:8000";
 		public string Domain
 		{
